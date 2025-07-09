@@ -5,9 +5,13 @@ import checkingIndicator from "../../assets/car-status-icons/checking-indicator.
 import notWorkingIndicator from "../../assets/car-status-icons/not-working-indicator.png";
 import styles from "./Home.module.css";
 
+import SimpleLineChart from "@/Components/chart";
+import MapTest from "@/Components/map";
+
 
 function Home() {
-    const percentage = 80;
+    const percentage = 30;
+
     return (
         <main>
             <div className="flex">
@@ -57,18 +61,25 @@ function Home() {
                     </div>
                 </div>
             </div>
-            <div>
-                <div className={`${styles["icon"]} flex items-center border rounded-xl p-[23px] h-fit`}>
-                    <img className="w-10 h-10 mr-2" src={working} alt="운행 차량 아이콘" />
-                    <div>
+            <div className="flex">
+                <div className="flex flex-col">
+                    <div className={`${styles["icon"]} flex items-center border rounded-xl p-[23px] max-h-[90px] min-w-[230px]`}>
+                        <img className="w-10 h-10 mr-2" src={working} alt="운행 차량 아이콘" />
                         <div>
-                            <span className="text-xl font-bold mr-2">49%</span>
-                            <span className="text-xs opacity-60">운행 중 차량 </span>
+                            <div>
+                                <span className="text-xl font-bold mr-2">{100 - percentage}%</span>
+                                <span className="text-xs opacity-60">운행 중 차량 (999)</span>
+                            </div>
+                            <div className="w-40 h-2 mt-2 bg-gray-200 rounded-full overflow-hidden">
+                                <div className="h-full bg-blue-500" style={{ width: `${100 - percentage}%` }} />
+                            </div>
                         </div>
-                        {/* <div>progress bar</div> */}
                     </div>
+                    <SimpleLineChart />
                 </div>
+                <div className="bg-teal-500 w-[400px] h-[400px]" id="map"></div>
             </div>
+            <MapTest />
         </main>
     );
 }
