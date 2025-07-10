@@ -1,12 +1,13 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
 const { kakao } = window;
 
-interface MapTestProps {
-  flexSize: number;
+type MapTestProps = {
+  flexSize?: number;
+  level?: number;
 }
 
-const MapTest: React.FC<MapTestProps> = ({ flexSize }) => {
+const MapTest: React.FC<MapTestProps> = ({ flexSize, level=13 }) => {
   
     const mapRef = useRef<kakao.maps.Map | null>(null);
 
@@ -15,7 +16,7 @@ const MapTest: React.FC<MapTestProps> = ({ flexSize }) => {
     const container = document.getElementById('map')!;
     const options = {
       center: new kakao.maps.LatLng(36.566535, 127.9709692),
-      level: 13
+      level: level
     };
     mapRef.current = new kakao.maps.Map(container, options);
   }, []);

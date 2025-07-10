@@ -8,7 +8,7 @@ import styles from "./CarList.module.css";
 
 function CarList() {
     return (
-        <section className={`${styles["car-list"]} border min-w-[200px] h-[347px] flex flex-col rounded-xl`}>
+        <section className={`${styles["car-list"]} border min-w-[200px] h-[347px] flex flex-col rounded-xl bg-white`}>
             <h3 className="flex items-center p-2 font-bold text-xl">
                 <img src={truck} alt="트럭 아이콘" className="mr-2" />
                 <span>차량 리스트</span>

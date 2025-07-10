@@ -3,7 +3,7 @@ import Navbar from "./Components/Navbar.tsx";
 import Home from "./Pages/Home/Home.tsx";
 import Management from "./Pages/Management/Management.tsx";
 import DrivingLog from "./Pages/DrivingLog.tsx";
-import LocationSearch from "./Pages/LocationSearch.tsx";
+import LocationSearch from "./Pages/LocationSearch/LocationSearch.tsx";
 
 function App() {
   return (
