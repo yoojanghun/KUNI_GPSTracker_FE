@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button } from "@/Components/ui/button"
+import { Button } from "@/Components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -9,27 +9,28 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/Components/ui/dialog"
-import { Input } from "@/Components/ui/input"
-import { Label } from "@/Components/ui/label"
-import { Plus } from "lucide-react"
+} from "@/Components/ui/dialog";
+import { Input } from "@/Components/ui/input";
+import { Label } from "@/Components/ui/label";
+import { Plus } from "lucide-react";
 
-export function AddCarButton({ text="차량 등록" } : {text?: String | null}) {
-  const [openFirst, setOpenFirst] = useState(false);
-  const [openSecond, setOpenSecond] = useState(false);
+export function AddCarButton() {
+  const [inputDialog, setInputDialog] = useState(false);
+  const [checkDialog, setCheckDialog] = useState(false);
   const [carNum, setCarNum] = useState("");
   const [modelName, setModelName] = useState("");
 
   return (
     <>
-      <Dialog open={openFirst} onOpenChange={setOpenFirst}>
+      <Dialog open={inputDialog} onOpenChange={setInputDialog}>
         <form>
           <DialogTrigger asChild>
             <Button
               className="bg-[#8D99FF] gap-3 hover:bg-[#8D99FF]/80"
-              onClick={() => setOpenFirst(true)}
+              onClick={() => {}}
             >
-              <Plus strokeWidth={3} size={20}/>{text}
+              <Plus strokeWidth={3} size={20} />
+              차량 등록
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
@@ -42,11 +43,11 @@ export function AddCarButton({ text="차량 등록" } : {text?: String | null}) 
             <div className="grid gap-4">
               <div className="grid gap-3">
                 <Label htmlFor="carNum">차량 번호</Label>
-                <Input 
-                  id="carNum" 
-                  name="carNum" 
-                  placeholder="예: 34나3434" 
-                  className="placeholder:text-[#ACACAC]" 
+                <Input
+                  id="carNum"
+                  name="carNum"
+                  placeholder="예: 34나3434"
+                  className="placeholder:text-[#ACACAC]"
                   value={carNum}
                   onChange={(e) => setCarNum(e.target.value)}
                 />
@@ -54,31 +55,32 @@ export function AddCarButton({ text="차량 등록" } : {text?: String | null}) 
               <div className="grid gap-3">
                 <Label htmlFor="modelName">차량명</Label>
                 <Input
-                 id="modelName" 
-                 name="modelName" 
-                 placeholder="예: Genesis GV80" 
-                 className="placeholder:text-[#ACACAC]"
-                 value={modelName}
-                 onChange={(e) => setModelName(e.target.value)}
-                 />
+                  id="modelName"
+                  name="modelName"
+                  placeholder="예: Genesis GV80"
+                  className="placeholder:text-[#ACACAC]"
+                  value={modelName}
+                  onChange={(e) => setModelName(e.target.value)}
+                />
               </div>
             </div>
             <DialogFooter>
-              <Button
-                type="button"
-                className="bg-[#8D99FF] gap-3 hover:bg-[#8D99FF]/80"
-                onClick={() => {
-                  setOpenFirst(false);
-                  setOpenSecond(true);
-                }}
-              >
-                입력 완료
-              </Button>
+              <DialogClose>
+                <Button
+                  type="button"
+                  className="bg-[#8D99FF] gap-3 hover:bg-[#8D99FF]/80"
+                  onClick={() => {
+                    setCheckDialog(true);
+                  }}
+                >
+                  입력 완료
+                </Button>
+              </DialogClose>
             </DialogFooter>
           </DialogContent>
         </form>
       </Dialog>
-      <Dialog open={openSecond} onOpenChange={setOpenSecond}>
+      <Dialog open={checkDialog} onOpenChange={setCheckDialog}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>차량 정보를 확인해 주세요</DialogTitle>
@@ -90,26 +92,29 @@ export function AddCarButton({ text="차량 등록" } : {text?: String | null}) 
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button
-              type="button"
-              className="bg-[#8D99FF] gap-3 hover:bg-[#8D99FF]/80"
-              onClick={() => {
-                setOpenSecond(false);
-                setOpenFirst(true);
-              }}
-            >
-              다시 입력
-            </Button>
-            <DialogClose>
+            <DialogClose asChild>
               <Button
-               type="submit" 
-               className="bg-[#8D99FF] gap-3 hover:bg-[#8D99FF]/80"
-               onClick={()=>{}}>등록</Button>
+                variant={"outline"}
+                type="button"
+                onClick={() => {
+                  setInputDialog(true);
+                }}
+              >
+                다시 입력
+              </Button>
             </DialogClose>
-            
+            <DialogClose asChild>
+              <Button
+                type="submit"
+                className="bg-[#8D99FF] gap-3 hover:bg-[#8D99FF]/80"
+                onClick={() => {}}
+              >
+                등록
+              </Button>
+            </DialogClose>
           </DialogFooter>
         </DialogContent>
       </Dialog>
     </>
-  )
+  );
 }
