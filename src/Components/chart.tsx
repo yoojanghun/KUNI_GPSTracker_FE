@@ -20,7 +20,7 @@ const data = [
 
 export default function SimpleLineChart() {
     return (
-    <div style={{ width: "100%", height: 300 }}>
+    <div style={{ height: "100%" }}>
         <ResponsiveContainer>
             <LineChart data={data}>
             <CartesianGrid strokeDasharray="3 3" />

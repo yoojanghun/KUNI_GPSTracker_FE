@@ -13,9 +13,9 @@ function Home() {
     const percentage = 30;
 
     return (
-        <main>
-            <div className="flex">
-                <div className={`${styles["icon"]} flex items-center border rounded-xl p-[23px] min-w-[202px] max-h-[90px]`}>
+        <main className="flex-1 box-border p-5">
+            <div className="flex gap-3 mb-5">
+                <div className={`${styles["icon"]} flex flex-1 justify-center items-center border rounded-xl p-[23px] min-w-[202px] max-h-[90px]`}>
                     <img className="w-10 h-10 mr-2" src={total} alt="전체 차량 아이콘" />
                     <div>
                         <div>
@@ -26,7 +26,7 @@ function Home() {
                     </div>
                 </div>
 
-                <div className={`${styles["icon"]} flex items-center border rounded-xl p-[23px] max-h-[90px]`}>
+                <div className={`${styles["icon"]} flex flex-2 justify-center items-center border rounded-xl p-[23px] max-h-[90px]`}>
                     <div className="flex items-center min-w-[230px]">
                         <img className="w-10 h-10 mr-2" src={notWorking} alt="미운행 차량 아이콘"/>
                         <div>
@@ -61,9 +61,9 @@ function Home() {
                     </div>
                 </div>
             </div>
-            <div className="flex">
-                <div className="flex flex-col">
-                    <div className={`${styles["icon"]} flex items-center border rounded-xl p-[23px] max-h-[90px] min-w-[230px]`}>
+            <div className="flex gap-4 h-[80%]">
+                <div className="flex flex-col flex-2 gap-5">
+                    <div className={`${styles["icon"]} flex justify-center items-center border rounded-xl p-[23px] max-h-[90px]`}>
                         <img className="w-10 h-10 mr-2" src={working} alt="운행 차량 아이콘" />
                         <div>
                             <div>
@@ -77,9 +77,8 @@ function Home() {
                     </div>
                     <SimpleLineChart />
                 </div>
-                <div className="bg-teal-500 w-[400px] h-[400px]" id="map"></div>
+                <MapTest flexSize={3} />
             </div>
-            <MapTest />
         </main>
     );
 }
