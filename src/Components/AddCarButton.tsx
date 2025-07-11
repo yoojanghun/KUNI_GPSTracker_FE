@@ -13,12 +13,14 @@ import {
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
 import { Plus } from "lucide-react";
+import { useCarStore } from "../Store/carStore";
 
 export function AddCarButton() {
   const [inputDialog, setInputDialog] = useState(false);
   const [checkDialog, setCheckDialog] = useState(false);
   const [carNum, setCarNum] = useState("");
   const [modelName, setModelName] = useState("");
+  const addCar = useCarStore((state) => state.addCar);
 
   return (
     <>
@@ -107,7 +109,18 @@ export function AddCarButton() {
               <Button
                 type="submit"
                 className="bg-[#8D99FF] gap-3 hover:bg-[#8D99FF]/80"
-                onClick={() => {}}
+                onClick={() => {
+                  addCar({
+                    number: carNum,
+                    name: modelName,
+                    mileage: "0km",
+                    status: "미운행",
+                  });
+                  setCarNum("");
+                  setModelName("");
+                  setInputDialog(false);
+                  setCheckDialog(false);
+                }}
               >
                 등록
               </Button>
