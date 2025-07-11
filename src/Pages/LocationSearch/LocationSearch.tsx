@@ -13,7 +13,7 @@ function LocationSearch() {
     return (
         <main className="flex-1 box-border relative">
             <MapTest level={13}/>
-            <Draggable nodeRef={nodeRef} bounds="parent">
+            <Draggable nodeRef={nodeRef} bounds="parent" cancel="label">
                 <div ref={nodeRef} className="absolute top-4 left-4 z-20 w-[200px] cursor-grab">
                     <CarList />
                 </div>
