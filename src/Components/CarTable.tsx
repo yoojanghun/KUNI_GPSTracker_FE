@@ -26,7 +26,9 @@ export function CarTable() {
   const isAllSelected = visibleCars.every((car) => selectedCars.has(car.number));
 
   return (
-    <div ref={tableRef}>
+    <div ref={tableRef} 
+    className="h-[470px] w-full flex flex-col gap-4 p-1"
+    >
     <Table>
       <TableHeader>
         <TableRow>
@@ -56,14 +58,16 @@ export function CarTable() {
         ))}
       </TableBody>
       <TableFooter>
+        
       </TableFooter>
     </Table>
-    <TablePagination
+      <TablePagination
       tableRef={tableRef}
       total={Math.ceil(cars.length / itemsPerPage)}
       current={currentPage}
       setCurrent={setCurrentPage}
     />
+    
     </div>
   );
 }
