@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { currentCarList } from "@/Components/currentCarList";
+import { currentCarList } from "@/Api/currentCarList";
 
 interface Car {
   number: string;   // 차량 번호

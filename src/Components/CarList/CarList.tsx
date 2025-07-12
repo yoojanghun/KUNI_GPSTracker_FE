@@ -1,7 +1,7 @@
 import truck from "../../assets/car-list-icons/truck.png";
 import searchGlass from "../../assets/car-list-icons/Search.png";
 import styles from "./CarList.module.css";
-import { currentCarList } from "../currentCarList.tsx";
+import { currentCarList } from "../../Api/currentCarList.tsx";
 import { useState, type ChangeEvent } from "react";
 
 type Car = {
