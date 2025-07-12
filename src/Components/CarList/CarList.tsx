@@ -47,27 +47,27 @@ function CarList() {
                 <table>
                     <tr>
                         <th className={styles["th"]}>운전자</th>
-                        <td className={styles["td"]}>홍길동</td>
+                        <td className={styles["td"]}>데이터없음</td>
                     </tr>
                     <tr>
-                        <th className={styles["th"]}>12가 1234</th>
-                        <td className={styles["td"]}>차량번호</td>
+                        <th className={styles["th"]}>차량번호</th>
+                        <td className={styles["td"]}>{selectedCar.number}</td>
                     </tr>
                     <tr>
                         <th className={styles["th"]}>차량명</th>
-                        <td className={styles["td"]}>Avante</td>
+                        <td className={styles["td"]}>{selectedCar.name}</td>
                     </tr>
                     <tr>
                         <th className={styles["th"]}>운행일자</th>
-                        <td className={styles["td"]}>2025-07-07</td>
+                        <td className={styles["td"]}>데이터 없음</td>
                     </tr>
                     <tr>
                         <th className={styles["th"]}>운행시간</th>
-                        <td className={styles["td"]}>1시간 2분</td>
+                        <td className={styles["td"]}>데이터 없음</td>
                     </tr>
                     <tr>
                         <th className={styles["th"]}>운행 거리</th>
-                        <td className={styles["td"]}>50,123km</td>
+                        <td className={styles["td"]}>{selectedCar.mileage}</td>
                     </tr>
                 </table>
             </section>
