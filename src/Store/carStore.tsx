@@ -4,7 +4,7 @@ import { currentCarList } from "@/Api/currentCarList";
 interface Car {
   number: string;   // 차량 번호
   name: string;     // 차량명
-  mileage: string;  // 주행거리 (ex: "0km")
+  mileage: number;  // 주행거리 (ex: "0km")
   status: string;   // 상태 (ex: "미운행", "운행중")
 }
 
