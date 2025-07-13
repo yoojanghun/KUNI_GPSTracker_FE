@@ -1,6 +1,6 @@
 import { CarTable } from "@/Components/ManageComponents/CarTable";
 
-export function CarTableSection() {
+export function ManageTable() {
     return (
         <div>
             <CarTable/>
