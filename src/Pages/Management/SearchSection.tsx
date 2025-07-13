@@ -1,8 +1,8 @@
-import { SearchButton } from "@/Components/SearchButton";
-import { DeleteButton } from "@/Components/DeleteButton";
-import { StatusSelect } from "@/Components/StatusSelection";
-import { SearchInput } from "@/Components/SearchInput";
-import { AddCarButton } from "@/Components/AddCarButton";
+import { SearchButton } from "@/Components/ManageComponents/SearchButton";
+import { DeleteButton } from "@/Components/ManageComponents/DeleteButton";
+import { StatusSelect } from "@/Components/ManageComponents/StatusSelection";
+import { SearchInput } from "@/Components/ManageComponents/SearchInput";
+import { AddCarButton } from "@/Components/ManageComponents/AddCarButton";
 
 export function SearchSection() {
   return (

@@ -13,7 +13,7 @@ import {
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
 import { CircleCheck, Plus } from "lucide-react";
-import { useCarStore } from "../Store/carStore";
+import { useCarStore } from "../../Store/carStore";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 

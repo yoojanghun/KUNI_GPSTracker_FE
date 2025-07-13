@@ -7,7 +7,7 @@ import {
 } from "@/Components/ui/dialog";
 import { Button } from "@/Components/ui/button";
 import { CircleAlert, FileX2, Trash } from "lucide-react";
-import { useCarStore } from "../Store/carStore";
+import { useCarStore } from "../../Store/carStore";
 import { toast } from "sonner";
 
 import { useState } from "react";

@@ -1,6 +1,6 @@
 import { Button } from "@/Components/ui/button";
 import { Search } from "lucide-react";
-import { useCarStore } from "../Store/carStore";
+import { useCarStore } from "../../Store/carStore";
 
 export function SearchButton() {
   const applyFilter = useCarStore((state) => state.applyFilter);
