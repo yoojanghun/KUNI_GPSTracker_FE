@@ -12,6 +12,7 @@ import { TablePagination } from "./TablePagination";
 import { useRef, useState } from "react";
 import { useCarStore } from "../Store/carStore";
 import { ArrowDownUp } from "lucide-react";
+import { StatusBadge } from "./StatusBadge";
 
 export function CarTable() {
   const tableRef = useRef<HTMLDivElement>(null); // 테이블의 너비값을 전달하기 위한 wrapper
@@ -99,7 +100,7 @@ export function CarTable() {
             <TableCell className="font-medium">{car.number}</TableCell>
             <TableCell>{car.name}</TableCell>
             <TableCell>{car.mileage.toLocaleString()} km</TableCell>
-            <TableCell>{car.status}</TableCell>
+            <TableCell><StatusBadge status={car.status} /></TableCell>
             <TableCell className="text-right">
               <Checkbox
                 checked={selectedCars.has(car.number)}

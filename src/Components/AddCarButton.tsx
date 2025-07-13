@@ -12,9 +12,10 @@ import {
 } from "@/Components/ui/dialog";
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
-import { Plus } from "lucide-react";
+import { CircleCheck, Plus } from "lucide-react";
 import { useCarStore } from "../Store/carStore";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 export function AddCarButton() {
   const [inputDialog, setInputDialog] = useState(false);
@@ -153,13 +154,21 @@ export function AddCarButton() {
                   addCar({
                     number: carNum,
                     name: modelName,
-                    mileage: "0km",
+                    mileage: 0,
                     status: "미운행",
                   });
-                  setCarNum("");
-                  setModelName("");
                   setInputDialog(false);
                   setCheckDialog(false);
+                  setAttemptedSubmit(false);
+                  toast(
+                    <span>
+                      <strong>{carNum}</strong> 차량이 등록되었습니다.
+                    </span>,{
+                      icon: <CircleCheck />
+                    }
+                  )
+                  setCarNum("");
+                  setModelName("");
                 }}
               >
                 등록

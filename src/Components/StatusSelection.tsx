@@ -28,7 +28,7 @@ export function StatusSelect() {
           <SelectGroup>
             <SelectItem value="운행중">운행중</SelectItem>
             <SelectItem value="미운행">미운행</SelectItem>
-            <SelectItem value="점검중">점검중</SelectItem>
+            <SelectItem value="수리중">수리중</SelectItem>
           </SelectGroup>
         </SelectContent>
       </Select>
