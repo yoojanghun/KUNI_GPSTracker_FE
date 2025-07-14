@@ -7,7 +7,7 @@ import { useState, type ChangeEvent } from "react";
 type Car = {
     number: string;
     name: string;
-    mileage: string;
+    mileage: number;
     status: string;     // 운행중, 미운행, 수리중
 }
 
