@@ -14,21 +14,22 @@ type Position = {
 };
 
 type MapTestProps = {
-  flexSize?: number;
   level?: number;
+  carStatus: string;
 }
 
-const MapTest: React.FC<MapTestProps> = ({ flexSize, level = 13 }) => {
+const MapTest: React.FC<MapTestProps> = ({ level = 13, carStatus }) => {
   const [positions, setPositions] = useState<Position[]>([]);
 
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<kakao.maps.Map | null>(null);
 
+  const totalClustererRef      = useRef<kakao.maps.MarkerClusterer | null>(null);
   const runningClustererRef    = useRef<kakao.maps.MarkerClusterer | null>(null);
   const notRunningClustererRef = useRef<kakao.maps.MarkerClusterer | null>(null);
   const inspectedClustererRef  = useRef<kakao.maps.MarkerClusterer | null>(null);
 
-  const polylinesRef = useRef<kakao.maps.Polyline[]>([]);
+  // const polylinesRef = useRef<kakao.maps.Polyline[]>([]);
 
   // 차량의 현재 위치 (예시 데이터)
   useEffect(() => {
@@ -230,11 +231,29 @@ const MapTest: React.FC<MapTestProps> = ({ flexSize, level = 13 }) => {
       level: level,
     });
 
+    //
+    totalClustererRef.current = new kakao.maps.MarkerClusterer({
+      map: mapInstance.current,
+      averageCenter: true,
+      minLevel: 6,
+        styles: [{
+                  width : '50px', 
+                  height : '50px',
+                  backgroundColor: 'green',
+                  borderRadius: '50%',
+                  opacity: '0.7',
+                  color: '#FFFFFF',
+                  textAlign: 'center',
+                  fontWeight: 'bold',
+                  lineHeight: '31px'
+            }]
+        })
+
     // 운행중 차량 클러스터러 생성
     runningClustererRef.current = new kakao.maps.MarkerClusterer({
       map: mapInstance.current,
       averageCenter: true,
-      minLevel: 8,
+      minLevel: 6,
       styles: [{
                 width : '50px', 
                 height : '50px',
@@ -252,7 +271,7 @@ const MapTest: React.FC<MapTestProps> = ({ flexSize, level = 13 }) => {
     notRunningClustererRef.current = new kakao.maps.MarkerClusterer({
       map: mapInstance.current,
       averageCenter: true,
-      minLevel: 8,
+      minLevel: 6,
       styles: [{
                 width : '50px', 
                 height : '50px',
@@ -270,7 +289,7 @@ const MapTest: React.FC<MapTestProps> = ({ flexSize, level = 13 }) => {
     inspectedClustererRef.current = new kakao.maps.MarkerClusterer({
       map: mapInstance.current,
       averageCenter: true,
-      minLevel: 8,
+      minLevel: 6,
       styles: [{
                 width : '50px', 
                 height : '50px',
@@ -307,14 +326,15 @@ const MapTest: React.FC<MapTestProps> = ({ flexSize, level = 13 }) => {
     if (!mapInstance.current) return;
     const kakao = (window as any).kakao;
 
-      // 이전 마커 클리어
+    // 이전 마커 클리어
+    totalClustererRef.current?.clear();
     runningClustererRef.current?.clear();
     notRunningClustererRef.current?.clear();
     inspectedClustererRef.current?.clear();
 
     // 이전 폴리라인 제거
-    polylinesRef.current.forEach(polyline => polyline.setMap(null));
-    polylinesRef.current = [];
+    // polylinesRef.current.forEach(polyline => polyline.setMap(null));
+    // polylinesRef.current = [];
 
     const createMarkers = (status: string, imageUrl: string) =>
       positions
@@ -325,46 +345,58 @@ const MapTest: React.FC<MapTestProps> = ({ flexSize, level = 13 }) => {
             position: new kakao.maps.LatLng(lastPoint.lat, lastPoint.lng),
             image: new kakao.maps.MarkerImage(
               imageUrl,
-              new kakao.maps.Size(40, 40),
+              new kakao.maps.Size(30, 30),
               { offset: new kakao.maps.Point(20, 40) }
             )
           });
     });
 
-    runningClustererRef.current?.addMarkers(createMarkers('운행중', '/running.png'));
-    notRunningClustererRef.current?.addMarkers(createMarkers('미운행', '/not-running.png'));
-    inspectedClustererRef.current?.addMarkers(createMarkers('점검중', '/inspected.png'));
+    if (carStatus === "전체") {
+      const allMarkers = positions.map(p => {
+        const lastPoint = p.path[p.path.length - 1];
+        return new kakao.maps.Marker({
+          position: new kakao.maps.LatLng(lastPoint.lat, lastPoint.lng),
+          image: new kakao.maps.MarkerImage(
+            "/vite.svg",
+            new kakao.maps.Size(30, 30),
+            { offset: new kakao.maps.Point(20, 40) }
+          )
+        });
+      });
+      totalClustererRef.current?.addMarkers(allMarkers);
+    }
+    else if (carStatus === "운행중") {
+      runningClustererRef.current?.addMarkers(createMarkers('운행중', '/car.png'));
+    }
+    else if (carStatus === "미운행") {
+      notRunningClustererRef.current?.addMarkers(createMarkers('미운행', '/car.png'));
+    }
+    else {
+      inspectedClustererRef.current?.addMarkers(createMarkers('점검중', '/car.png'));
+    }
 
     // 차량별 경로 폴리라인 생성
-    positions.forEach(vehicle => {
-      const linePath = vehicle.path.map(point =>
-        new kakao.maps.LatLng(point.lat, point.lng)
-      );
+    // positions.forEach(vehicle => {
+    //   const linePath = vehicle.path.map(point =>
+    //     new kakao.maps.LatLng(point.lat, point.lng)
+    //   );
 
-      const polyline = new kakao.maps.Polyline({
-        path: linePath,
-        strokeWeight: 4,
-        strokeColor: "#3399FF",
-        strokeOpacity: 0.8,
-        strokeStyle: "solid",
-      });
+    //   const polyline = new kakao.maps.Polyline({
+    //     path: linePath,
+    //     strokeWeight: 8,
+    //     strokeColor: "red",
+    //     strokeOpacity: 0.8,
+    //     strokeStyle: "solid",
+    //   });
 
-      polyline.setMap(mapInstance.current);
-      polylinesRef.current.push(polyline);
-    });
-  }, [positions]);
+    //   polyline.setMap(mapInstance.current);
+    //   polylinesRef.current.push(polyline);
+    // });
+  }, [carStatus, positions]);
 
 
   return (
-    <div
-      ref={mapContainerRef}
-      style={{
-        flex: flexSize,
-        width: '100%',   
-        height: '100%', 
-        minWidth: 0,     
-      }}
-    />
+    <div ref={mapContainerRef} style={{ width: '100%', height: '100%', minWidth: 0}}/>
   );
 };
 
