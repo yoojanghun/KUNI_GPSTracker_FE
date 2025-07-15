@@ -71,7 +71,7 @@ const MapTest: React.FC<MapTestProps> = ({ level = 13, carStatus }) => {
               ] 
       },
       { number: "14라3098", 
-        status: "점검중", 
+        status: "수리중", 
         path: [
                 { lat: 37.5700, lng: 126.9800, time: 1710518400000 },
                 { lat: 37.5705, lng: 126.9804, time: 1710518460000 },
@@ -83,7 +83,7 @@ const MapTest: React.FC<MapTestProps> = ({ level = 13, carStatus }) => {
               ] 
       },
       { number: "25차9269", 
-        status: "점검중", 
+        status: "수리중", 
         path: [
                 { lat: 37.5720, lng: 126.9820, time: 1710518400000 },
                 { lat: 37.5723, lng: 126.9825, time: 1710518460000 },
@@ -132,7 +132,7 @@ const MapTest: React.FC<MapTestProps> = ({ level = 13, carStatus }) => {
               ] 
       },
       { number: "76자7220", 
-        status: "점검중", 
+        status: "수리중", 
         path: [
                 { lat: 37.5551, lng: 126.9292, time: 1710518400000 },
                 { lat: 37.5551, lng: 126.9287, time: 1710518460000 },
@@ -157,7 +157,7 @@ const MapTest: React.FC<MapTestProps> = ({ level = 13, carStatus }) => {
       },
 
       { number: "71라0899", 
-        status: "점검중", 
+        status: "수리중", 
         path: [
                 { lat: 37.5611, lng: 126.9831, time: 1710518400000 },
                 { lat: 37.5616, lng: 126.9836, time: 1710518460000 },
@@ -193,7 +193,7 @@ const MapTest: React.FC<MapTestProps> = ({ level = 13, carStatus }) => {
               ] 
       },
       { number: "63라2469", 
-        status: "점검중", 
+        status: "수리중", 
         path: [
                 { lat: 35.1023, lng: 129.0261, time: 1710518400000 },
                 { lat: 35.1027, lng: 129.0265, time: 1710518460000 },
@@ -285,7 +285,7 @@ const MapTest: React.FC<MapTestProps> = ({ level = 13, carStatus }) => {
             }]
     });
 
-    // 점검중 차량 클러스터러 생성
+    // 수리중 차량 클러스터러 생성
     inspectedClustererRef.current = new kakao.maps.MarkerClusterer({
       map: mapInstance.current,
       averageCenter: true,
@@ -366,13 +366,13 @@ const MapTest: React.FC<MapTestProps> = ({ level = 13, carStatus }) => {
       totalClustererRef.current?.addMarkers(allMarkers);
     }
     else if (carStatus === "운행중") {
-      runningClustererRef.current?.addMarkers(createMarkers('운행중', '/car.png'));
+      runningClustererRef.current?.addMarkers(createMarkers('운행중', '/vite.svg'));
     }
     else if (carStatus === "미운행") {
-      notRunningClustererRef.current?.addMarkers(createMarkers('미운행', '/car.png'));
+      notRunningClustererRef.current?.addMarkers(createMarkers('미운행', '/vite.svg'));
     }
     else {
-      inspectedClustererRef.current?.addMarkers(createMarkers('점검중', '/car.png'));
+      inspectedClustererRef.current?.addMarkers(createMarkers('수리중', '/vite.svg'));
     }
 
     // 차량별 경로 폴리라인 생성

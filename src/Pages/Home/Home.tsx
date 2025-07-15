@@ -14,7 +14,7 @@ import { useState, type ChangeEvent } from "react";
 
 function Home() {
     const percentage = 30;
-    const [carStatusBtn, setCarStatusBtn] = useState("전체");
+    const [carStatusBtn, setCarStatusBtn] = useState<string>("전체");
 
     function handleCarStatusBtn(e: ChangeEvent<HTMLInputElement>) {
         setCarStatusBtn(e.target.value);
@@ -89,27 +89,27 @@ function Home() {
                 </div>
                 <div className={`${styles["icon"]} flex-3 border box-border p-4 pt-2 h-[100%] rounded-3xl`}>
                     <div className="w-[100%] h-[9%] flex items-center justify-between">
-                        <div className="flex items-center">
+                        <div className="flex items-center w-[25%]">
                             <img src={location} className="w-7 h-7 mr-2"/>
                             <span className="font-bold text-xl">차량 현황</span>
                         </div>
-                        <div className="flex justify-around w-[70%]">
-                            <label className="flex items-center font-bold">
+                        <div className="flex justify-around w-[75%]">
+                            <label className="flex items-center font-bold mr-1">
                                 <input type="checkbox" value="전체"
                                        onChange={handleCarStatusBtn}
                                        checked={carStatusBtn === "전체"} 
                                        className="w-4 h-4 mr-1"/>
                                 전체
                             </label>
-                            <label className="flex items-center font-bold">
-                                <input type="checkbox" value="점검중"
+                            <label className="flex items-center font-bold mr-1">
+                                <input type="checkbox" value="수리중"
                                        onChange={handleCarStatusBtn}
-                                       checked={carStatusBtn === "점검중"}
+                                       checked={carStatusBtn === "수리중"}
                                        className="w-4 h-4 mr-1"/>
                                 <img src={checkingIndicator} className="mr-1 w-6" />
                                 점검중
                             </label>
-                            <label className="flex items-center font-bold">
+                            <label className="flex items-center font-bold mr-1">
                                 <input type="checkbox" value="미운행" 
                                        onChange={handleCarStatusBtn}
                                        checked={carStatusBtn === "미운행"}
@@ -117,7 +117,7 @@ function Home() {
                                 <img src={notWorkingIndicator} className="mr-1 w-6" />
                                 미운행
                             </label>
-                            <label className="flex items-center font-bold">
+                            <label className="flex items-center font-bold mr-1">
                                 <input type="checkbox" value="운행중" 
                                        onChange={handleCarStatusBtn}
                                        checked={carStatusBtn === "운행중"}
