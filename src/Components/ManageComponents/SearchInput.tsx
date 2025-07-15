@@ -1,5 +1,5 @@
 import { Input } from "@/Components/ui/input";
-import { useCarStore } from "../Store/carStore";
+import { useCarStore } from "../../Store/carStore";
 
 export function SearchInput() {
   const filter = useCarStore((state) => state.filter);

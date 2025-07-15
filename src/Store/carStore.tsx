@@ -9,11 +9,13 @@ interface Car {
 }
 
 interface CarStore {
+  // 속성
   cars: Car[];                         // 전체 차량 리스트
   filteredCars: Car[];                // 필터링된 차량 리스트
   selected: Set<string>;              // 선택된 차량 번호들
   filter: { carNumber: string; status: string };  // 검색 필터
 
+  // 함수
   setFilter: (filter: { carNumber: string; status: string }) => void;
   applyFilter: () => void;
   addCar: (car: Car) => void;

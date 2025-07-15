@@ -7,12 +7,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/Components/ui/table"
-import { Checkbox } from "./ui/checkbox";
-import { TablePagination } from "./TablePagination";
+import { Checkbox } from "../ui/checkbox";
+import { TablePagination } from "../TablePagination";
 import { useRef, useState } from "react";
-import { useCarStore } from "../Store/carStore";
+import { useCarStore } from "../../Store/carStore";
 import { ArrowDownUp } from "lucide-react";
-import { StatusBadge } from "./StatusBadge";
+import { StatusBadge } from "../StatusBadge";
 
 export function CarTable() {
   const tableRef = useRef<HTMLDivElement>(null); // 테이블의 너비값을 전달하기 위한 wrapper
