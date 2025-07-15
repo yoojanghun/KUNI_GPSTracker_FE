@@ -43,6 +43,7 @@ export function LogTable() {
     currentPage * itemsPerPage
   );
 
+
   return (
     <div ref={tableRef} className="h-[470px] w-full flex flex-col gap-4 p-1">
       <Table className="table-fixed w-full">

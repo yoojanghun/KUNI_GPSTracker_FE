@@ -10,6 +10,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/Components/ui/dialog";
+
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
 import { CircleCheck, Plus } from "lucide-react";
@@ -25,6 +26,7 @@ export function AddCarButton() {
   const [attemptedSubmit, setAttemptedSubmit] = useState(false);
   const addCar = useCarStore((state) => state.addCar);
 
+  // TODO: react-hook-form 도입 고려 (리펙토링 시)
   // 입력값 유효성 검사
   const isCarNumValid = () => {
     return carNum.trim() !== ""; // && ;
