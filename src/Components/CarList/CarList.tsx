@@ -11,10 +11,19 @@ type Car = {
     status: string;     // 운행중, 미운행, 수리중
 }
 
-function CarList() {
+type carStatusBtnProp = {
+    carStatusBtn: string;
+    setCarStatusBtn: (value: string) => void;
+}
+
+function CarList({ carStatusBtn, setCarStatusBtn }: carStatusBtnProp) {
 
     const [inputVal, setInputVal] = useState<string>("");
     const [selectedCar, setSelectedCar] = useState<Car | null>(null);
+
+    function handleCarStatusBtn(e: ChangeEvent<HTMLSelectElement>) {
+        setCarStatusBtn(e.target.value);
+    }
 
     const carStatusClass: Record<string, string> = {
         "운행중": "bg-[#c1d8ff] text-[#5491f5]",
@@ -30,13 +39,15 @@ function CarList() {
         setInputVal("");
     }
 
-    const filteredCarList = inputVal === "" ? currentCarList : currentCarList.filter((car) => {
-        if(inputVal.trim() === "") {
-            return false
-        }
+    const filteredCarList = currentCarList.filter((car) => {
+        const keyword = inputVal.trim().toLowerCase();
 
-        const keyword = inputVal.toLowerCase();
-        return car["name"].toLowerCase().includes(keyword) || car["number"].toLowerCase().includes(keyword);
+        const matchesKeyWord = car["name"].trim().toLowerCase().includes(keyword) || 
+                               car["number"].trim().toLowerCase().includes(keyword);
+                               
+        const matchesStatus = car["status"] === carStatusBtn || carStatusBtn === "전체";
+
+        return matchesKeyWord && matchesStatus;
     })
 
     if(selectedCar) {
@@ -76,9 +87,17 @@ function CarList() {
     
     return (
         <section className={`${styles["car-list"]} border w-[300px] h-[400px] flex flex-col rounded-xl bg-white box-border p-3`}>
-            <h3 className="flex items-center font-bold text-xl mb-2">
-                <img src={truck} alt="트럭 아이콘" className="mr-2" />
-                <span>차량 리스트</span>
+            <h3 className="flex justify-between items-center font-bold text-xl mb-2 pr-1">
+                <div className="flex items-center">
+                    <img src={truck} alt="트럭 아이콘" className="mr-2" />
+                    <span>차량 리스트</span>
+                </div>
+                <select onChange={handleCarStatusBtn} className="border-2 px-1">
+                    <option value="전체">전체</option>
+                    <option value="운행중">운행중</option>
+                    <option value="미운행">미운행</option>
+                    <option value="수리중">수리중</option>
+                </select>
             </h3>
             <form action="#" onSubmit={e => e.preventDefault()} className="mb-2">
                 <label className={`${styles["car-list__input"]} flex items-center border-none rounded px-2 py-1`}>

@@ -1,10 +1,12 @@
-import { useRef } from 'react';
+import { useState, useRef } from 'react';
 import Draggable from 'react-draggable';
 import CarList from "../../Components/CarList/CarList.tsx";
 import MapTest from "@/Components/map.tsx";
 
 
 function LocationSearch() {
+    const [carStatusBtn, setCarStatusBtn] = useState<string>("전체");
+    
     const nodeRef = useRef<HTMLDivElement>(null);
     // nodeRef엔 current속성값이 div의 DOM인 객체가 들어옴
     // nodeRef는 Draggable을 사용할 때 어떤 엘리먼트를 드래그할 지 알려주는 것 
@@ -12,10 +14,10 @@ function LocationSearch() {
     
     return (
         <main className="flex-1 box-border relative">
-            <MapTest level={13}/>
+            <MapTest carStatus={carStatusBtn} level={13}/>
             <Draggable nodeRef={nodeRef} bounds="parent" cancel="label">
                 <div ref={nodeRef} className="absolute top-4 left-4 z-20 w-[200px] cursor-grab">
-                    <CarList />
+                    <CarList carStatusBtn={carStatusBtn} setCarStatusBtn={setCarStatusBtn}/>
                 </div>
             </Draggable>
         </main>
