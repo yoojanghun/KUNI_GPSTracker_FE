@@ -1,5 +1,6 @@
 import truck from "../../assets/car-list-icons/truck.png";
 import searchGlass from "../../assets/car-list-icons/Search.png";
+import arrowLeft from "../../assets/arrow-left.png";
 import styles from "./CarList.module.css";
 import { currentCarList } from "../../Api/currentCarList.tsx";
 import { useState, type ChangeEvent } from "react";
@@ -43,8 +44,8 @@ function CarList({ carStatusBtn, setCarStatusBtn }: carStatusBtnProp) {
         const keyword = inputVal.trim().toLowerCase();
 
         const matchesKeyWord = car["name"].trim().toLowerCase().includes(keyword) || 
-                               car["number"].trim().toLowerCase().includes(keyword);
-                               
+                                car["number"].trim().toLowerCase().includes(keyword);
+
         const matchesStatus = car["status"] === carStatusBtn || carStatusBtn === "전체";
 
         return matchesKeyWord && matchesStatus;
@@ -53,33 +54,40 @@ function CarList({ carStatusBtn, setCarStatusBtn }: carStatusBtnProp) {
     if(selectedCar) {
         return (
             <section className={`${styles["car-list"]} border w-[300px] h-[400px] flex flex-col rounded-xl bg-white box-border p-3`}>
-                <h1>안녕</h1>
-                <button className="cursor-pointer" onClick={() => setSelectedCar(null)}>뒤로 가기</button>
+                <button className="flex items-center cursor-pointer" onClick={() => setSelectedCar(null)}>
+                    <img src={arrowLeft} alt="뒤로가기 버튼" className="w-6 h-6 mr-2"/>
+                    <span className="text-lg font-bold">뒤로 가기</span>
+                </button>
+                <p className="mb-5 font-bold opacity-20 ml-1">
+                    {selectedCar.number}
+                </p>
                 <table>
-                    <tr>
-                        <th className={styles["th"]}>운전자</th>
-                        <td className={styles["td"]}>데이터없음</td>
-                    </tr>
-                    <tr>
-                        <th className={styles["th"]}>차량번호</th>
-                        <td className={styles["td"]}>{selectedCar.number}</td>
-                    </tr>
-                    <tr>
-                        <th className={styles["th"]}>차량명</th>
-                        <td className={styles["td"]}>{selectedCar.name}</td>
-                    </tr>
-                    <tr>
-                        <th className={styles["th"]}>운행일자</th>
-                        <td className={styles["td"]}>데이터 없음</td>
-                    </tr>
-                    <tr>
-                        <th className={styles["th"]}>운행시간</th>
-                        <td className={styles["td"]}>데이터 없음</td>
-                    </tr>
-                    <tr>
-                        <th className={styles["th"]}>운행 거리</th>
-                        <td className={styles["td"]}>{selectedCar.mileage}</td>
-                    </tr>
+                    <tbody>
+                        <tr>
+                            <th className={styles["th"]}>운전자</th>
+                            <td className={styles["td"]}>데이터없음</td>
+                        </tr>
+                        <tr>
+                            <th className={styles["th"]}>차량번호</th>
+                            <td className={styles["td"]}>{selectedCar.number}</td>
+                        </tr>
+                        <tr>
+                            <th className={styles["th"]}>차량명</th>
+                            <td className={styles["td"]}>{selectedCar.name}</td>
+                        </tr>
+                        <tr>
+                            <th className={styles["th"]}>운행일자</th>
+                            <td className={styles["td"]}>데이터 없음</td>
+                        </tr>
+                        <tr>
+                            <th className={styles["th"]}>운행시간</th>
+                            <td className={styles["td"]}>데이터 없음</td>
+                        </tr>
+                        <tr>
+                            <th className={styles["th"]}>운행 거리</th>
+                            <td className={styles["td"]}>{selectedCar.mileage}</td>
+                        </tr>
+                    </tbody>
                 </table>
             </section>
         )
