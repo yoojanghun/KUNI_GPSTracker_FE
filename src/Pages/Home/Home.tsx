@@ -34,11 +34,11 @@ function Home() {
                     </div>
                 </div>
 
-                <div className={`${styles["icon"]} flex flex-2 justify-center items-center border rounded-xl p-[23px] min-h-[110px]`}>
+                <div className={`${styles["icon"]} flex flex-2 justify-evenly items-center border rounded-xl p-[23px] min-h-[110px]`}>
                     <div className="flex items-center min-w-[280px]">
                         <img className="w-13 h-13 mr-3" src={notWorking} alt="미운행 차량 아이콘"/>
                         <div>
-                            <div className="mr-6">
+                            <div className="mr-6 min-w-[200px]">
                                 <span className="text-3xl font-bold mr-3">{percentage}%</span>
                                 <span className="text-sm opacity-60">미운행 차량 (1,001)</span>
                             </div>
@@ -47,7 +47,7 @@ function Home() {
                             </div>
                         </div>
                     </div>
-                    <div className="min-w-[180px]">
+                    <div className="min-w-[180px] mr-3">
                         <div className="flex items-center mb-2">
                             <img className="w-8 h-8 mr-1" src={checkingIndicator} alt="점검중 차량 아이콘" />
                             <div>
@@ -89,41 +89,41 @@ function Home() {
                 </div>
                 <div className={`${styles["icon"]} flex-3 border box-border p-4 pt-2 h-[100%] rounded-3xl`}>
                     <div className="w-[100%] h-[9%] flex items-center justify-between">
-                        <div className="flex items-center w-[25%]">
+                        <div className="flex items-center">
                             <img src={location} className="w-7 h-7 mr-2"/>
                             <span className="font-bold text-xl">차량 현황</span>
                         </div>
                         <div className="flex justify-around w-[75%]">
-                            <label className="flex items-center font-bold mr-1">
+                            <label className="flex items-center font-bold mr-1 min-w-[60px]">
                                 <input type="checkbox" value="전체"
-                                       onChange={handleCarStatusBtn}
-                                       checked={carStatusBtn === "전체"} 
-                                       className="w-4 h-4 mr-1"/>
-                                전체
+                                        onChange={handleCarStatusBtn}
+                                        checked={carStatusBtn === "전체"} 
+                                        className="w-4 h-4 mr-1"/>
+                                <span>전체</span>
                             </label>
-                            <label className="flex items-center font-bold mr-1">
+                            <label className="flex items-center font-bold mr-1 min-w-[100px]">
                                 <input type="checkbox" value="수리중"
-                                       onChange={handleCarStatusBtn}
-                                       checked={carStatusBtn === "수리중"}
-                                       className="w-4 h-4 mr-1"/>
+                                        onChange={handleCarStatusBtn}
+                                        checked={carStatusBtn === "수리중"}
+                                        className="w-4 h-4 mr-1"/>
                                 <img src={checkingIndicator} className="mr-1 w-6" />
-                                점검중
+                                <span>점검중</span>
                             </label>
-                            <label className="flex items-center font-bold mr-1">
+                            <label className="flex items-center font-bold mr-1 min-w-[100px]">
                                 <input type="checkbox" value="미운행" 
-                                       onChange={handleCarStatusBtn}
-                                       checked={carStatusBtn === "미운행"}
-                                       className="w-4 h-4 mr-1"/>
+                                        onChange={handleCarStatusBtn}
+                                        checked={carStatusBtn === "미운행"}
+                                        className="w-4 h-4 mr-1"/>
                                 <img src={notWorkingIndicator} className="mr-1 w-6" />
-                                미운행
+                                <span>미운행</span>
                             </label>
-                            <label className="flex items-center font-bold mr-1">
+                            <label className="flex items-center font-bold mr-1 min-w-[100px]">
                                 <input type="checkbox" value="운행중" 
-                                       onChange={handleCarStatusBtn}
-                                       checked={carStatusBtn === "운행중"}
-                                       className="w-4 h-4 mr-1"/>
+                                        onChange={handleCarStatusBtn}
+                                        checked={carStatusBtn === "운행중"}
+                                        className="w-4 h-4 mr-1"/>
                                 <img src={workingIndicator} className="mr-1 w-6" />
-                                운행중
+                                <span>운행중</span>
                             </label>
                         </div>
                     </div>
