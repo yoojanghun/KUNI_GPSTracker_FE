@@ -100,7 +100,7 @@ function CarList({ carStatusBtn, setCarStatusBtn }: carStatusBtnProp) {
                     <img src={truck} alt="트럭 아이콘" className="mr-2" />
                     <span>차량 리스트</span>
                 </div>
-                <select onChange={handleCarStatusBtn} className="border-2 px-1">
+                <select onChange={handleCarStatusBtn} className="border-2 px-1 cursor-pointer">
                     <option value="전체">전체</option>
                     <option value="운행중">운행중</option>
                     <option value="미운행">미운행</option>
@@ -110,7 +110,7 @@ function CarList({ carStatusBtn, setCarStatusBtn }: carStatusBtnProp) {
             <form action="#" onSubmit={e => e.preventDefault()} className="mb-2">
                 <label className={`${styles["car-list__input"]} flex items-center border-none rounded px-2 py-1`}>
                     <img src={searchGlass} alt="검색 아이콘" className="w-4 h-4 mr-2" />
-                    <input value={inputVal} onChange={handleInput} type="text" placeholder="차량 검색" className="w-full outline-none text-sm" />
+                    <input value={inputVal} onChange={handleInput} type="text" placeholder="차량 검색" className="w-full h-7 outline-none text-sm" />
                     {inputVal && <button onClick={clearInput} type="button" className="text-sm cursor-pointer opacity-30 mr-[3px]">X</button>}
                 </label>
             </form>
