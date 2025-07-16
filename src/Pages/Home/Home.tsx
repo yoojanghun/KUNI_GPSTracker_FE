@@ -5,6 +5,7 @@ import checkingIndicator from "../../assets/car-status-icons/checking-indicator.
 import notWorkingIndicator from "../../assets/car-status-icons/not-working-indicator.png";
 import workingIndicator from "../../assets/car-status-icons/working-indicator.png";
 import location from "../../assets/nav-bar-icons/location_on.png";
+import calendar from "../../assets/Calendar.png";
 import styles from "./Home.module.css";
 
 import SimpleLineChart from "@/Components/chart";
@@ -84,6 +85,7 @@ function Home() {
                         </div>
                     </div>
                     <div className={`${styles["icon"]} border box-border pr-4 pt-4 pb-4 h-[100%] rounded-xl`}>
+                        
                         <SimpleLineChart />
                     </div>
                 </div>
