@@ -85,8 +85,13 @@ function Home() {
                         </div>
                     </div>
                     <div className={`${styles["icon"]} border box-border pr-4 pt-4 pb-4 h-[100%] rounded-xl`}>
-                        
-                        <SimpleLineChart />
+                        <div className="flex items-center ml-4 mb-5 font-bold">
+                            <img src={calendar} alt="캘린더 아이콘" className="w-6 h-6 mr-2"/>
+                            <span className="text-xl">이 주의 일별 운행 건수</span>
+                        </div>
+                        <div className="w-[100%] h-[90%]">
+                            <SimpleLineChart />
+                        </div>
                     </div>
                 </div>
                 <div className={`${styles["icon"]} flex-3 border box-border p-4 pt-2 h-[100%] rounded-3xl`}>

@@ -2,14 +2,21 @@ import truck from "../../assets/car-list-icons/truck.png";
 import searchGlass from "../../assets/car-list-icons/Search.png";
 import arrowLeft from "../../assets/arrow-left.png";
 import styles from "./CarList.module.css";
-import { currentCarList } from "../../Api/currentCarList.tsx";
-import { useState, type ChangeEvent } from "react";
+import { useEffect, useState } from "react";
+
+// currnetCarList는 배열이다. 배열안에 객체들 포함
+type Position = {
+    lat: number;
+    lng: number;
+    time: number;
+}
 
 type Car = {
     number: string;
     name: string;
     mileage: number;
     status: string;     // 운행중, 미운행, 수리중
+    path?: Position[];
 }
 
 type carStatusBtnProp = {
@@ -21,10 +28,7 @@ function CarList({ carStatusBtn, setCarStatusBtn }: carStatusBtnProp) {
 
     const [inputVal, setInputVal] = useState<string>("");
     const [selectedCar, setSelectedCar] = useState<Car | null>(null);
-
-    function handleCarStatusBtn(e: ChangeEvent<HTMLSelectElement>) {
-        setCarStatusBtn(e.target.value);
-    }
+    const [currentCarList, setCurrentCarList] = useState<Car[]>([])
 
     const carStatusClass: Record<string, string> = {
         "운행중": "bg-[#c1d8ff] text-[#5491f5]",
@@ -32,13 +36,11 @@ function CarList({ carStatusBtn, setCarStatusBtn }: carStatusBtnProp) {
         "수리중": "bg-[#ffe4be] text-[#ffa62a]"
     }
 
-    function handleInput(event: ChangeEvent<HTMLInputElement>) {
-        setInputVal(event.target.value);
-    }
-
-    function clearInput() {
-        setInputVal("");
-    }
+    useEffect(() => {
+        fetch("/carListExample.json")
+        .then(res => res.json())
+        .then(data => setCurrentCarList(data));
+    }, [])
 
     const filteredCarList = currentCarList.filter((car) => {
         const keyword = inputVal.trim().toLowerCase();
@@ -94,24 +96,24 @@ function CarList({ carStatusBtn, setCarStatusBtn }: carStatusBtnProp) {
     }
     
     return (
-        <section className={`${styles["car-list"]} border w-[300px] h-[400px] flex flex-col rounded-xl bg-white box-border p-3`}>
+        <section className={`${styles["car-list"]} border w-[300px] h-[480px] flex flex-col rounded-xl bg-white box-border p-3`}>
             <h3 className="flex justify-between items-center font-bold text-xl mb-2 pr-1">
                 <div className="flex items-center">
                     <img src={truck} alt="트럭 아이콘" className="mr-2" />
-                    <span>차량 리스트</span>
+                    <span className="text-xl">차량 리스트</span>
                 </div>
-                <select onChange={handleCarStatusBtn} className="border-2 px-1 cursor-pointer">
+                <select onChange={(e) => setCarStatusBtn(e.target.value)} className="border-2 px-1 cursor-pointer">
                     <option value="전체">전체</option>
                     <option value="운행중">운행중</option>
                     <option value="미운행">미운행</option>
                     <option value="수리중">수리중</option>
                 </select>
             </h3>
-            <form action="#" onSubmit={e => e.preventDefault()} className="mb-2">
+            <form action="#" onSubmit={e => e.preventDefault()} className="mb-3">
                 <label className={`${styles["car-list__input"]} flex items-center border-none rounded px-2 py-1`}>
                     <img src={searchGlass} alt="검색 아이콘" className="w-4 h-4 mr-2" />
-                    <input value={inputVal} onChange={handleInput} type="text" placeholder="차량 검색" className="w-full h-7 outline-none text-sm" />
-                    {inputVal && <button onClick={clearInput} type="button" className="text-sm cursor-pointer opacity-30 mr-[3px]">X</button>}
+                    <input value={inputVal} onChange={(e) => setInputVal(e.target.value)} type="text" placeholder="차량 검색" className="w-full h-7 outline-none text-xl" />
+                    {inputVal && <button onClick={() => setInputVal("")} type="button" className="text-sm cursor-pointer opacity-30 mr-[3px]">X</button>}
                 </label>
             </form>
 
@@ -121,12 +123,15 @@ function CarList({ carStatusBtn, setCarStatusBtn }: carStatusBtnProp) {
 
                     return <li key={car.number} onClick={() => setSelectedCar(car)}
                         className={`${styles["car-list__item"]} flex items-center rounded-lg box-border px-2 py-2`}>
-                        <span className={`p-1 px-2 font-bold mr-[7px] border text-sm rounded-sm ${iconSrc}`}>{car.status}</span>
-                        <span className="font-bold">{car.number} {car.name}</span>
+                        <span className={`p-1 px-2 font-bold mr-3 border text-sm rounded-sm ${iconSrc} min-w-[55px]`}>{car.status}</span>
+                        <p>
+                            <span className="font-bold">{car.number}</span> <br /> 
+                            <span>{car.name}</span>
+                        </p>
                     </li>
                 })}
             </ul>
-    </section>
+        </section>
     );
 }
 
