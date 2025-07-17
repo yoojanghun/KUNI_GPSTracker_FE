@@ -3,31 +3,18 @@ import searchGlass from "../../assets/car-list-icons/Search.png";
 import arrowLeft from "../../assets/arrow-left.png";
 import styles from "./CarList.module.css";
 import { useEffect, useState } from "react";
-
-// currnetCarList는 배열이다. 배열안에 객체들 포함
-type Position = {
-    lat: number;
-    lng: number;
-    time: number;
-}
-
-type Car = {
-    number: string;
-    name: string;
-    mileage: number;
-    status: string;     // 운행중, 미운행, 수리중
-    path?: Position[];
-}
+import type { Car } from "@/Pages/LocationSearch/LocationSearch.tsx"
 
 type carStatusBtnProp = {
     carStatusBtn: string;
     setCarStatusBtn: (value: string) => void;
+    selectedCar: Car | null;
+    setSelectedCar: (value: Car | null) => void;
 }
 
-function CarList({ carStatusBtn, setCarStatusBtn }: carStatusBtnProp) {
+function CarList({ carStatusBtn, setCarStatusBtn, selectedCar, setSelectedCar }: carStatusBtnProp) {
 
     const [inputVal, setInputVal] = useState<string>("");
-    const [selectedCar, setSelectedCar] = useState<Car | null>(null);
     const [currentCarList, setCurrentCarList] = useState<Car[]>([])
 
     const carStatusClass: Record<string, string> = {
@@ -42,7 +29,8 @@ function CarList({ carStatusBtn, setCarStatusBtn }: carStatusBtnProp) {
         .then(data => setCurrentCarList(data));
     }, [])
 
-    const filteredCarList = currentCarList.filter((car) => {
+    // carList 목록에 보여지는 차량들
+    const filteredCarList = currentCarList.filter((car) => {            
         const keyword = inputVal.trim().toLowerCase();
 
         const matchesKeyWord = car["name"].trim().toLowerCase().includes(keyword) || 
@@ -117,19 +105,22 @@ function CarList({ carStatusBtn, setCarStatusBtn }: carStatusBtnProp) {
                 </label>
             </form>
 
+            {/* car는 각 차량 객체 */}
             <ul className="flex-1 overflow-y-auto space-y-2 pr-2">
                 {filteredCarList.map((car) => {
                     const iconSrc = carStatusClass[car.status];
 
                     return <li key={car.number} onClick={() => setSelectedCar(car)}
-                        className={`${styles["car-list__item"]} flex items-center rounded-lg box-border px-2 py-2`}>
-                        <span className={`p-1 px-2 font-bold mr-3 border text-sm rounded-sm ${iconSrc} min-w-[55px]`}>{car.status}</span>
-                        <p>
-                            <span className="font-bold">{car.number}</span> <br /> 
-                            <span>{car.name}</span>
-                        </p>
-                    </li>
-                })}
+                                className={`${styles["car-list__item"]} flex items-center rounded-lg box-border px-2 py-2`}>
+                                <span className={`p-1 px-2 font-bold mr-3 border text-sm rounded-sm ${iconSrc} min-w-[55px]`}>
+                                    {car.status}
+                                </span>
+                                <p>
+                                    <span className="font-bold">{car.number}</span> <br /> 
+                                    <span className="opacity-50">{car.name}</span>
+                                </p>
+                        </li>
+                    })}
             </ul>
         </section>
     );
