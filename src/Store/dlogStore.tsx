@@ -7,7 +7,7 @@ interface DLog {
   startTime: string,
   endTime: string,
   distance: number,
-  driver: string
+  recordId: string,
 }
 
 interface DLogStore {
@@ -23,6 +23,7 @@ interface DLogStore {
   ) => void 
   setIsDateValid: ( valid:boolean ) => void
   applyFilter: () => void
+  findById: ( id:string ) => DLog
 }
 
 export const useDLogStore = create<DLogStore>((set, get) => ({
@@ -73,5 +74,19 @@ export const useDLogStore = create<DLogStore>((set, get) => ({
 
   set({ filteredDLogs: filtered });
   set({ isDateValid: isTimeValid });
+},
+findById: ( id ) => {
+
+  const { DLogs } = get();
+  const found = DLogs.find((log) => { 
+    console.log('DLog_id: ', log.recordId);
+    console.log('find_id: ', id);
+    return log.recordId === id 
+  });
+
+  if (found === undefined) {
+    throw new Error("일치하는 Id값이 없습니다.");
+  }
+  return found;
 },
 }))

@@ -4,6 +4,7 @@ import Home from "./Pages/Home/Home.tsx";
 import Management from "./Pages/Management/Management.tsx";
 import DrivingLog from "./Pages/DriveLog/DrivingLog.tsx";
 import LocationSearch from "./Pages/LocationSearch/LocationSearch.tsx";
+import { DLogDetails } from "./Pages/DriveLog/DLogDetails.tsx";
 import { Toaster } from "sonner";
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
           <Route path="/location" element={<LocationSearch />}/>
           <Route path="/management" element={<Management />} />
           <Route path="/log" element={<DrivingLog />} />
+          <Route path="/log/:recordId" element={<DLogDetails />} />
         </Routes>
       </div>
     </Router>

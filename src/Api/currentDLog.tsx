@@ -5,7 +5,7 @@ export const currentDLog = [
     "startTime": "2025-07-07T19:30:00",
     "endTime": "2025-07-07T19:57:00",
     "distance": 118,
-    "driver": "황현우"
+    "recordId": "rec-001"
   },
   {
     "carNumber": "48아9889",
@@ -13,7 +13,7 @@ export const currentDLog = [
     "startTime": "2025-07-09T07:00:00",
     "endTime": "2025-07-09T07:27:00",
     "distance": 127,
-    "driver": "황현우"
+    "recordId": "rec-002"
   },
   {
     "carNumber": "28아9926",
@@ -21,7 +21,7 @@ export const currentDLog = [
     "startTime": "2025-07-07T11:15:00",
     "endTime": "2025-07-07T12:38:00",
     "distance": 126,
-    "driver": "윤지훈"
+    "recordId": "rec-003"
   },
   {
     "carNumber": "93하2572",
@@ -29,7 +29,7 @@ export const currentDLog = [
     "startTime": "2025-07-07T21:15:00",
     "endTime": "2025-07-07T22:00:00",
     "distance": 116,
-    "driver": "정수빈"
+    "recordId": "rec-004"
   },
   {
     "carNumber": "48아1563",
@@ -37,7 +37,7 @@ export const currentDLog = [
     "startTime": "2025-07-09T15:30:00",
     "endTime": "2025-07-09T16:15:00",
     "distance": 127,
-    "driver": "김지아"
+    "recordId": "rec-005"
   },
   {
     "carNumber": "99가2119",
@@ -45,7 +45,7 @@ export const currentDLog = [
     "startTime": "2025-07-07T05:30:00",
     "endTime": "2025-07-07T06:41:00",
     "distance": 130,
-    "driver": "김지아"
+    "recordId": "rec-006"
   },
   {
     "carNumber": "80자6117",
@@ -53,7 +53,7 @@ export const currentDLog = [
     "startTime": "2025-07-07T23:15:00",
     "endTime": "2025-07-08T00:38:00",
     "distance": 100,
-    "driver": "박하늘"
+    "recordId": "rec-007"
   },
   {
     "carNumber": "80자8022",
@@ -61,7 +61,7 @@ export const currentDLog = [
     "startTime": "2025-07-09T17:30:00",
     "endTime": "2025-07-09T18:46:00",
     "distance": 129,
-    "driver": "정수빈"
+    "recordId": "rec-008"
   },
   {
     "carNumber": "32나3733",
@@ -69,7 +69,7 @@ export const currentDLog = [
     "startTime": "2025-07-07T13:00:00",
     "endTime": "2025-07-07T13:45:00",
     "distance": 110,
-    "driver": "윤민수"
+    "recordId": "rec-009"
   },
   {
     "carNumber": "99가1541",
@@ -77,7 +77,7 @@ export const currentDLog = [
     "startTime": "2025-07-08T11:00:00",
     "endTime": "2025-07-08T11:33:00",
     "distance": 135,
-    "driver": "윤민수"
+    "recordId": "rec-010"
   },
   {
     "carNumber": "48아4046",
@@ -85,7 +85,7 @@ export const currentDLog = [
     "startTime": "2025-07-07T17:30:00",
     "endTime": "2025-07-07T17:49:00",
     "distance": 112,
-    "driver": "박지훈"
+    "recordId": "rec-011"
   },
   {
     "carNumber": "63마6649",
@@ -93,7 +93,7 @@ export const currentDLog = [
     "startTime": "2025-07-07T09:30:00",
     "endTime": "2025-07-07T10:43:00",
     "distance": 120,
-    "driver": "서지훈"
+    "recordId": "rec-012"
   },
   {
     "carNumber": "99가2051",
@@ -101,7 +101,7 @@ export const currentDLog = [
     "startTime": "2025-07-07T13:45:00",
     "endTime": "2025-07-07T14:35:00",
     "distance": 127,
-    "driver": "윤민수"
+    "recordId": "rec-013"
   },
   {
     "carNumber": "32나1694",
@@ -109,7 +109,7 @@ export const currentDLog = [
     "startTime": "2025-07-07T09:15:00",
     "endTime": "2025-07-07T10:33:00",
     "distance": 150,
-    "driver": "윤민수"
+    "recordId": "rec-014"
   },
   {
     "carNumber": "28아3627",
@@ -117,7 +117,7 @@ export const currentDLog = [
     "startTime": "2025-07-09T23:45:00",
     "endTime": "2025-07-10T00:11:00",
     "distance": 128,
-    "driver": "김수빈"
+    "recordId": "rec-015"
   },
   {
     "carNumber": "80자4537",
@@ -125,7 +125,7 @@ export const currentDLog = [
     "startTime": "2025-07-07T17:45:00",
     "endTime": "2025-07-07T18:25:00",
     "distance": 140,
-    "driver": "황현우"
+    "recordId": "rec-016"
   },
   {
     "carNumber": "32나7610",
@@ -133,7 +133,7 @@ export const currentDLog = [
     "startTime": "2025-07-08T13:45:00",
     "endTime": "2025-07-08T14:27:00",
     "distance": 117,
-    "driver": "김지아"
+    "recordId": "rec-017"
   },
   {
     "carNumber": "28아4583",
@@ -141,7 +141,7 @@ export const currentDLog = [
     "startTime": "2025-07-09T00:15:00",
     "endTime": "2025-07-09T01:08:00",
     "distance": 123,
-    "driver": "박하늘"
+    "recordId": "rec-018"
   },
   {
     "carNumber": "99가2628",
@@ -149,7 +149,7 @@ export const currentDLog = [
     "startTime": "2025-07-09T11:00:00",
     "endTime": "2025-07-09T12:17:00",
     "distance": 100,
-    "driver": "김수빈"
+    "recordId": "rec-019"
   },
   {
     "carNumber": "63마5259",
@@ -157,7 +157,7 @@ export const currentDLog = [
     "startTime": "2025-07-09T21:15:00",
     "endTime": "2025-07-09T22:33:00",
     "distance": 147,
-    "driver": "황현우"
+    "recordId": "rec-020"
   },
   {
     "carNumber": "48아7925",
@@ -165,7 +165,7 @@ export const currentDLog = [
     "startTime": "2025-07-08T19:15:00",
     "endTime": "2025-07-08T20:38:00",
     "distance": 121,
-    "driver": "서지훈"
+    "recordId": "rec-021"
   },
   {
     "carNumber": "48아1394",
@@ -173,7 +173,7 @@ export const currentDLog = [
     "startTime": "2025-07-09T17:45:00",
     "endTime": "2025-07-09T19:15:00",
     "distance": 139,
-    "driver": "김수빈"
+    "recordId": "rec-022"
   },
   {
     "carNumber": "99가1798",
@@ -181,7 +181,7 @@ export const currentDLog = [
     "startTime": "2025-07-09T05:15:00",
     "endTime": "2025-07-09T06:32:00",
     "distance": 130,
-    "driver": "박하늘"
+    "recordId": "rec-023"
   },
   {
     "carNumber": "80자3821",
@@ -189,7 +189,7 @@ export const currentDLog = [
     "startTime": "2025-07-07T09:00:00",
     "endTime": "2025-07-07T09:39:00",
     "distance": 130,
-    "driver": "김지아"
+    "recordId": "rec-024"
   },
   {
     "carNumber": "65사6781",
@@ -197,7 +197,7 @@ export const currentDLog = [
     "startTime": "2025-07-09T05:15:00",
     "endTime": "2025-07-09T05:47:00",
     "distance": 101,
-    "driver": "김지아"
+    "recordId": "rec-025"
   },
   {
     "carNumber": "80자6297",
@@ -205,7 +205,7 @@ export const currentDLog = [
     "startTime": "2025-07-09T05:00:00",
     "endTime": "2025-07-09T05:46:00",
     "distance": 123,
-    "driver": "정수빈"
+    "recordId": "rec-026"
   },
   {
     "carNumber": "80자3920",
@@ -213,7 +213,7 @@ export const currentDLog = [
     "startTime": "2025-07-07T21:45:00",
     "endTime": "2025-07-07T22:55:00",
     "distance": 137,
-    "driver": "김지아"
+    "recordId": "rec-027"
   },
   {
     "carNumber": "88사2891",
@@ -221,7 +221,7 @@ export const currentDLog = [
     "startTime": "2025-07-08T21:30:00",
     "endTime": "2025-07-08T22:10:00",
     "distance": 111,
-    "driver": "박지훈"
+    "recordId": "rec-028"
   },
   {
     "carNumber": "28아8457",
@@ -229,7 +229,7 @@ export const currentDLog = [
     "startTime": "2025-07-09T05:30:00",
     "endTime": "2025-07-09T06:33:00",
     "distance": 143,
-    "driver": "윤민수"
+    "recordId": "rec-029"
   },
   {
     "carNumber": "63마4800",
@@ -237,7 +237,7 @@ export const currentDLog = [
     "startTime": "2025-07-08T00:30:00",
     "endTime": "2025-07-08T01:21:00",
     "distance": 137,
-    "driver": "박지훈"
+    "recordId": "rec-030"
   },
   {
     "carNumber": "80자2981",
@@ -245,7 +245,7 @@ export const currentDLog = [
     "startTime": "2025-07-08T07:30:00",
     "endTime": "2025-07-08T08:15:00",
     "distance": 144,
-    "driver": "황현우"
+    "recordId": "rec-031"
   },
   {
     "carNumber": "93하2678",
@@ -253,7 +253,7 @@ export const currentDLog = [
     "startTime": "2025-07-08T19:00:00",
     "endTime": "2025-07-08T19:40:00",
     "distance": 141,
-    "driver": "황현우"
+    "recordId": "rec-032"
   },
   {
     "carNumber": "32나8399",
@@ -261,7 +261,7 @@ export const currentDLog = [
     "startTime": "2025-07-07T00:45:00",
     "endTime": "2025-07-07T02:00:00",
     "distance": 127,
-    "driver": "김지아"
+    "recordId": "rec-033"
   },
   {
     "carNumber": "48바5316",
@@ -269,7 +269,7 @@ export const currentDLog = [
     "startTime": "2025-07-07T05:30:00",
     "endTime": "2025-07-07T06:40:00",
     "distance": 124,
-    "driver": "황현우"
+    "recordId": "rec-034"
   },
   {
     "carNumber": "65사5379",
@@ -277,7 +277,7 @@ export const currentDLog = [
     "startTime": "2025-07-09T09:30:00",
     "endTime": "2025-07-09T10:05:00",
     "distance": 119,
-    "driver": "황현우"
+    "recordId": "rec-035"
   },
   {
     "carNumber": "99가1422",
@@ -285,7 +285,7 @@ export const currentDLog = [
     "startTime": "2025-07-07T09:30:00",
     "endTime": "2025-07-07T09:54:00",
     "distance": 105,
-    "driver": "김수빈"
+    "recordId": "rec-036"
   },
   {
     "carNumber": "32나2917",
@@ -293,7 +293,7 @@ export const currentDLog = [
     "startTime": "2025-07-09T15:45:00",
     "endTime": "2025-07-09T16:28:00",
     "distance": 116,
-    "driver": "정수빈"
+    "recordId": "rec-037"
   },
   {
     "carNumber": "28아1735",
@@ -301,7 +301,7 @@ export const currentDLog = [
     "startTime": "2025-07-08T05:45:00",
     "endTime": "2025-07-08T06:27:00",
     "distance": 111,
-    "driver": "황현우"
+    "recordId": "rec-038"
   },
   {
     "carNumber": "80자4336",
@@ -309,7 +309,7 @@ export const currentDLog = [
     "startTime": "2025-07-09T05:45:00",
     "endTime": "2025-07-09T06:18:00",
     "distance": 147,
-    "driver": "서지훈"
+    "recordId": "rec-039"
   },
   {
     "carNumber": "99가3170",
@@ -317,7 +317,7 @@ export const currentDLog = [
     "startTime": "2025-07-07T17:45:00",
     "endTime": "2025-07-07T18:35:00",
     "distance": 114,
-    "driver": "박지훈"
+    "recordId": "rec-040"
   },
   {
     "carNumber": "65사1062",
@@ -325,7 +325,7 @@ export const currentDLog = [
     "startTime": "2025-07-08T15:45:00",
     "endTime": "2025-07-08T16:55:00",
     "distance": 150,
-    "driver": "김수빈"
+    "recordId": "rec-041"
   },
   {
     "carNumber": "48바3264",
@@ -333,7 +333,7 @@ export const currentDLog = [
     "startTime": "2025-07-07T11:30:00",
     "endTime": "2025-07-07T12:55:00",
     "distance": 121,
-    "driver": "김수빈"
+    "recordId": "rec-042"
   },
   {
     "carNumber": "80자7968",
@@ -341,7 +341,7 @@ export const currentDLog = [
     "startTime": "2025-07-09T07:45:00",
     "endTime": "2025-07-09T08:49:00",
     "distance": 132,
-    "driver": "김지아"
+    "recordId": "rec-043"
   },
   {
     "carNumber": "63마9431",
@@ -349,7 +349,7 @@ export const currentDLog = [
     "startTime": "2025-07-09T09:45:00",
     "endTime": "2025-07-09T10:07:00",
     "distance": 128,
-    "driver": "윤지훈"
+    "recordId": "rec-044"
   },
   {
     "carNumber": "48아2706",
@@ -357,7 +357,7 @@ export const currentDLog = [
     "startTime": "2025-07-09T00:15:00",
     "endTime": "2025-07-09T00:52:00",
     "distance": 128,
-    "driver": "윤지훈"
+    "recordId": "rec-045"
   },
   {
     "carNumber": "48아7667",
@@ -365,7 +365,7 @@ export const currentDLog = [
     "startTime": "2025-07-09T07:15:00",
     "endTime": "2025-07-09T08:16:00",
     "distance": 109,
-    "driver": "박지훈"
+    "recordId": "rec-046"
   },
   {
     "carNumber": "88사8521",
@@ -373,7 +373,7 @@ export const currentDLog = [
     "startTime": "2025-07-08T05:45:00",
     "endTime": "2025-07-08T06:38:00",
     "distance": 113,
-    "driver": "정수빈"
+    "recordId": "rec-047"
   },
   {
     "carNumber": "32나4807",
@@ -381,7 +381,7 @@ export const currentDLog = [
     "startTime": "2025-07-08T15:00:00",
     "endTime": "2025-07-08T15:18:00",
     "distance": 133,
-    "driver": "정수빈"
+    "recordId": "rec-048"
   },
   {
     "carNumber": "63마7950",
@@ -389,7 +389,7 @@ export const currentDLog = [
     "startTime": "2025-07-09T19:45:00",
     "endTime": "2025-07-09T20:10:00",
     "distance": 127,
-    "driver": "박지훈"
+    "recordId": "rec-049"
   },
   {
     "carNumber": "65사3896",
@@ -397,6 +397,6 @@ export const currentDLog = [
     "startTime": "2025-07-09T13:15:00",
     "endTime": "2025-07-09T13:33:00",
     "distance": 130,
-    "driver": "신민수"
+    "recordId": "rec-050"
   }
 ]
