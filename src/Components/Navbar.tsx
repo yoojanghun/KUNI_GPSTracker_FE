@@ -1,11 +1,7 @@
 import { NavLink } from "react-router-dom";
 import logo from "../assets/logo.svg";
-import car from "../assets/nav-bar-icons/directions_car.png";
-import location from "../assets/nav-bar-icons/location_on.png";
-import tool from "../assets/nav-bar-icons/Tool.png";
-import folder from "../assets/nav-bar-icons/folder.png";
 import { CarFront, Folder, MapPin, Wrench } from "lucide-react";
-import type { JSX, RefAttributes } from "react";
+import type { JSX } from "react";
 
 interface NavItem {
     to: string;
