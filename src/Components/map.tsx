@@ -1,27 +1,18 @@
 import { useState, useEffect, useRef } from 'react';
+import type { Car, Position } from '@/Pages/LocationSearch/LocationSearch.tsx';
 import { useKakaoLoader } from 'react-kakao-maps-sdk';
 
-type PathPoint = {
-  lat: number;
-  lng: number;
-  time: number;
-};
 
-type Position = {
-  number: string;
-  name: string;
-  mileage: number;
-  status: string;
-  path: PathPoint[];
-};
+type CarWithPath = Omit<Car, "path"> & { path: Position[]; };
 
 type MapTestProps = {
   level?: number;
   carStatus: string;
+  selectedCar: Car | null;
 }
 
-const MapTest: React.FC<MapTestProps> = ({ level = 13, carStatus }) => {
-  const [positions, setPositions] = useState<Position[]>([]);
+const MapTest: React.FC<MapTestProps> = ({ level = 13, carStatus, selectedCar }) => {
+  const [positions, setPositions] = useState<CarWithPath[]>([]);      // positions에는 차량들의 리스트 객체들이 들어감
 
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<kakao.maps.Map | null>(null);
@@ -48,11 +39,11 @@ const MapTest: React.FC<MapTestProps> = ({ level = 13, carStatus }) => {
 
     // 지도 생성
     mapInstance.current = new kakao.maps.Map(mapContainerRef.current, {
-      center: new kakao.maps.LatLng(37.5665, 126.9780),
+      center: new kakao.maps.LatLng(37.5660, 126.9775),
       level: level,
     });
 
-    //
+    // 전체 차량 클러스터러 생성
     totalClustererRef.current = new kakao.maps.MarkerClusterer({
       map: mapInstance.current,
       averageCenter: true,
@@ -68,7 +59,7 @@ const MapTest: React.FC<MapTestProps> = ({ level = 13, carStatus }) => {
                   fontWeight: 'bold',
                   lineHeight: '31px'
             }]
-        })
+    });
 
     // 운행중 차량 클러스터러 생성
     runningClustererRef.current = new kakao.maps.MarkerClusterer({
@@ -135,13 +126,13 @@ const MapTest: React.FC<MapTestProps> = ({ level = 13, carStatus }) => {
     window.addEventListener('resize', handleResize);
 
     return () => {
-      window.removeEventListener('resize', handleResize);
+      // window.removeEventListener('resize', handleResize);
       mapInstance.current = null;
       runningClustererRef.current = null;
       notRunningClustererRef.current = null;
       inspectedClustererRef.current = null;
     };
-  }, [level]);
+  }, []);
 
   useEffect(() => {
     if (!mapInstance.current) return;
@@ -214,7 +205,19 @@ const MapTest: React.FC<MapTestProps> = ({ level = 13, carStatus }) => {
     //   polylinesRef.current.push(polyline);
     // });
   }, [carStatus, positions]);
+  // 옵션창에서 carStatus를 바꾸거나, 차량 데이터가 변경되어 positions가 바뀌거나 => 마커 다시 로드
 
+  useEffect(() => {
+    if (!mapInstance.current || !selectedCar?.path?.length) return;
+
+    // selecTedCar가 바뀔 때마다 지도 중심으로 다시 로드
+    const selectedCarLastPoint = selectedCar.path[selectedCar.path.length - 1];     // 위도 경도 시간 객체
+    const selectedCarCenter = new kakao.maps.LatLng(selectedCarLastPoint.lat, selectedCarLastPoint.lng);
+
+    console.log(selectedCarLastPoint);
+    mapInstance.current.setCenter(selectedCarCenter);
+    mapInstance.current.setLevel(5);
+  }, [selectedCar])
 
   return (
     <div ref={mapContainerRef} style={{ width: '100%', height: '100%', minWidth: 0}}/>
