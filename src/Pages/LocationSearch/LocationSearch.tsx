@@ -27,7 +27,7 @@ function LocationSearch() {
     // bounds는 드래그 가능한 범위를 제한. bounds="parent": 부모 요소 내에서만 이동 허용
     return (
         <main className="flex-1 box-border relative">
-            <MapTest carStatus={carStatusBtn} level={13} selectedCar={selectedCar}/>
+            <MapTest carStatus={carStatusBtn} level={12} selectedCar={selectedCar}/>
             <Draggable nodeRef={nodeRef} bounds="parent" cancel="label">
                 <div ref={nodeRef} className="absolute top-4 left-4 z-20 w-[200px] cursor-grab">
                     <CarList carStatusBtn={carStatusBtn} 
