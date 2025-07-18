@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from 'react';
 import type { Car, Position } from '@/Pages/LocationSearch/LocationSearch.tsx';
 import { useKakaoLoader } from 'react-kakao-maps-sdk';
 
-
 type CarWithPath = Omit<Car, "path"> & { path: Position[]; };
 
 type MapTestProps = {
@@ -119,7 +118,7 @@ const MapTest: React.FC<MapTestProps> = ({ level = 13, carStatus, selectedCar })
     const handleResize = () => {
       if (!mapInstance.current) return;
       kakao.maps.event.trigger(mapInstance.current!, 'resize');
-      mapInstance.current!.setCenter(
+      mapInstance.current!.panTo(
         new kakao.maps.LatLng(37.5665, 126.9780)
       );
     };
@@ -214,13 +213,12 @@ const MapTest: React.FC<MapTestProps> = ({ level = 13, carStatus, selectedCar })
     const selectedCarLastPoint = selectedCar.path[selectedCar.path.length - 1];     // 위도 경도 시간 객체
     const selectedCarCenter = new kakao.maps.LatLng(selectedCarLastPoint.lat, selectedCarLastPoint.lng);
 
-    console.log(selectedCarLastPoint);
-    mapInstance.current.setCenter(selectedCarCenter);
-    mapInstance.current.setLevel(5);
+    mapInstance.current.setLevel(3);
+    mapInstance.current.panTo(selectedCarCenter);
   }, [selectedCar])
 
   return (
-    <div ref={mapContainerRef} style={{ width: '100%', height: '100%', minWidth: 0}}/>
+    <div ref={mapContainerRef} style={{ width: '100%', height: '100%'}}/>
   );
 };
 
