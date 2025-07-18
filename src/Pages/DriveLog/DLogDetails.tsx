@@ -1,11 +1,54 @@
 import { useNavigate, useParams } from "react-router-dom";
+import { useRef, useEffect } from "react";
 import { Button } from "@/Components/ui/button";
 import { Clipboard, Clock, ClockFading, Map } from "lucide-react";
 import { useDLogStore } from "@/Store/dlogStore";
 import { DLogHeader } from "./DLogHeader";
-import log from "../../assets/log.png";
+import indicator from "../../Components/Indicators.svg"
+
 
 export function DLogDetails() {
+  // 임시 위도 경도
+  let startLat = 37.561535;
+  let startLong = 126.9719692;
+  let endLat = 37.566535;
+  let endLong = 126.9779692;
+  let centerLat = (startLat + endLat) / 2;
+  let centerLong = (startLong + endLong) / 2;
+
+  // 마커 설정
+  const markerImage = new kakao.maps.MarkerImage(
+    indicator,
+    new kakao.maps.Size(28, 28),
+  )
+  const startMarker = new kakao.maps.Marker({
+    position: new kakao.maps.LatLng(startLat, startLong),
+    image: markerImage
+  });
+  const endMarker = new kakao.maps.Marker({
+    position: new kakao.maps.LatLng(endLat, endLong),
+    image: markerImage
+  });
+  
+
+  const containerRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (containerRef.current) {
+      const options = {
+        center: new kakao.maps.LatLng(centerLat, centerLong),
+        level: 4,
+      };
+      const map = new kakao.maps.Map(containerRef.current, options);
+      startMarker.setMap(map);
+      endMarker.setMap(map);
+    }
+  }, []);
+
+  
+
+  
+
   const navigate = useNavigate();
   const { recordId } = useParams();
 
@@ -67,7 +110,7 @@ export function DLogDetails() {
             <Map size={22} />
             운행 경로
           </div>
-            <img src={log} alt="Drive Log" className="w-full"></img>
+          <div ref={containerRef} id="map" className="w-full h-[400px] rounded-[6px]"></div>
         </div>
       </div>
       <div className="mt-6"></div>
