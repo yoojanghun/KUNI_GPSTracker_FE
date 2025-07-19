@@ -1,17 +1,20 @@
 import { useState, useEffect, useRef } from 'react';
-import type { Car, Position } from '@/Pages/LocationSearch/LocationSearch.tsx';
+import type { CarInfo, Position } from '@/Store/catStatus.ts';
+import { useCarStatusOptionStore, useSelectCarStore } from '@/Store/catStatus';
 import { useKakaoLoader } from 'react-kakao-maps-sdk';
 
-type CarWithPath = Omit<Car, "path"> & { path: Position[]; };
+type CarWithPath = Omit<CarInfo, "path"> & { path: Position[]; };
 
 type MapTestProps = {
   level?: number;
-  carStatus: string;
-  selectedCar?: Car | null;
   selectedCarFocus: boolean;
 }
 
-function MapBasic ({ level = 13, carStatus, selectedCar, selectedCarFocus }: MapTestProps) {
+function MapBasic ({ level = 13, selectedCarFocus }: MapTestProps) {
+
+  const carStatusOption = useCarStatusOptionStore(state => state.carStatusOption);
+  const selectedCar = useSelectCarStore(state => state.selectedCar);
+
   const [positions, setPositions] = useState<CarWithPath[]>([]);      // positions에는 차량들의 리스트 객체들이 들어감
 
   const mapContainerRef = useRef<HTMLDivElement>(null);
@@ -163,7 +166,7 @@ function MapBasic ({ level = 13, carStatus, selectedCar, selectedCarFocus }: Map
           });
     });
 
-    if (carStatus === "전체") {
+    if (carStatusOption === "전체") {
       const allMarkers = positions.map(p => {
         const lastPoint = p.path[p.path.length - 1];
         return new kakao.maps.Marker({
@@ -177,10 +180,10 @@ function MapBasic ({ level = 13, carStatus, selectedCar, selectedCarFocus }: Map
       });
       totalClustererRef.current?.addMarkers(allMarkers);
     }
-    else if (carStatus === "운행중") {
+    else if (carStatusOption === "운행중") {
       runningClustererRef.current?.addMarkers(createMarkers('운행중', '/vite.svg'));
     }
-    else if (carStatus === "미운행") {
+    else if (carStatusOption === "미운행") {
       notRunningClustererRef.current?.addMarkers(createMarkers('미운행', '/vite.svg'));
     }
     else {
@@ -204,19 +207,21 @@ function MapBasic ({ level = 13, carStatus, selectedCar, selectedCarFocus }: Map
     //   polyline.setMap(mapInstance.current);
     //   polylinesRef.current.push(polyline);
     // });
-  }, [carStatus, positions]);
+  }, [carStatusOption, positions]);
   // 옵션창에서 carStatus를 바꾸거나, 차량 데이터가 변경되어 positions가 바뀌거나 => 마커 다시 로드
 
-  useEffect(() => {
-    if (!mapInstance.current || !selectedCar?.path?.length || !selectedCarFocus) return;
-
-    // selecTedCar가 바뀔 때마다 지도 중심으로 다시 로드
-    const selectedCarLastPoint = selectedCar.path[selectedCar.path.length - 1];     // 위도 경도 시간 객체
-    const selectedCarCenter = new kakao.maps.LatLng(selectedCarLastPoint.lat, selectedCarLastPoint.lng);
-
-    mapInstance.current.setLevel(3);
-    mapInstance.current.panTo(selectedCarCenter);
-  }, [selectedCar])
+  if(selectedCarFocus) {
+    useEffect(() => {
+      if (!mapInstance.current || !selectedCar?.path?.length) return;
+  
+      // selecTedCar가 바뀔 때마다 지도 중심으로 다시 로드
+      const selectedCarLastPoint = selectedCar.path[selectedCar.path.length - 1];     // 위도 경도 시간 객체
+      const selectedCarCenter = new kakao.maps.LatLng(selectedCarLastPoint.lat, selectedCarLastPoint.lng);
+  
+      mapInstance.current.setLevel(3);
+      mapInstance.current.panTo(selectedCarCenter);
+    }, [selectedCar])
+  }
 
   return (
     <div ref={mapContainerRef} style={{ width: '100%', height: '100%'}}/>

@@ -3,19 +3,20 @@ import searchGlass from "../../assets/car-list-icons/Search.png";
 import arrowLeft from "../../assets/arrow-left.png";
 import styles from "./CarList.module.css";
 import { useEffect, useState } from "react";
-import type { Car } from "@/Pages/LocationSearch/LocationSearch.tsx"
+import type { CarInfo } from "@/Store/catStatus.ts"
+import { useSelectCarStore } from "@/Store/catStatus";
+import { useCarStatusOptionStore } from "@/Store/catStatus.ts";
 
-type carStatusBtnProp = {
-    carStatusBtn: string;
-    setCarStatusBtn: (value: string) => void;
-    selectedCar: Car | null;
-    setSelectedCar: (value: Car | null) => void;
-}
+function CarList() {
 
-function CarList({ carStatusBtn, setCarStatusBtn, selectedCar, setSelectedCar }: carStatusBtnProp) {
+    const setSelectedCar = useSelectCarStore(state => state.setSelectedCar);
+    const selectedCar = useSelectCarStore(state => state.selectedCar);
+
+    const setCarStatusOption = useCarStatusOptionStore(state => state.setCarStatusOption);
+    const carStatusOption = useCarStatusOptionStore(state => state.carStatusOption);
 
     const [inputVal, setInputVal] = useState<string>("");
-    const [currentCarList, setCurrentCarList] = useState<Car[]>([])
+    const [currentCarList, setCurrentCarList] = useState<CarInfo[]>([])
 
     const carStatusClass: Record<string, string> = {
         "운행중": "bg-[#c1d8ff] text-[#5491f5]",
@@ -36,7 +37,7 @@ function CarList({ carStatusBtn, setCarStatusBtn, selectedCar, setSelectedCar }:
         const matchesKeyWord = car["name"].trim().toLowerCase().includes(keyword) || 
                                 car["number"].trim().toLowerCase().includes(keyword);
 
-        const matchesStatus = car["status"] === carStatusBtn || carStatusBtn === "전체";
+        const matchesStatus = car["status"] === carStatusOption || carStatusOption === "전체";
 
         return matchesKeyWord && matchesStatus;
     })
@@ -90,7 +91,7 @@ function CarList({ carStatusBtn, setCarStatusBtn, selectedCar, setSelectedCar }:
                     <img src={truck} alt="트럭 아이콘" className="mr-2" />
                     <span className="text-xl">차량 리스트</span>
                 </div>
-                <select onChange={(e) => setCarStatusBtn(e.target.value)} className="border-2 px-1 cursor-pointer">
+                <select onChange={e => setCarStatusOption(e.target.value)} value={carStatusOption} className="border-2 px-1 cursor-pointer">
                     <option value="전체">전체</option>
                     <option value="운행중">운행중</option>
                     <option value="미운행">미운행</option>
@@ -100,14 +101,14 @@ function CarList({ carStatusBtn, setCarStatusBtn, selectedCar, setSelectedCar }:
             <form action="#" onSubmit={e => e.preventDefault()} className="mb-3">
                 <label className={`${styles["car-list__input"]} flex items-center border-none rounded px-2 py-1`}>
                     <img src={searchGlass} alt="검색 아이콘" className="w-4 h-4 mr-2" />
-                    <input value={inputVal} onChange={(e) => setInputVal(e.target.value)} type="text" placeholder="차량 검색" className="w-full h-7 outline-none text-xl" />
+                    <input value={inputVal} onChange={e => setInputVal(e.target.value)} type="text" placeholder="차량 검색" className="w-full h-7 outline-none text-xl" />
                     {inputVal && <button onClick={() => setInputVal("")} type="button" className="text-sm cursor-pointer opacity-30 mr-[3px]">X</button>}
                 </label>
             </form>
 
             {/* car는 각 차량 객체 */}
             <ul className="flex-1 overflow-y-auto space-y-2 pr-2">
-                {filteredCarList.map((car) => {
+                {filteredCarList.map(car => {
                     const iconSrc = carStatusClass[car.status];
 
                     return <li key={car.number} onClick={() => setSelectedCar(car)}
@@ -120,7 +121,8 @@ function CarList({ carStatusBtn, setCarStatusBtn, selectedCar, setSelectedCar }:
                                     <span className="opacity-50">{car.name}</span>
                                 </p>
                         </li>
-                    })}
+                    })
+                }
             </ul>
         </section>
     );
