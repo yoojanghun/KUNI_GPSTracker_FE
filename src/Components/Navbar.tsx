@@ -1,9 +1,9 @@
 import { NavLink } from "react-router-dom";
-import logo from "../assets/logo.png";
-import car from "../assets/nav-bar-icons/directions_car.png";
-import location from "../assets/nav-bar-icons/location_on.png";
-import tool from "../assets/nav-bar-icons/Tool.png";
-import folder from "../assets/nav-bar-icons/folder.png";
+import logo from "@/assets/logo.png";
+import car from "@/assets/nav-bar-icons/directions_car.png";
+import location from "@/assets/nav-bar-icons/location_on.png";
+import tool from "@/assets/nav-bar-icons/Tool.png";
+import folder from "@/assets/nav-bar-icons/folder.png";
 
 interface NavItem {
   to: string;

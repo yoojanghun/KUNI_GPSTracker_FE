@@ -1,6 +1,6 @@
-import truck from "../../assets/car-list-icons/truck.png";
-import searchGlass from "../../assets/car-list-icons/Search.png";
-import arrowLeft from "../../assets/arrow-left.png";
+import truck from "@/assets/car-list-icons/truck.png";
+import searchGlass from "@/assets/car-list-icons/Search.png";
+import arrowLeft from "@/assets/arrow-left.png";
 import styles from "./CarList.module.css";
 import { useEffect, useState } from "react";
 import type { CarInfo } from "@/Store/catStatus.ts"
@@ -14,6 +14,10 @@ function CarList() {
 
     const setCarStatusOption = useCarStatusOptionStore(state => state.setCarStatusOption);
     const carStatusOption = useCarStatusOptionStore(state => state.carStatusOption);
+
+    useEffect(() => {
+        setCarStatusOption("전체");
+    }, [])
 
     const [inputVal, setInputVal] = useState<string>("");
     const [currentCarList, setCurrentCarList] = useState<CarInfo[]>([])
