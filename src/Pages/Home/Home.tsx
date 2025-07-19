@@ -9,7 +9,7 @@ import calendar from "../../assets/Calendar.png";
 import styles from "./Home.module.css";
 
 import SimpleLineChart from "@/Components/chart";
-import MapTest from "@/Components/map";
+import MapBasic from "@/Components/Map/MapBasic";
 import { useState, type ChangeEvent } from "react";
 
 
@@ -135,7 +135,7 @@ function Home() {
                         </div>
                     </div>
                     <div className="w-[100%] h-[91%]">
-                        <MapTest carStatus={carStatusBtn} />
+                        <MapBasic level={13} carStatus={carStatusBtn} selectedCarFocus={false}/>
                     </div>
                 </div>
             </div>
