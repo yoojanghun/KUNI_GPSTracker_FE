@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import Draggable from 'react-draggable';
-import CarList from "../../Components/CarList/CarList.tsx";
+import CarList from "@/Components/CarList/CarList.tsx";
 import MapBasic from "@/Components/Map/MapBasic.tsx";
 
 function LocationSearch() {

@@ -1,16 +1,17 @@
-import total from "../../assets/car-status-icons/total.png";
-import working from "../../assets/car-status-icons/working.png";
-import notWorking from "../../assets/car-status-icons/not-working.png";
-import checkingIndicator from "../../assets/car-status-icons/checking-indicator.png";
-import notWorkingIndicator from "../../assets/car-status-icons/not-working-indicator.png";
-import workingIndicator from "../../assets/car-status-icons/working-indicator.png";
-import location from "../../assets/nav-bar-icons/location_on.png";
-import calendar from "../../assets/Calendar.png";
+import total from "@/assets/car-status-icons/total.png";
+import working from "@/assets/car-status-icons/working.png";
+import notWorking from "@/assets/car-status-icons/not-working.png";
+import checkingIndicator from "@/assets/car-status-icons/checking-indicator.png";
+import notWorkingIndicator from "@/assets/car-status-icons/not-working-indicator.png";
+import workingIndicator from "@/assets/car-status-icons/working-indicator.png";
+import location from "@/assets/nav-bar-icons/location_on.png";
+import calendar from "@/assets/Calendar.png";
 import styles from "./Home.module.css";
 
 import SimpleLineChart from "@/Components/chart";
 import MapBasic from "@/Components/Map/MapBasic";
 import { useCarStatusOptionStore } from "@/Store/catStatus";
+import { useEffect } from "react";
 
 
 function Home() {
@@ -18,6 +19,10 @@ function Home() {
 
     const carStatusOption = useCarStatusOptionStore(state => state.carStatusOption);
     const setCarStatusOption = useCarStatusOptionStore(state => state.setCarStatusOption);
+
+    useEffect(() => {
+        setCarStatusOption("전체");
+    }, [])
 
     return (
         <main className="flex-1 box-border p-5">
