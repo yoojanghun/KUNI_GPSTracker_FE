@@ -16,10 +16,46 @@ export function DLogDetails() {
   let centerLat = (startLat + endLat) / 2;
   let centerLong = (startLong + endLong) / 2;
 
+  // 임시 이동 경로
+  const path = [
+  new kakao.maps.LatLng(37.561535, 126.9719692),
+  new kakao.maps.LatLng(37.5617875, 126.97236766),
+  new kakao.maps.LatLng(37.56204, 126.97276612),
+  new kakao.maps.LatLng(37.5622925, 126.97316458),
+  new kakao.maps.LatLng(37.562545, 126.97356304),
+  new kakao.maps.LatLng(37.5627975, 126.9739615),
+  new kakao.maps.LatLng(37.56305, 126.97435996),
+  new kakao.maps.LatLng(37.5633025, 126.97475842),
+  new kakao.maps.LatLng(37.563555, 126.97515688),
+  new kakao.maps.LatLng(37.5638075, 126.97555534),
+  new kakao.maps.LatLng(37.56406, 126.9759538),
+  new kakao.maps.LatLng(37.5643125, 126.97635226),
+  new kakao.maps.LatLng(37.564565, 126.97675072),
+  new kakao.maps.LatLng(37.5648175, 126.97714918),
+  new kakao.maps.LatLng(37.56507, 126.97754764),
+  new kakao.maps.LatLng(37.5653225, 126.9779461),
+  new kakao.maps.LatLng(37.565575, 126.97834456),
+  new kakao.maps.LatLng(37.5658275, 126.97874302),
+  new kakao.maps.LatLng(37.56608, 126.97914148),
+  new kakao.maps.LatLng(37.5663325, 126.97953994),
+  new kakao.maps.LatLng(37.566535, 126.9779692),
+];
+
+// 이동경로 설정
+const polyline = new kakao.maps.Polyline({
+  path: path,
+  strokeWeight: 4,
+  strokeColor: "#000000",
+  strokeOpacity: 0.8,
+  strokeStyle: "solid",
+});
+
+
   // 마커 설정
   const markerImage = new kakao.maps.MarkerImage(
     indicator,
     new kakao.maps.Size(28, 28),
+    {offset: new kakao.maps.Point(14, 14)}
   )
   const startMarker = new kakao.maps.Marker({
     position: new kakao.maps.LatLng(startLat, startLong),
@@ -42,6 +78,7 @@ export function DLogDetails() {
       const map = new kakao.maps.Map(containerRef.current, options);
       startMarker.setMap(map);
       endMarker.setMap(map);
+      polyline.setMap(map);
     }
   }, []);
 
