@@ -138,7 +138,7 @@ function Home() {
                         </div>
                     </div>
                     <div className="w-[100%] h-[91%]">
-                        <MapBasic level={13} selectedCarFocus={false}/>
+                        <MapBasic level={13} maxLevel={13} selectedCarFocus={false}/>
                     </div>
                 </div>
             </div>

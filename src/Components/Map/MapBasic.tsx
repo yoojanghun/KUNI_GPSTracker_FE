@@ -7,10 +7,11 @@ type CarWithPath = Omit<CarInfo, "path"> & { path: Position[]; };
 
 type MapTestProps = {
   level?: number;
+  maxLevel: number;
   selectedCarFocus: boolean;
 }
 
-function MapBasic ({ level = 13, selectedCarFocus }: MapTestProps) {
+function MapBasic ({ level = 13, maxLevel, selectedCarFocus }: MapTestProps) {
 
   const carStatusOption = useCarStatusOptionStore(state => state.carStatusOption);
   const selectedCar = useSelectCarStore(state => state.selectedCar);
@@ -45,6 +46,10 @@ function MapBasic ({ level = 13, selectedCarFocus }: MapTestProps) {
       center: new kakao.maps.LatLng(37.5660, 126.9775),
       level: level,
     });
+
+    const zoomControl = new kakao.maps.ZoomControl();
+    mapInstance.current.addControl(zoomControl, kakao.maps.ControlPosition.BOTTOMRIGHT);
+    mapInstance.current.setMaxLevel(maxLevel);
 
     // 전체 차량 클러스터러 생성
     totalClustererRef.current = new kakao.maps.MarkerClusterer({
@@ -147,37 +152,87 @@ function MapBasic ({ level = 13, selectedCarFocus }: MapTestProps) {
     notRunningClustererRef.current?.clear();
     inspectedClustererRef.current?.clear();
 
-    // 이전 폴리라인 제거
-    // polylinesRef.current.forEach(polyline => polyline.setMap(null));
-    // polylinesRef.current = [];
-
     const createMarkers = (status: string, imageUrl: string) =>
       positions
         .filter(p => p.status === status)
         .map(p => {
           const lastPoint = p.path[p.path.length - 1]; // 마지막 위치 객체
-          return new kakao.maps.Marker({
+
+          // 1) Marker 생성
+          const marker = new kakao.maps.Marker({
             position: new kakao.maps.LatLng(lastPoint.lat, lastPoint.lng),
             image: new kakao.maps.MarkerImage(
               imageUrl,
               new kakao.maps.Size(30, 30),
-              { offset: new kakao.maps.Point(20, 40) }
+              { offset: new kakao.maps.Point(15, 30) }
             )
           });
-    });
+
+          // 2) InfoWindow 생성
+          const iwContent = `
+            <div style="padding:5px; font-size:12px;">
+              ${p.number}<br>
+              ${p.name}<br>
+              <a href="https://map.kakao.com/link/map/${p.number},${lastPoint.lat},${lastPoint.lng}"
+                style="color:blue" target="_blank">큰지도보기</a>
+              <a href="https://map.kakao.com/link/to/${p.number},${lastPoint.lat},${lastPoint.lng}"
+                style="color:blue; margin-left:4px;" target="_blank">길찾기</a>
+            </div>`;
+          const infowindow = new kakao.maps.InfoWindow({ content: iwContent });
+          
+          // 3) 이벤트 리스너 등록 (클릭하면 열기)
+          kakao.maps.event.addListener(marker, "click", () => {
+            if(infowindow.getMap()) {
+              infowindow.close();
+            }
+            else {
+              infowindow.open(mapInstance.current, marker);
+            }
+          })
+          return marker;
+        }
+    );
 
     if (carStatusOption === "전체") {
-      const allMarkers = positions.map(p => {
-        const lastPoint = p.path[p.path.length - 1];
-        return new kakao.maps.Marker({
-          position: new kakao.maps.LatLng(lastPoint.lat, lastPoint.lng),
-          image: new kakao.maps.MarkerImage(
-            "/vite.svg",
-            new kakao.maps.Size(30, 30),
-            { offset: new kakao.maps.Point(20, 40) }
-          )
+      const allMarkers = positions
+        .map(p => {
+          const lastPoint = p.path[p.path.length - 1];
+
+          // 1) Marker 생성
+          const marker = new kakao.maps.Marker({
+            position: new kakao.maps.LatLng(lastPoint.lat, lastPoint.lng),
+            image: new kakao.maps.MarkerImage(
+              "/vite.svg",
+              new kakao.maps.Size(30, 30),
+              { offset: new kakao.maps.Point(15, 30) }
+            )
+          });
+
+          // 2) InfoWindow 생성
+          const iwContent = `
+            <div style="padding:5px; font-size:12px;">
+              ${p.number}<br>
+              ${p.name}<br>
+              <a href="https://map.kakao.com/link/map/${p.number},${lastPoint.lat},${lastPoint.lng}"
+                style="color:blue" target="_blank">큰지도보기</a>
+              <a href="https://map.kakao.com/link/to/${p.number},${lastPoint.lat},${lastPoint.lng}"
+                style="color:blue; margin-left:4px;" target="_blank">길찾기</a>
+            </div>`;
+          const infowindow = new kakao.maps.InfoWindow({ content: iwContent });
+
+          // 3) 이벤트 리스너 등록 (클릭하면 열기)
+          kakao.maps.event.addListener(marker, "click", () => {
+            if (infowindow.getMap()) {
+              infowindow.close();
+            } 
+            else {
+              infowindow.open(mapInstance.current, marker);
+            }
+          });
+          return marker;
         });
-      });
+
+      // 4) 클러스터러에 마커 추가
       totalClustererRef.current?.addMarkers(allMarkers);
     }
     else if (carStatusOption === "운행중") {
@@ -190,38 +245,19 @@ function MapBasic ({ level = 13, selectedCarFocus }: MapTestProps) {
       inspectedClustererRef.current?.addMarkers(createMarkers('수리중', '/vite.svg'));
     }
 
-    // 차량별 경로 폴리라인 생성
-    // positions.forEach(vehicle => {
-    //   const linePath = vehicle.path.map(point =>
-    //     new kakao.maps.LatLng(point.lat, point.lng)
-    //   );
-
-    //   const polyline = new kakao.maps.Polyline({
-    //     path: linePath,
-    //     strokeWeight: 8,
-    //     strokeColor: "red",
-    //     strokeOpacity: 0.8,
-    //     strokeStyle: "solid",
-    //   });
-
-    //   polyline.setMap(mapInstance.current);
-    //   polylinesRef.current.push(polyline);
-    // });
   }, [carStatusOption, positions]);
   // 옵션창에서 carStatus를 바꾸거나, 차량 데이터가 변경되어 positions가 바뀌거나 => 마커 다시 로드
 
-  if(selectedCarFocus) {
-    useEffect(() => {
-      if (!mapInstance.current || !selectedCar?.path?.length) return;
+  useEffect(() => {
+    if (!mapInstance.current || !selectedCar?.path?.length || !selectedCarFocus) return;
   
       // selecTedCar가 바뀔 때마다 지도 중심으로 다시 로드
-      const selectedCarLastPoint = selectedCar.path[selectedCar.path.length - 1];     // 위도 경도 시간 객체
-      const selectedCarCenter = new kakao.maps.LatLng(selectedCarLastPoint.lat, selectedCarLastPoint.lng);
+    const selectedCarLastPoint = selectedCar.path[selectedCar.path.length - 1];     // 위도 경도 시간 객체
+    const selectedCarCenter = new kakao.maps.LatLng(selectedCarLastPoint.lat, selectedCarLastPoint.lng);
   
-      mapInstance.current.setLevel(3);
-      mapInstance.current.panTo(selectedCarCenter);
-    }, [selectedCar])
-  }
+    mapInstance.current.setLevel(3);
+    mapInstance.current.panTo(selectedCarCenter);
+  }, [selectedCar])
 
   return (
     <div ref={mapContainerRef} style={{ width: '100%', height: '100%'}}/>
