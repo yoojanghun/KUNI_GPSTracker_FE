@@ -2,7 +2,7 @@ import truck from "@/assets/car-list-icons/truck.png";
 import searchGlass from "@/assets/car-list-icons/Search.png";
 import arrowLeft from "@/assets/arrow-left.png";
 import styles from "./CarList.module.css";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { CarInfo } from "@/Store/catStatus.ts"
 import { useSelectCarStore } from "@/Store/catStatus";
 import { useCarStatusOptionStore } from "@/Store/catStatus.ts";
@@ -21,6 +21,13 @@ function CarList() {
 
     const [inputVal, setInputVal] = useState<string>("");
     const [currentCarList, setCurrentCarList] = useState<CarInfo[]>([])
+    const [isVisible, setIsVisible] = useState<boolean>(true);
+
+    const hideBtnRef = useRef<HTMLButtonElement | null>(null);
+
+    function hideBtn() {
+        setIsVisible(!isVisible);
+    }
 
     const carStatusClass: Record<string, string> = {
         "운행중": "bg-[#c1d8ff] text-[#5491f5]",
@@ -48,20 +55,16 @@ function CarList() {
 
     if(selectedCar) {
         return (
-            <section className={`${styles["car-list"]} border w-[300px] h-[400px] flex flex-col rounded-xl bg-white box-border p-3`}>
+             <section className={`${styles["car-list"]} border w-75 max-h-130 flex flex-col rounded-xl bg-white box-border p-3`}>
                 <button className="flex items-center cursor-pointer" onClick={() => setSelectedCar(null)}>
                     <img src={arrowLeft} alt="뒤로가기 버튼" className="w-6 h-6 mr-2"/>
                     <span className="text-lg font-bold">뒤로 가기</span>
                 </button>
-                <p className="mb-5 font-bold opacity-20 ml-1">
+                <p className="font-bold opacity-20 ml-1">
                     {selectedCar.number}
                 </p>
-                <table>
+                {isVisible && <table className="mt-5">
                     <tbody>
-                        <tr>
-                            <th className={styles["th"]}>운전자</th>
-                            <td className={styles["td"]}>데이터없음</td>
-                        </tr>
                         <tr>
                             <th className={styles["th"]}>차량번호</th>
                             <td className={styles["td"]}>{selectedCar.number}</td>
@@ -83,14 +86,16 @@ function CarList() {
                             <td className={styles["td"]}>{selectedCar.mileage}</td>
                         </tr>
                     </tbody>
-                </table>
-                <button>안녕?</button>
+                </table>}
+                <button ref={hideBtnRef} onClick={hideBtn} className={`${styles["hide-btn"]} rounded-br-xl rounded-bl-xl h-6 border`}>
+                    {isVisible ? "🔺" : "🔻"}
+                </button>
             </section>
         )
     }
     
     return (
-        <section className={`${styles["car-list"]} border w-[300px] h-[480px] flex flex-col rounded-xl bg-white box-border p-3`}>
+        <section className={`${styles["car-list"]} border w-75 max-h-130 flex flex-col rounded-xl bg-white box-border p-3`}>
             <h3 className="flex justify-between items-center font-bold text-xl mb-2 pr-1">
                 <div className="flex items-center">
                     <img src={truck} alt="트럭 아이콘" className="mr-2" />
@@ -103,16 +108,16 @@ function CarList() {
                     <option value="수리중">수리중</option>
                 </select>
             </h3>
+
             <form action="#" onSubmit={e => e.preventDefault()} className="mb-3">
                 <label className={`${styles["car-list__input"]} flex items-center border-none rounded px-2 py-1`}>
                     <img src={searchGlass} alt="검색 아이콘" className="w-4 h-4 mr-2" />
-                    <input value={inputVal} onChange={e => setInputVal(e.target.value)} type="text" placeholder="차량 검색" className="w-full h-7 outline-none text-xl" />
-                    {inputVal && <button onClick={() => setInputVal("")} type="button" className="text-sm cursor-pointer opacity-30 mr-[3px]">X</button>}
+                    <input value={inputVal} onChange={e => setInputVal(e.target.value)} type="text" placeholder="차량 검색" className="w-full h-7 outline-none text-xl" />                        {inputVal && <button onClick={() => setInputVal("")} type="button" className="text-sm cursor-pointer opacity-30 mr-[3px]">X</button>}
                 </label>
             </form>
 
-            {/* car는 각 차량 객체 */}
-            <ul className="flex-1 overflow-y-auto space-y-2 pr-2">
+                {/* car는 각 차량 객체 */}
+            {isVisible && <ul className="flex-1 overflow-y-auto space-y-2 pr-2 min-h-100 pb-2">
                 {filteredCarList.map(car => {
                     const iconSrc = carStatusClass[car.status];
 
@@ -128,9 +133,12 @@ function CarList() {
                         </li>
                     })
                 }
-            </ul>
-            <button>안녕?</button>
+            </ul>}
+            <button ref={hideBtnRef} onClick={hideBtn} className={`${styles["hide-btn"]} rounded-br-xl rounded-bl-xl h-6 border`}>
+                {isVisible ? "🔺" : "🔻"}
+            </button>
         </section>
+        
     );
 }
 
