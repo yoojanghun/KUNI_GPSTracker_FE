@@ -1,3 +1,5 @@
+// 운행일지 상세페이지의 커스텀 오버레이
+
 export function makeOverlayHTML(type: "start" | "end", lat: number, lng: number): HTMLElement {
   const label = type === "start" ? "출발지" : "도착지";
   const content = document.createElement("div");
