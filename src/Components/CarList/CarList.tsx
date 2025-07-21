@@ -84,6 +84,7 @@ function CarList() {
                         </tr>
                     </tbody>
                 </table>
+                <button>안녕?</button>
             </section>
         )
     }
@@ -128,6 +129,7 @@ function CarList() {
                     })
                 }
             </ul>
+            <button>안녕?</button>
         </section>
     );
 }
