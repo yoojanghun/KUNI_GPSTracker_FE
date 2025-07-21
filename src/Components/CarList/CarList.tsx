@@ -3,9 +3,9 @@ import searchGlass from "@/assets/car-list-icons/Search.png";
 import arrowLeft from "@/assets/arrow-left.png";
 import styles from "./CarList.module.css";
 import { useEffect, useRef, useState } from "react";
-import type { CarInfo } from "@/Store/catStatus.ts"
-import { useSelectCarStore } from "@/Store/catStatus";
-import { useCarStatusOptionStore } from "@/Store/catStatus.ts";
+import type { CarInfo } from "@/Store/carStatus"
+import { useSelectCarStore } from "@/Store/carStatus";
+import { useCarStatusOptionStore } from "@/Store/carStatus";
 
 function CarList() {
 
@@ -24,10 +24,6 @@ function CarList() {
     const [isVisible, setIsVisible] = useState<boolean>(true);
 
     const hideBtnRef = useRef<HTMLButtonElement | null>(null);
-
-    function hideBtn() {
-        setIsVisible(!isVisible);
-    }
 
     const carStatusClass: Record<string, string> = {
         "운행중": "bg-[#c1d8ff] text-[#5491f5]",
@@ -53,6 +49,19 @@ function CarList() {
         return matchesKeyWord && matchesStatus;
     })
 
+    function handleInput(event: React.ChangeEvent<HTMLInputElement>) {
+        setInputVal(event.target.value);
+
+        const keyword = event.target.value.trim().toLowerCase();
+        const isMatchingCar = filteredCarList.filter((car) => {
+            return car["name"].trim().toLowerCase().includes(keyword) || 
+                    car["number"].trim().toLowerCase().includes(keyword);
+        })
+        if(isMatchingCar.length > 0 && keyword !== "") {
+            setIsVisible(true);
+        }
+    }
+
     if(selectedCar) {
         return (
              <section className={`${styles["car-list"]} border w-75 max-h-130 flex flex-col rounded-xl bg-white box-border p-3`}>
@@ -63,7 +72,7 @@ function CarList() {
                 <p className="font-bold opacity-20 ml-1">
                     {selectedCar.number}
                 </p>
-                {isVisible && <table className="mt-5">
+                {isVisible && <table className="my-5">
                     <tbody>
                         <tr>
                             <th className={styles["th"]}>차량번호</th>
@@ -87,7 +96,9 @@ function CarList() {
                         </tr>
                     </tbody>
                 </table>}
-                <button ref={hideBtnRef} onClick={hideBtn} className={`${styles["hide-btn"]} rounded-br-xl rounded-bl-xl h-6 border`}>
+                <button ref={hideBtnRef} 
+                    onClick={() => {setIsVisible(!isVisible)}} 
+                    className={`${styles["hide-btn"]} rounded-br-xl rounded-bl-xl h-6 border`}>
                     {isVisible ? "🔺" : "🔻"}
                 </button>
             </section>
@@ -112,12 +123,12 @@ function CarList() {
             <form action="#" onSubmit={e => e.preventDefault()} className="mb-3">
                 <label className={`${styles["car-list__input"]} flex items-center border-none rounded px-2 py-1`}>
                     <img src={searchGlass} alt="검색 아이콘" className="w-4 h-4 mr-2" />
-                    <input value={inputVal} onChange={e => setInputVal(e.target.value)} type="text" placeholder="차량 검색" className="w-full h-7 outline-none text-xl" />                        {inputVal && <button onClick={() => setInputVal("")} type="button" className="text-sm cursor-pointer opacity-30 mr-[3px]">X</button>}
+                    <input value={inputVal} onChange={handleInput} type="text" placeholder="차량 검색" className="w-full h-7 outline-none text-xl" />                        {inputVal && <button onClick={() => setInputVal("")} type="button" className="text-sm cursor-pointer opacity-30 mr-[3px]">X</button>}
                 </label>
             </form>
 
                 {/* car는 각 차량 객체 */}
-            {isVisible && <ul className="flex-1 overflow-y-auto space-y-2 pr-2 min-h-100 pb-2">
+            {isVisible && <ul className="flex-1 overflow-y-auto space-y-2 pr-2 min-h-105 pb-2">
                 {filteredCarList.map(car => {
                     const iconSrc = carStatusClass[car.status];
 
@@ -134,7 +145,9 @@ function CarList() {
                     })
                 }
             </ul>}
-            <button ref={hideBtnRef} onClick={hideBtn} className={`${styles["hide-btn"]} rounded-br-xl rounded-bl-xl h-6 border`}>
+            <button ref={hideBtnRef} 
+                onClick={() => {setIsVisible(!isVisible)}} 
+                className={`${styles["hide-btn"]} rounded-br-xl rounded-bl-xl h-6 border`}>
                 {isVisible ? "🔺" : "🔻"}
             </button>
         </section>

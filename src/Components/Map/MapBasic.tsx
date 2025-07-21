@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import type { CarInfo, Position } from '@/Store/catStatus.ts';
-import { useCarStatusOptionStore, useSelectCarStore } from '@/Store/catStatus';
+import type { CarInfo, Position } from '@/Store/carStatus';
+import { useCarStatusOptionStore, useSelectCarStore } from '@/Store/carStatus';
 import { useKakaoLoader } from 'react-kakao-maps-sdk';
 
 type CarWithPath = Omit<CarInfo, "path"> & { path: Position[]; };
@@ -14,6 +14,8 @@ type MapTestProps = {
 function MapBasic ({ level = 13, maxLevel, selectedCarFocus }: MapTestProps) {
 
   const carStatusOption = useCarStatusOptionStore(state => state.carStatusOption);
+
+  const setSelectedCar = useSelectCarStore(state => state.setSelectedCar);
   const selectedCar = useSelectCarStore(state => state.selectedCar);
 
   const [positions, setPositions] = useState<CarWithPath[]>([]);      // positions에는 차량들의 리스트 객체들이 들어감
@@ -170,13 +172,14 @@ function MapBasic ({ level = 13, maxLevel, selectedCarFocus }: MapTestProps) {
 
           // 2) InfoWindow 생성
           const iwContent = `
-            <div style="padding:5px; font-size:12px;">
-              ${p.number}<br>
-              ${p.name}<br>
+            <div style="padding:5px; font-size:1rem;">
+              <span>${p.number}</span><br>
+              <span>${p.name}</span><br>
+              <span>${p.status}</span><br>
               <a href="https://map.kakao.com/link/map/${p.number},${lastPoint.lat},${lastPoint.lng}"
-                style="color:blue" target="_blank">큰지도보기</a>
+                style="color:blue; font-size: 0.8rem;" target="_blank">큰지도보기</a>
               <a href="https://map.kakao.com/link/to/${p.number},${lastPoint.lat},${lastPoint.lng}"
-                style="color:blue; margin-left:4px;" target="_blank">길찾기</a>
+                style="color:blue; font-size: 0.8rem;" margin-left:4px;" target="_blank">길찾기</a>
             </div>`;
           const infowindow = new kakao.maps.InfoWindow({ content: iwContent });
           
@@ -187,6 +190,7 @@ function MapBasic ({ level = 13, maxLevel, selectedCarFocus }: MapTestProps) {
             }
             else {
               infowindow.open(mapInstance.current, marker);
+              setSelectedCar(p);
             }
           })
           return marker;
@@ -210,13 +214,14 @@ function MapBasic ({ level = 13, maxLevel, selectedCarFocus }: MapTestProps) {
 
           // 2) InfoWindow 생성
           const iwContent = `
-            <div style="padding:5px; font-size:12px;">
-              ${p.number}<br>
-              ${p.name}<br>
+            <div style="padding:5px; font-size: 1rem;">
+              <span>${p.number}</span><br>
+              <span>${p.name}</span><br>
+              <span>${p.status}</span><br>
               <a href="https://map.kakao.com/link/map/${p.number},${lastPoint.lat},${lastPoint.lng}"
-                style="color:blue" target="_blank">큰지도보기</a>
+                style="color:blue; font-size: 0.8rem;" target="_blank">큰지도보기</a>
               <a href="https://map.kakao.com/link/to/${p.number},${lastPoint.lat},${lastPoint.lng}"
-                style="color:blue; margin-left:4px;" target="_blank">길찾기</a>
+                style="color:blue; font-size: 0.8rem; margin-left:4px;" target="_blank"">길찾기</a>
             </div>`;
           const infowindow = new kakao.maps.InfoWindow({ content: iwContent });
 
@@ -227,6 +232,7 @@ function MapBasic ({ level = 13, maxLevel, selectedCarFocus }: MapTestProps) {
             } 
             else {
               infowindow.open(mapInstance.current, marker);
+              setSelectedCar(p);
             }
           });
           return marker;
