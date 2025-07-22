@@ -20,18 +20,36 @@ export function DLogDetails() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<kakao.maps.Map | null>(null);
 
+  // id값과 일치하는 데이터 fetch
+  const navigate = useNavigate();
+  const { Id } = useParams();
+
+  if (Id === undefined) {
+    throw new Error(`id값이 없습니다. recordId: ${Id}`);
+  }
+
+  const findById = useDLogStore((state) => state.findById);
+  const { startTime, endTime, distance, carNumber, carName } =
+    findById(Id);
+
+  const detailData = detailLog.find((items) => items.recordId === Id )?.data;
+
+  if (detailData === undefined) {
+    throw new Error(`일치하는 상세 데이터가 없습니다. recordId: ${Id}`);
+  }
+
   // 위도, 경도값 fetch 및 LatLng 객체로 변환
   const startPosition = new kakao.maps.LatLng(
-    detailLog.startLat,
-    detailLog.startLong
+    detailData.startLat,
+    detailData.startLong
   );
   const endPosition = new kakao.maps.LatLng(
-    detailLog.endLat,
-    detailLog.endLong
+    detailData.endLat,
+    detailData.endLong
   );
   const centerPosition = new kakao.maps.LatLng(
-    (detailLog.startLat + detailLog.endLat) / 2,
-    (detailLog.startLong + detailLog.endLong) / 2
+    (detailData.startLat + detailData.endLat) / 2,
+    (detailData.startLong + detailData.endLong) / 2
   );
 
     // geodecoder (좌표->주소) 객체 생성
@@ -64,17 +82,8 @@ export function DLogDetails() {
     }
   );
 
-  // id값과 일치하는 데이터 fetch
-  const navigate = useNavigate();
-  const { recordId } = useParams();
+  
 
-  if (recordId === undefined) {
-    throw new Error("id값이 없습니다.");
-  }
-
-  const findById = useDLogStore((state) => state.findById);
-  const { startTime, endTime, distance, carNumber, carName } =
-    findById(recordId);
 
   
 
@@ -111,10 +120,10 @@ export function DLogDetails() {
   console.log('end: ', endAddr);
 
   useEffect(() => {
-    if (!containerRef.current || !detailLog || !detailLog.record.length) {
+    if (!containerRef.current || !detailLog || !detailData.record.length) {
       console.log('contRef: ', containerRef.current);
       console.log('detailog: ', detailLog);
-      console.log('detail.record: ', detailLog.record);
+      console.log('detail.record: ', detailData.record);
       console.log('여기서 막힘');
       return;
     }
@@ -126,7 +135,7 @@ export function DLogDetails() {
     mapRef.current = map;
 
     // 이동경로 설정
-    const path = detailLog.record.map(
+    const path = detailData.record.map(
       (k) => new kakao.maps.LatLng(k.lat, k.long)
     );
     const polyline = new kakao.maps.Polyline({
@@ -177,7 +186,7 @@ export function DLogDetails() {
       </div>
       <div className="m-5 mx-20">
         <div className="flex flex-row gap-5 mb-6 justify-start w-full">
-          <div className="border rounded-[12px] border-[#000000]/10 shadow-md px-8 py-6 justify-start gap-4 flex flex-col shrink-0">
+          <div className="border rounded-[12px] border-[#000000]/10 shadow-md px-8 py-6 justify-between gap-4 flex flex-col shrink-0">
             <div className="flex items-center gap-3 font-bold text-xl">
               <Clock size={22} />
               시작 시간
@@ -186,7 +195,7 @@ export function DLogDetails() {
               {startTime.replace("T", " ")}
             </div>
           </div>
-          <div className="border rounded-[12px] border-[#000000]/10 shadow-md px-8 py-6 justify-start gap-4 flex flex-col shrink-0">
+          <div className="border rounded-[12px] border-[#000000]/10 shadow-md px-8 py-6 justify-between gap-4 flex flex-col shrink-0">
             <div className="flex items-center gap-3 font-bold text-xl">
               <ClockFading size={22} />
               종료 시간
@@ -195,7 +204,7 @@ export function DLogDetails() {
               {endTime.replace("T", " ")}
             </div>
           </div>
-          <div className="border rounded-[12px] border-[#000000]/10 shadow-md px-6 py-6 justify-start gap-4 flex flex-col shrink-0">
+          <div className="border rounded-[12px] border-[#000000]/10 shadow-md px-6 py-6 justify-between gap-4 flex flex-col shrink-0">
             <div className="flex items-center gap-3 font-bold text-xl">
               <Clipboard size={22} />총 운행거리
             </div>

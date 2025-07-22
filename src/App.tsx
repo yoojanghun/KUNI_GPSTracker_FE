@@ -18,7 +18,7 @@ function App() {
           <Route path="/location" element={<LocationSearch />}/>
           <Route path="/management" element={<Management />} />
           <Route path="/log" element={<DrivingLog />} />
-          <Route path="/log/:recordId" element={<DLogDetails />} />
+          <Route path="/log/:Id" element={<DLogDetails />} />
         </Routes>
       </div>
     </Router>
