@@ -1,22 +1,22 @@
 import { useState, useEffect, useRef } from 'react';
 import type { CarInfo, Position } from '@/Store/carStatus';
-import { useCarStatusOptionStore, useSelectCarStore } from '@/Store/carStatus';
+import { useCarStatusOptionStore, useMapStore } from '@/Store/carStatus';
 import { useKakaoLoader } from 'react-kakao-maps-sdk';
 
 type CarWithPath = Omit<CarInfo, "path"> & { path: Position[]; };
 
 type MapTestProps = {
-  level?: number;
   maxLevel: number;
-  selectedCarFocus: boolean;
 }
 
-function MapBasic ({ level = 13, maxLevel, selectedCarFocus }: MapTestProps) {
+function MapBasic ({ maxLevel }: MapTestProps) {
 
   const carStatusOption = useCarStatusOptionStore(state => state.carStatusOption);
 
-  const setSelectedCar = useSelectCarStore(state => state.setSelectedCar);
-  const selectedCar = useSelectCarStore(state => state.selectedCar);
+  const mapCenter = useMapStore(state => state.mapCenter);
+  const setMapCenter = useMapStore(state => state.setMapCenter);
+  const mapLevel = useMapStore(state => state.mapLevel);
+  const setMapLevel = useMapStore(state => state.setMapLevel);
 
   const [positions, setPositions] = useState<CarWithPath[]>([]);      // positions에는 차량들의 리스트 객체들이 들어감
 
@@ -27,8 +27,6 @@ function MapBasic ({ level = 13, maxLevel, selectedCarFocus }: MapTestProps) {
   const runningClustererRef = useRef<kakao.maps.MarkerClusterer | null>(null);
   const notRunningClustererRef = useRef<kakao.maps.MarkerClusterer | null>(null);
   const inspectedClustererRef = useRef<kakao.maps.MarkerClusterer | null>(null);
-
-  // const polylinesRef = useRef<kakao.maps.Polyline[]>([]);
 
   // 차량의 현재 위치 (예시 데이터)
   useEffect(() => {
@@ -41,17 +39,24 @@ function MapBasic ({ level = 13, maxLevel, selectedCarFocus }: MapTestProps) {
     // loading이 끝나고 에러가 없으며, ref가 유효할 때만 실행
     if (!mapContainerRef.current || mapInstance.current) return;
 
-    const kakao = (window as any).kakao as typeof window.kakao;
-
     // 지도 생성
     mapInstance.current = new kakao.maps.Map(mapContainerRef.current, {
-      center: new kakao.maps.LatLng(37.5660, 126.9775),
-      level: level,
+      center: new kakao.maps.LatLng(mapCenter.lat, mapCenter.lng),
+      level: mapLevel,
     });
+    mapInstance.current.setMaxLevel(maxLevel);
 
+    // zoom 컨트롤러 생성
     const zoomControl = new kakao.maps.ZoomControl();
     mapInstance.current.addControl(zoomControl, kakao.maps.ControlPosition.BOTTOMRIGHT);
-    mapInstance.current.setMaxLevel(maxLevel);
+
+    const mapCenterLevelEvent = () => {
+      if(!mapInstance.current) return;
+      const center = mapInstance.current.getCenter();
+      setMapCenter({ lat: center.getLat(), lng: center.getLng()});
+      setMapLevel(mapInstance.current.getLevel());
+    }
+    kakao.maps.event.addListener(mapInstance.current, "idle", mapCenterLevelEvent);
 
     // 전체 차량 클러스터러 생성
     totalClustererRef.current = new kakao.maps.MarkerClusterer({
@@ -137,12 +142,13 @@ function MapBasic ({ level = 13, maxLevel, selectedCarFocus }: MapTestProps) {
 
     return () => {
       window.removeEventListener('resize', handleResize);
+      kakao.maps.event.removeListener(mapInstance.current!, 'idle', mapCenterLevelEvent);
       mapInstance.current = null;
       runningClustererRef.current = null;
       notRunningClustererRef.current = null;
       inspectedClustererRef.current = null;
     };
-  }, []);
+  }, [mapCenter, mapLevel]);
 
   useEffect(() => {
     if (!mapInstance.current) return;
@@ -190,7 +196,6 @@ function MapBasic ({ level = 13, maxLevel, selectedCarFocus }: MapTestProps) {
             }
             else {
               infowindow.open(mapInstance.current, marker);
-              setSelectedCar(p);
             }
           })
           return marker;
@@ -218,10 +223,8 @@ function MapBasic ({ level = 13, maxLevel, selectedCarFocus }: MapTestProps) {
               <span>${p.number}</span><br>
               <span>${p.name}</span><br>
               <span>${p.status}</span><br>
-              <a href="https://map.kakao.com/link/map/${p.number},${lastPoint.lat},${lastPoint.lng}"
-                style="color:blue; font-size: 0.8rem;" target="_blank">큰지도보기</a>
               <a href="https://map.kakao.com/link/to/${p.number},${lastPoint.lat},${lastPoint.lng}"
-                style="color:blue; font-size: 0.8rem; margin-left:4px;" target="_blank"">길찾기</a>
+                style="color:blue; font-size: 0.8rem;" target="_blank">길찾기</a>
             </div>`;
           const infowindow = new kakao.maps.InfoWindow({ content: iwContent });
 
@@ -232,7 +235,6 @@ function MapBasic ({ level = 13, maxLevel, selectedCarFocus }: MapTestProps) {
             } 
             else {
               infowindow.open(mapInstance.current, marker);
-              setSelectedCar(p);
             }
           });
           return marker;
@@ -251,19 +253,8 @@ function MapBasic ({ level = 13, maxLevel, selectedCarFocus }: MapTestProps) {
       inspectedClustererRef.current?.addMarkers(createMarkers('수리중', '/vite.svg'));
     }
 
-  }, [carStatusOption, positions]);
+  }, [carStatusOption, positions, mapCenter, mapLevel]);
   // 옵션창에서 carStatus를 바꾸거나, 차량 데이터가 변경되어 positions가 바뀌거나 => 마커 다시 로드
-
-  useEffect(() => {
-    if (!mapInstance.current || !selectedCar?.path?.length || !selectedCarFocus) return;
-  
-      // selecTedCar가 바뀔 때마다 지도 중심으로 다시 로드
-    const selectedCarLastPoint = selectedCar.path[selectedCar.path.length - 1];     // 위도 경도 시간 객체
-    const selectedCarCenter = new kakao.maps.LatLng(selectedCarLastPoint.lat, selectedCarLastPoint.lng);
-  
-    mapInstance.current.setLevel(3);
-    mapInstance.current.panTo(selectedCarCenter);
-  }, [selectedCar])
 
   return (
     <div ref={mapContainerRef} style={{ width: '100%', height: '100%'}}/>

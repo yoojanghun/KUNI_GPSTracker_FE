@@ -3,20 +3,18 @@ import arrowLeft from "@/assets/arrow-left.png";
 import styles from "./CarList.module.css";
 import { useEffect, useRef, useState } from "react";
 import type { CarInfo } from "@/Store/carStatus"
-import { useSelectCarStore } from "@/Store/carStatus";
-import { useCarStatusOptionStore } from "@/Store/carStatus";
+import { useSelectCarStore, useCarStatusOptionStore, useMapStore } from "@/Store/carStatus";
 
 function CarList() {
 
     const setSelectedCar = useSelectCarStore(state => state.setSelectedCar);
     const selectedCar = useSelectCarStore(state => state.selectedCar);
 
+    const setMapCenter = useMapStore(state => state.setMapCenter);
+    const setMapLevel = useMapStore(state => state.setMapLevel);
+
     const setCarStatusOption = useCarStatusOptionStore(state => state.setCarStatusOption);
     const carStatusOption = useCarStatusOptionStore(state => state.carStatusOption);
-
-    useEffect(() => {
-        setCarStatusOption("전체");
-    }, [])
 
     const [inputVal, setInputVal] = useState<string>("");
     const [currentCarList, setCurrentCarList] = useState<CarInfo[]>([])
@@ -63,11 +61,21 @@ function CarList() {
 
     if(selectedCar) {
         return (
-             <section className={`${styles["car-list"]} border w-75 max-h-130 flex flex-col rounded-xl bg-white box-border p-3`}>
-                <button className="flex items-center cursor-pointer" onClick={() => setSelectedCar(null)}>
-                    <img src={arrowLeft} alt="뒤로가기 버튼" className="w-6 h-6 mr-2"/>
-                    <span className="text-lg font-bold">뒤로 가기</span>
-                </button>
+            <section className={`${styles["car-list"]} border w-75 max-h-130 flex flex-col rounded-xl bg-white box-border p-3`}>
+                <div className="flex justify-between items-center font-bold text-xl pr-1">
+                    <button className="flex items-center cursor-pointer" onClick={() => setSelectedCar(null)}>
+                        <img src={arrowLeft} alt="뒤로가기 버튼" className="w-6 h-6 mr-2"/>
+                        <span className="text-lg font-bold">뒤로 가기</span>
+                    </button>
+                    <select onChange={e => setCarStatusOption(e.target.value)} 
+                            value={carStatusOption} 
+                            className="border-2 px-1 cursor-pointer rounded-sm">
+                        <option value="전체">전체</option>
+                        <option value="운행중">운행중</option>
+                        <option value="미운행">미운행</option>
+                        <option value="수리중">점검중</option>
+                    </select>
+                </div>
                 <p className="font-bold opacity-20 ml-1">
                     {selectedCar.number}
                 </p>
@@ -111,11 +119,13 @@ function CarList() {
                     <Truck className="mr-2" />
                     <span className="text-xl">차량 리스트</span>
                 </div>
-                <select onChange={e => setCarStatusOption(e.target.value)} value={carStatusOption} className="border-2 px-1 cursor-pointer">
+                <select onChange={e => setCarStatusOption(e.target.value)} 
+                        value={carStatusOption} 
+                        className="border-2 px-1 cursor-pointer rounded-sm">
                     <option value="전체">전체</option>
                     <option value="운행중">운행중</option>
                     <option value="미운행">미운행</option>
-                    <option value="수리중">수리중</option>
+                    <option value="수리중">점검중</option>
                 </select>
             </h3>
 
@@ -128,23 +138,33 @@ function CarList() {
             </form>
 
                 {/* car는 각 차량 객체 */}
-            {isVisible && <ul className="flex-1 overflow-y-auto space-y-2 pr-2 min-h-105 pb-2">
-                {filteredCarList.map(car => {
-                    const iconSrc = carStatusClass[car.status];
+            {isVisible && (
+                <ul className="flex-1 overflow-y-auto space-y-2 pr-2 min-h-105 pb-2">
+                    {filteredCarList.map(car => {
+                        if (!car.path) return null;
+                        const iconSrc   = carStatusClass[car.status];
+                        const lastPoint = car.path[car.path.length - 1];
 
-                    return <li key={car.number} onClick={() => setSelectedCar(car)}
-                                className={`${styles["car-list__item"]} flex items-center rounded-lg box-border px-2 py-2`}>
-                                <span className={`p-1 px-2 font-bold mr-3 border text-sm rounded-sm ${iconSrc} min-w-[55px]`}>
-                                    {car.status}
-                                </span>
-                                <p>
-                                    <span className="font-bold">{car.number}</span> <br /> 
-                                    <span className="opacity-50">{car.name}</span>
-                                </p>
+                    return (
+                        <li key={car.number}
+                            onClick={() => {
+                                setMapCenter({ lat: lastPoint.lat, lng: lastPoint.lng });
+                                setMapLevel(2);
+                                setSelectedCar(car);}}
+                            className={`${styles["car-list__item"]} flex items-center rounded-lg box-border px-2 py-2`}>
+                        <span className={`p-1 px-2 font-bold mr-3 border text-sm rounded-sm ${iconSrc} min-w-[55px]`}>
+                            {car.status}
+                        </span>
+                        <p>
+                            <span className="font-bold">{car.number}</span>
+                            <br />
+                            <span className="opacity-50">{car.name}</span>
+                        </p>
                         </li>
-                    })
-                }
-            </ul>}
+                        );
+                    })}
+                </ul>
+            )}
             <button ref={hideBtnRef} 
                 onClick={() => {setIsVisible(!isVisible)}} 
                 className={`${styles["hide-btn"]} rounded-br-xl rounded-bl-xl h-6 border`}>
