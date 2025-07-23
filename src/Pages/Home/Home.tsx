@@ -11,7 +11,6 @@ import styles from "./Home.module.css";
 import SimpleLineChart from "@/Components/chart";
 import MapBasic from "@/Components/Map/MapBasic";
 import { useCarStatusOptionStore } from "@/Store/carStatus";
-import { useEffect } from "react";
 
 
 function Home() {
@@ -19,10 +18,6 @@ function Home() {
 
     const carStatusOption = useCarStatusOptionStore(state => state.carStatusOption);
     const setCarStatusOption = useCarStatusOptionStore(state => state.setCarStatusOption);
-
-    useEffect(() => {
-        setCarStatusOption("전체");
-    }, [])
 
     return (
         <main className="flex-1 box-border p-5">
@@ -112,12 +107,12 @@ function Home() {
                                 <span>전체</span>
                             </label>
                             <label className="flex items-center font-bold mr-1 min-w-[100px]">
-                                <input type="checkbox" value="수리중"
+                                <input type="checkbox" value="운행중" 
                                         onChange={(e) => setCarStatusOption(e.target.value)}
-                                        checked={carStatusOption === "수리중"}
+                                        checked={carStatusOption === "운행중"}
                                         className="w-4 h-4 mr-1"/>
-                                <img src={checkingIndicator} className="mr-1 w-6" />
-                                <span>점검중</span>
+                                <img src={workingIndicator} className="mr-1 w-6" />
+                                <span>운행중</span>
                             </label>
                             <label className="flex items-center font-bold mr-1 min-w-[100px]">
                                 <input type="checkbox" value="미운행" 
@@ -128,17 +123,17 @@ function Home() {
                                 <span>미운행</span>
                             </label>
                             <label className="flex items-center font-bold mr-1 min-w-[100px]">
-                                <input type="checkbox" value="운행중" 
+                                <input type="checkbox" value="수리중"
                                         onChange={(e) => setCarStatusOption(e.target.value)}
-                                        checked={carStatusOption === "운행중"}
+                                        checked={carStatusOption === "수리중"}
                                         className="w-4 h-4 mr-1"/>
-                                <img src={workingIndicator} className="mr-1 w-6" />
-                                <span>운행중</span>
+                                <img src={checkingIndicator} className="mr-1 w-6" />
+                                <span>점검중</span>
                             </label>
                         </div>
                     </div>
                     <div className="w-[100%] h-[91%]">
-                        <MapBasic level={13} maxLevel={13} selectedCarFocus={false}/>
+                        <MapBasic maxLevel={13} />
                     </div>
                 </div>
             </div>
