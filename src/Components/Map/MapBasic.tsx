@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import type { CarInfo, Position } from '@/Store/carStatus';
-import { useCarStatusOptionStore, useMapStore } from '@/Store/carStatus';
+import { useCarStatusOptionStore, useMapStore, useMarkedCarStore } from '@/Store/carStatus';
 import { useKakaoLoader } from 'react-kakao-maps-sdk';
 
 type CarWithPath = Omit<CarInfo, "path"> & { path: Position[]; };
@@ -17,6 +17,10 @@ function MapBasic ({ maxLevel }: MapTestProps) {
   const setMapCenter = useMapStore(state => state.setMapCenter);
   const mapLevel = useMapStore(state => state.mapLevel);
   const setMapLevel = useMapStore(state => state.setMapLevel);
+
+  const markedCar = useMarkedCarStore(state => state.markedCar);
+  const addMarkedCar = useMarkedCarStore(state => state.addMarkedCar);
+  const deleteMarkedCar = useMarkedCarStore(state => state.deleteMarkedCar);
 
   const [positions, setPositions] = useState<CarWithPath[]>([]);      // positions에는 차량들의 리스트 객체들이 들어감
 
@@ -189,13 +193,19 @@ function MapBasic ({ maxLevel }: MapTestProps) {
             </div>`;
           const infowindow = new kakao.maps.InfoWindow({ content: iwContent });
           
+          if(markedCar.includes(p.number)) {
+            infowindow.open(mapInstance.current, marker);
+          }
+
           // 3) 이벤트 리스너 등록 (클릭하면 열기)
           kakao.maps.event.addListener(marker, "click", () => {
             if(infowindow.getMap()) {
               infowindow.close();
+              deleteMarkedCar(p.number);
             }
             else {
               infowindow.open(mapInstance.current, marker);
+              addMarkedCar(p.number);
             }
           })
           return marker;
@@ -228,13 +238,19 @@ function MapBasic ({ maxLevel }: MapTestProps) {
             </div>`;
           const infowindow = new kakao.maps.InfoWindow({ content: iwContent });
 
+          if(markedCar.includes(p.number)) {
+            infowindow.open(mapInstance.current, marker);
+          }
+          
           // 3) 이벤트 리스너 등록 (클릭하면 열기)
           kakao.maps.event.addListener(marker, "click", () => {
             if (infowindow.getMap()) {
               infowindow.close();
+              deleteMarkedCar(p.number);
             } 
             else {
               infowindow.open(mapInstance.current, marker);
+              addMarkedCar(p.number);
             }
           });
           return marker;
