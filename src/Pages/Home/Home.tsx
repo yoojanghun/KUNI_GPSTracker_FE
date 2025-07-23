@@ -1,10 +1,9 @@
-import total from "@/assets/car-status-icons/total.png";
-import working from "@/assets/car-status-icons/working.png";
-import notWorking from "@/assets/car-status-icons/not-working.png";
-import checkingIndicator from "@/assets/car-status-icons/checking-indicator.png";
-import notWorkingIndicator from "@/assets/car-status-icons/not-working-indicator.png";
-import workingIndicator from "@/assets/car-status-icons/working-indicator.png";
-import location from "@/assets/nav-bar-icons/location_on.png";
+import total from "../../assets/car-status-icons/total.svg";
+import working from "../../assets/car-status-icons/working.svg";
+import notWorking from "../../assets/car-status-icons/not-working.svg";
+import checkingIndicator from "../../assets/car-status-icons/checking-indicator.svg";
+import notWorkingIndicator from "../../assets/car-status-icons/not-working-indicator.svg";
+import workingIndicator from "../../assets/car-status-icons/working-indicator.svg";
 import calendar from "@/assets/Calendar.png";
 import styles from "./Home.module.css";
 
@@ -12,6 +11,8 @@ import SimpleLineChart from "@/Components/chart";
 import MapBasic from "@/Components/Map/MapBasic";
 import { useCarStatusOptionStore } from "@/Store/carStatus";
 import { useEffect } from "react";
+import { MapPin } from "lucide-react";
+
 
 
 function Home() {
@@ -98,9 +99,9 @@ function Home() {
                     </div>
                 </div>
                 <div className={`${styles["icon"]} flex-3 border box-border p-4 pt-2 h-[100%] rounded-3xl`}>
-                    <div className="w-[100%] h-[9%] flex items-center justify-between">
+                    <div className="w-[100%] h-[9%] flex items-center justify-between">                                   
                         <div className="flex items-center">
-                            <img src={location} className="w-7 h-7 mr-2"/>
+                            <MapPin className="w-7 h-7 mr-2"/>
                             <span className="font-bold text-xl">차량 현황</span>
                         </div>
                         <div className="flex justify-around w-[75%]">
