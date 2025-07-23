@@ -1,5 +1,4 @@
-import truck from "@/assets/car-list-icons/truck.png";
-import searchGlass from "@/assets/car-list-icons/Search.png";
+import { Search, Truck } from "lucide-react";        
 import arrowLeft from "@/assets/arrow-left.png";
 import styles from "./CarList.module.css";
 import { useEffect, useRef, useState } from "react";
@@ -117,7 +116,7 @@ function CarList() {
         <section className={`${styles["car-list"]} border w-75 max-h-130 flex flex-col rounded-xl bg-white box-border p-3`}>
             <h3 className="flex justify-between items-center font-bold text-xl mb-2 pr-1">
                 <div className="flex items-center">
-                    <img src={truck} alt="트럭 아이콘" className="mr-2" />
+                    <Truck className="mr-2" />
                     <span className="text-xl">차량 리스트</span>
                 </div>
                 <select onChange={e => setCarStatusOption(e.target.value)} 
@@ -132,8 +131,9 @@ function CarList() {
 
             <form action="#" onSubmit={e => e.preventDefault()} className="mb-3">
                 <label className={`${styles["car-list__input"]} flex items-center border-none rounded px-2 py-1`}>
-                    <img src={searchGlass} alt="검색 아이콘" className="w-4 h-4 mr-2" />
-                    <input value={inputVal} onChange={handleInput} type="text" placeholder="차량 검색" className="w-full h-7 outline-none text-xl" />                        {inputVal && <button onClick={() => setInputVal("")} type="button" className="text-sm cursor-pointer opacity-30 mr-[3px]">X</button>}
+                    <Search className="w-4 h-4 mr-2" />
+                    <input value={inputVal} onChange={handleInput} type="text" placeholder="차량 검색" className="w-full h-7 outline-none text-xl" />                        
+                    {inputVal && <button onClick={() => setInputVal("")} type="button" className="text-sm cursor-pointer opacity-30 mr-[3px]">X</button>}
                 </label>
             </form>
 

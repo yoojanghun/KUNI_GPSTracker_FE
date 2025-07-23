@@ -1,21 +1,19 @@
 import { NavLink } from "react-router-dom";
-import logo from "@/assets/logo.png";
-import car from "@/assets/nav-bar-icons/directions_car.png";
-import location from "@/assets/nav-bar-icons/location_on.png";
-import tool from "@/assets/nav-bar-icons/Tool.png";
-import folder from "@/assets/nav-bar-icons/folder.png";
+import logo from "../assets/logo.svg";
+import { CarFront, Folder, MapPin, Wrench } from "lucide-react";
+import type { JSX } from "react";
 
 interface NavItem {
-  to: string;
-  icon: string;
-  label: string;
+    to: string;
+    icon: JSX.Element;
+    label: string;
 }
 
 const navItems: NavItem[] = [
-  { to: "/",            icon: car,      label: "운행 정보" },
-  { to: "/location",    icon: location, label: "위치 조회" },
-  { to: "/management",  icon: tool,     label: "차량 관리" },
-  { to: "/log",         icon: folder,   label: "운행 일지" },
+  { to: "/",            icon: <CarFront />, label: "운행 정보" },
+  { to: "/location",    icon: <MapPin />, label: "위치 조회" },
+  { to: "/management",  icon: <Wrench />,     label: "차량 관리" },
+  { to: "/log",         icon: <Folder />,   label: "운행 일지" },
 ];
 
 const Navbar: React.FC = () => {
@@ -34,7 +32,7 @@ const Navbar: React.FC = () => {
               transition-opacity duration-200
               ${isActive ? "opacity-100 shadow-xl" : "opacity-50"}`
           }>
-          <img src={icon} alt={`${label} 아이콘`} />
+          {icon}
           <span>{label}</span>
         </NavLink>
       ))}
