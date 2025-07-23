@@ -1,8 +1,7 @@
-import truck from "../../assets/car-list-icons/truck.png";
-import searchGlass from "../../assets/car-list-icons/Search.png";
 import styles from "./CarList.module.css";
 import { currentCarList } from "../../Api/currentCarList.tsx";
 import { useState, type ChangeEvent } from "react";
+import { Search, Truck } from "lucide-react";
 
 type Car = {
     number: string;
@@ -89,7 +88,7 @@ function CarList({ carStatusBtn, setCarStatusBtn }: carStatusBtnProp) {
         <section className={`${styles["car-list"]} border w-[300px] h-[400px] flex flex-col rounded-xl bg-white box-border p-3`}>
             <h3 className="flex justify-between items-center font-bold text-xl mb-2 pr-1">
                 <div className="flex items-center">
-                    <img src={truck} alt="트럭 아이콘" className="mr-2" />
+                    <Truck className="mr-2" />
                     <span>차량 리스트</span>
                 </div>
                 <select onChange={handleCarStatusBtn} className="border-2 px-1">
@@ -101,7 +100,7 @@ function CarList({ carStatusBtn, setCarStatusBtn }: carStatusBtnProp) {
             </h3>
             <form action="#" onSubmit={e => e.preventDefault()} className="mb-2">
                 <label className={`${styles["car-list__input"]} flex items-center border-none rounded px-2 py-1`}>
-                    <img src={searchGlass} alt="검색 아이콘" className="w-4 h-4 mr-2" />
+                    <Search className="w-4 h-4 mr-2" />
                     <input value={inputVal} onChange={handleInput} type="text" placeholder="차량 검색" className="w-full outline-none text-sm" />
                     {inputVal && <button onClick={clearInput} type="button" className="text-sm cursor-pointer opacity-30 mr-[3px]">X</button>}
                 </label>
