@@ -10,8 +10,6 @@ import styles from "./Home.module.css";
 import SimpleLineChart from "@/Components/chart";
 import MapBasic from "@/Components/Map/MapBasic";
 import { useCarStatusOptionStore } from "@/Store/carStatus";
-
-import { useEffect } from "react";
 import { MapPin } from "lucide-react";
 
 function Home() {
