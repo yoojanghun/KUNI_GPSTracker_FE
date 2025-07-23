@@ -4,22 +4,26 @@ import notWorking from "../../assets/car-status-icons/not-working.svg";
 import checkingIndicator from "../../assets/car-status-icons/checking-indicator.svg";
 import notWorkingIndicator from "../../assets/car-status-icons/not-working-indicator.svg";
 import workingIndicator from "../../assets/car-status-icons/working-indicator.svg";
-
+import calendar from "@/assets/Calendar.png";
 import styles from "./Home.module.css";
 
 import SimpleLineChart from "@/Components/chart";
-import MapTest from "@/Components/map";
-import { useState, type ChangeEvent } from "react";
+import MapBasic from "@/Components/Map/MapBasic";
+import { useCarStatusOptionStore } from "@/Store/carStatus";
+import { useEffect } from "react";
 import { MapPin } from "lucide-react";
+
 
 
 function Home() {
     const percentage = 30;
-    const [carStatusBtn, setCarStatusBtn] = useState<string>("전체");
 
-    function handleCarStatusBtn(e: ChangeEvent<HTMLInputElement>) {
-        setCarStatusBtn(e.target.value);
-    }
+    const carStatusOption = useCarStatusOptionStore(state => state.carStatusOption);
+    const setCarStatusOption = useCarStatusOptionStore(state => state.setCarStatusOption);
+
+    useEffect(() => {
+        setCarStatusOption("전체");
+    }, [])
 
     return (
         <main className="flex-1 box-border p-5">
@@ -35,11 +39,11 @@ function Home() {
                     </div>
                 </div>
 
-                <div className={`${styles["icon"]} flex flex-2 justify-center items-center border rounded-xl p-[23px] min-h-[110px]`}>
+                <div className={`${styles["icon"]} flex flex-2 justify-evenly items-center border rounded-xl p-[23px] min-h-[110px]`}>
                     <div className="flex items-center min-w-[280px]">
                         <img className="w-13 h-13 mr-3" src={notWorking} alt="미운행 차량 아이콘"/>
                         <div>
-                            <div className="mr-6">
+                            <div className="mr-6 min-w-[200px]">
                                 <span className="text-3xl font-bold mr-3">{percentage}%</span>
                                 <span className="text-sm opacity-60">미운행 차량 (1,001)</span>
                             </div>
@@ -48,7 +52,7 @@ function Home() {
                             </div>
                         </div>
                     </div>
-                    <div className="min-w-[180px]">
+                    <div className="min-w-[180px] mr-3">
                         <div className="flex items-center mb-2">
                             <img className="w-8 h-8 mr-1" src={checkingIndicator} alt="점검중 차량 아이콘" />
                             <div>
@@ -85,51 +89,57 @@ function Home() {
                         </div>
                     </div>
                     <div className={`${styles["icon"]} border box-border pr-4 pt-4 pb-4 h-[100%] rounded-xl`}>
-                        <SimpleLineChart />
+                        <div className="flex items-center ml-4 mb-5 font-bold">
+                            <img src={calendar} alt="캘린더 아이콘" className="w-6 h-6 mr-2"/>
+                            <span className="text-xl">이 주의 일별 운행 건수</span>
+                        </div>
+                        <div className="w-[100%] h-[90%]">
+                            <SimpleLineChart />
+                        </div>
                     </div>
                 </div>
                 <div className={`${styles["icon"]} flex-3 border box-border p-4 pt-2 h-[100%] rounded-3xl`}>
-                    <div className="w-[100%] h-[9%] flex items-center justify-between">
-                        <div className="flex items-center w-[25%]">
+                    <div className="w-[100%] h-[9%] flex items-center justify-between">                                   
+                        <div className="flex items-center">
                             <MapPin className="w-7 h-7 mr-2"/>
                             <span className="font-bold text-xl">차량 현황</span>
                         </div>
                         <div className="flex justify-around w-[75%]">
-                            <label className="flex items-center font-bold mr-1">
+                            <label className="flex items-center font-bold mr-1 min-w-[60px]">
                                 <input type="checkbox" value="전체"
-                                       onChange={handleCarStatusBtn}
-                                       checked={carStatusBtn === "전체"} 
-                                       className="w-4 h-4 mr-1"/>
-                                전체
+                                        onChange={(e) => setCarStatusOption(e.target.value)}
+                                        checked={carStatusOption === "전체"} 
+                                        className="w-4 h-4 mr-1"/>
+                                <span>전체</span>
                             </label>
-                            <label className="flex items-center font-bold mr-1">
+                            <label className="flex items-center font-bold mr-1 min-w-[100px]">
                                 <input type="checkbox" value="수리중"
-                                       onChange={handleCarStatusBtn}
-                                       checked={carStatusBtn === "수리중"}
-                                       className="w-4 h-4 mr-1"/>
+                                        onChange={(e) => setCarStatusOption(e.target.value)}
+                                        checked={carStatusOption === "수리중"}
+                                        className="w-4 h-4 mr-1"/>
                                 <img src={checkingIndicator} className="mr-1 w-6" />
-                                점검중
+                                <span>점검중</span>
                             </label>
-                            <label className="flex items-center font-bold mr-1">
+                            <label className="flex items-center font-bold mr-1 min-w-[100px]">
                                 <input type="checkbox" value="미운행" 
-                                       onChange={handleCarStatusBtn}
-                                       checked={carStatusBtn === "미운행"}
-                                       className="w-4 h-4 mr-1"/>
+                                        onChange={(e) => setCarStatusOption(e.target.value)}
+                                        checked={carStatusOption === "미운행"}
+                                        className="w-4 h-4 mr-1"/>
                                 <img src={notWorkingIndicator} className="mr-1 w-6" />
-                                미운행
+                                <span>미운행</span>
                             </label>
-                            <label className="flex items-center font-bold mr-1">
+                            <label className="flex items-center font-bold mr-1 min-w-[100px]">
                                 <input type="checkbox" value="운행중" 
-                                       onChange={handleCarStatusBtn}
-                                       checked={carStatusBtn === "운행중"}
-                                       className="w-4 h-4 mr-1"/>
+                                        onChange={(e) => setCarStatusOption(e.target.value)}
+                                        checked={carStatusOption === "운행중"}
+                                        className="w-4 h-4 mr-1"/>
                                 <img src={workingIndicator} className="mr-1 w-6" />
-                                운행중
+                                <span>운행중</span>
                             </label>
                         </div>
                     </div>
                     <div className="w-[100%] h-[91%]">
-                        <MapTest carStatus={carStatusBtn} />
+                        <MapBasic level={13} maxLevel={13} selectedCarFocus={false}/>
                     </div>
                 </div>
             </div>

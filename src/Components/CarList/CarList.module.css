@@ -1,4 +1,7 @@
 /* Car List 디자인 */
+.car-list{
+    position: relative;
+}
 .car-list,
 .car-list__item {
     border-color: hsla(0, 0%, 0%, 0.2);
@@ -27,4 +30,14 @@
 }
 .td {
     text-align: center;
+}
+
+/* 축소 버튼 디자인 */
+.hide-btn{
+    background-color: hsl(0, 0%, 100%);
+    position: absolute;
+    bottom: -24px;
+    left: 33%;
+    width: 30%;
+    cursor: pointer;
 }

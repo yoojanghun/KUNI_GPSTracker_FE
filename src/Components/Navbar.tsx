@@ -28,9 +28,9 @@ const Navbar: React.FC = () => {
           to={to}
           end
           className={({ isActive }) =>
-            `text-[1rem] mb-9 bg-white px-5 py-2 flex gap-2 items-center rounded-[20px]
-             transition-opacity duration-200
-             ${isActive ? "opacity-100 shadow-xl" : "opacity-50"}`
+              `text-[1rem] mb-9 bg-white px-5 py-2 flex gap-2 items-center rounded-[20px]
+              transition-opacity duration-200
+              ${isActive ? "opacity-100 shadow-xl" : "opacity-50"}`
           }>
           {icon}
           <span>{label}</span>

@@ -10,12 +10,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/Components/ui/table";
-import { ChevronRight } from "lucide-react";
-import { ArrowDownNarrowWide } from "lucide-react";
-import { ArrowDownWideNarrow } from "lucide-react";
+import { ChevronRight, ClockArrowDown, ClockArrowUp } from "lucide-react";
 import { useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 
 export function LogTable() {
+  const navigate = useNavigate();
+
   const tableRef = useRef<HTMLDivElement>(null); // 테이블의 너비값을 전달하기 위한 wrapper
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -52,9 +53,9 @@ export function LogTable() {
             <TableHead className="w-[35px] text-start cursor-pointer">
               <div className="flex items-center justify-center gap-1">
                 {sortDirection === "asc" ? (
-                  <ArrowDownNarrowWide onClick={() => handleSort()} />
+                  <ClockArrowDown onClick={() => handleSort()} />
                 ) : (
-                  <ArrowDownWideNarrow onClick={() => handleSort()} />
+                  <ClockArrowUp onClick={() => handleSort()} />
                 )}
               </div>
             </TableHead>
@@ -83,11 +84,6 @@ export function LogTable() {
                 <span>총 주행거리</span>
               </div>
             </TableHead>
-            <TableHead className="w-[100px] text-start ">
-              <div className="flex items-center justify-center gap-1">
-                <span>운전자</span>
-              </div>
-            </TableHead>
             <TableHead className="text-right"></TableHead>
           </TableRow>
         </TableHeader>
@@ -100,11 +96,14 @@ export function LogTable() {
               <TableCell>{dlog.startTime.replace("T", " ")}</TableCell>
               <TableCell>{dlog.endTime.replace("T", " ")}</TableCell>
               <TableCell>{dlog.distance.toLocaleString()} km</TableCell>
-              <TableCell>{dlog.driver}</TableCell>
               <TableCell className="text-right ">
                 <ChevronRight
-                  className="inline-block pr-2"
-                  onClick={() => {}}
+                  className="inline-block pr-2 cursor-pointer"
+                  onClick={() => navigate(`/log/${dlog.recordId}`, {
+                    state: {
+                      id: dlog.recordId,
+                    }
+                  })}
                 />
               </TableCell>
             </TableRow>
