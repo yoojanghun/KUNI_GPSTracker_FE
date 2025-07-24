@@ -3,15 +3,15 @@ import arrowLeft from "@/assets/arrow-left.png";
 import styles from "./CarList.module.css";
 import { useEffect, useRef, useState } from "react";
 import type { CarInfo } from "@/Store/carStatus"
-import { useSelectCarStore, useCarStatusOptionStore, useMapStore } from "@/Store/carStatus";
+import { useSelectCarStore, useCarStatusOptionStore, useTrackCarStore } from "@/Store/carStatus";
 
 function CarList() {
 
     const setSelectedCar = useSelectCarStore(state => state.setSelectedCar);
     const selectedCar = useSelectCarStore(state => state.selectedCar);
 
-    const setMapCenter = useMapStore(state => state.setMapCenter);
-    const setMapLevel = useMapStore(state => state.setMapLevel);
+    const setMapCenterCarList = useTrackCarStore(state => state.setMapCenterCarList);
+    const setMapLevelCarList = useTrackCarStore(state => state.setMapLevelCarList);
 
     const setCarStatusOption = useCarStatusOptionStore(state => state.setCarStatusOption);
     const carStatusOption = useCarStatusOptionStore(state => state.carStatusOption);
@@ -148,8 +148,8 @@ function CarList() {
                     return (
                         <li key={car.number}
                             onClick={() => {
-                                setMapCenter({ lat: lastPoint.lat, lng: lastPoint.lng });
-                                setMapLevel(2);
+                                setMapCenterCarList({ lat: lastPoint.lat, lng: lastPoint.lng });
+                                setMapLevelCarList(2);
                                 setSelectedCar(car);}}
                             className={`${styles["car-list__item"]} flex items-center rounded-lg box-border px-2 py-2`}>
                         <span className={`p-1 px-2 font-bold mr-3 border text-sm rounded-sm ${iconSrc} min-w-[55px]`}>
