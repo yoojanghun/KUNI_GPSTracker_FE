@@ -16,7 +16,7 @@ const navItems: NavItem[] = [
   { to: "/log",         icon: <Folder />,   label: "운행 일지" },
 ];
 
-const Navbar: React.FC = () => {
+const Navbar = () => {
   return (
     <nav className="flex flex-col items-center bg-[#F5F6FF] h-screen min-w-[200px]">
       <NavLink className="mb-3" to="/" end>

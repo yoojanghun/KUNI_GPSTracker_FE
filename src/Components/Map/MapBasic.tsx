@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import type { CarInfo, Position } from '@/Store/carStatus';
-import { useCarStatusOptionStore, useMapStore, useMarkedCarStore } from '@/Store/carStatus';
+import { useCarStatusOptionStore, useMapStore, useMarkedCarStore, useTrackCarStore } from '@/Store/carStatus';
 import { useKakaoLoader } from 'react-kakao-maps-sdk';
 
 type CarWithPath = Omit<CarInfo, "path"> & { path: Position[]; };
@@ -12,12 +12,12 @@ type MapTestProps = {
 function MapBasic ({ maxLevel }: MapTestProps) {
 
   const carStatusOption = useCarStatusOptionStore(state => state.carStatusOption);
-
   const mapCenter = useMapStore(state => state.mapCenter);
   const setMapCenter = useMapStore(state => state.setMapCenter);
   const mapLevel = useMapStore(state => state.mapLevel);
   const setMapLevel = useMapStore(state => state.setMapLevel);
-
+  const mapCenterCarList = useTrackCarStore(state => state.mapCenterCarList);
+  const mapLevelCarList = useTrackCarStore(state => state.mapLevelCarList);
   const markedCar = useMarkedCarStore(state => state.markedCar);
   const addMarkedCar = useMarkedCarStore(state => state.addMarkedCar);
   const deleteMarkedCar = useMarkedCarStore(state => state.deleteMarkedCar);
@@ -39,9 +39,20 @@ function MapBasic ({ maxLevel }: MapTestProps) {
     .then(data => setPositions(data));
   }, []);
 
+  // 차량 클릭 시 기존 지도 인스턴스의 center/level 만 변경
   useEffect(() => {
-    // loading이 끝나고 에러가 없으며, ref가 유효할 때만 실행
-    if (!mapContainerRef.current || mapInstance.current) return;
+    if(!mapInstance.current) return;
+    const target = new kakao.maps.LatLng(
+      mapCenterCarList.lat,
+      mapCenterCarList.lng
+    );
+    mapInstance.current.setLevel(mapLevelCarList);
+    mapInstance.current.setCenter(target);
+  }, [mapCenterCarList, mapLevelCarList]);
+
+  // 지도 생성, 지도에서 중심좌표 레벨 추적 후 상태 저장
+  useEffect(() => {
+    if (!mapContainerRef.current) return;
 
     // 지도 생성
     mapInstance.current = new kakao.maps.Map(mapContainerRef.current, {
@@ -49,10 +60,6 @@ function MapBasic ({ maxLevel }: MapTestProps) {
       level: mapLevel,
     });
     mapInstance.current.setMaxLevel(maxLevel);
-
-    // zoom 컨트롤러 생성
-    const zoomControl = new kakao.maps.ZoomControl();
-    mapInstance.current.addControl(zoomControl, kakao.maps.ControlPosition.BOTTOMRIGHT);
 
     const mapCenterLevelEvent = () => {
       if(!mapInstance.current) return;
@@ -62,6 +69,14 @@ function MapBasic ({ maxLevel }: MapTestProps) {
     }
     kakao.maps.event.addListener(mapInstance.current, "idle", mapCenterLevelEvent);
 
+    return () => {
+      kakao.maps.event.removeListener(mapInstance.current!, 'idle', mapCenterLevelEvent);
+    };
+  }, []);
+
+  // 차량별 클러스터링
+  useEffect(() => {
+    if(!mapInstance.current) return;
     // 전체 차량 클러스터러 생성
     totalClustererRef.current = new kakao.maps.MarkerClusterer({
       map: mapInstance.current,
@@ -133,32 +148,13 @@ function MapBasic ({ maxLevel }: MapTestProps) {
                 lineHeight: '31px'
             }]
     });
+  }, [])
 
-    // 리사이즈 대응
-    const handleResize = () => {
-      if (!mapInstance.current) return;
-      kakao.maps.event.trigger(mapInstance.current!, 'resize');
-      mapInstance.current!.panTo(
-        new kakao.maps.LatLng(37.5665, 126.9780)
-      );
-    };
-    window.addEventListener('resize', handleResize);
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      kakao.maps.event.removeListener(mapInstance.current!, 'idle', mapCenterLevelEvent);
-      mapInstance.current = null;
-      runningClustererRef.current = null;
-      notRunningClustererRef.current = null;
-      inspectedClustererRef.current = null;
-    };
-  }, [mapCenter, mapLevel]);
-
+  // 마커 생성, 만들어진 마커로 지도 클러스터링
   useEffect(() => {
     if (!mapInstance.current) return;
     const kakao = (window as any).kakao;
 
-    // 이전 마커 클리어
     totalClustererRef.current?.clear();
     runningClustererRef.current?.clear();
     notRunningClustererRef.current?.clear();
@@ -269,8 +265,7 @@ function MapBasic ({ maxLevel }: MapTestProps) {
       inspectedClustererRef.current?.addMarkers(createMarkers('수리중', '/vite.svg'));
     }
 
-  }, [carStatusOption, positions, mapCenter, mapLevel]);
-  // 옵션창에서 carStatus를 바꾸거나, 차량 데이터가 변경되어 positions가 바뀌거나 => 마커 다시 로드
+  }, [carStatusOption, positions]);
 
   return (
     <div ref={mapContainerRef} style={{ width: '100%', height: '100%'}}/>

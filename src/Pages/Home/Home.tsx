@@ -10,7 +10,7 @@ import styles from "./Home.module.css";
 import SimpleLineChart from "@/Components/chart";
 import MapBasic from "@/Components/Map/MapBasic";
 import { useCarStatusOptionStore } from "@/Store/carStatus";
-import { MapPin } from "lucide-react";
+import {  MapPin } from "lucide-react";
 
 function Home() {
     const percentage = 30;
