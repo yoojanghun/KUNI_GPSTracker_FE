@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import type { CarInfo, Position } from '@/Store/carStatus';
-import { useCarStatusOptionStore, useMapStore, useMarkedCarStore, useTrackCarStore } from '@/Store/carStatus';
+import { useCarStatusOptionStore, useLocationSearchMapStore, useMarkedCarStore, useTrackCarStore } from '@/Store/carStatus';
 import { useKakaoLoader } from 'react-kakao-maps-sdk';
 
 type CarWithPath = Omit<CarInfo, "path"> & { path: Position[]; };
@@ -9,13 +9,13 @@ type MapTestProps = {
   maxLevel: number;
 }
 
-function MapBasic ({ maxLevel }: MapTestProps) {
+function MapLocationSearch ({ maxLevel }: MapTestProps) {
 
   const carStatusOption = useCarStatusOptionStore(state => state.carStatusOption);
-  const mapCenter = useMapStore(state => state.mapCenter);
-  const setMapCenter = useMapStore(state => state.setMapCenter);
-  const mapLevel = useMapStore(state => state.mapLevel);
-  const setMapLevel = useMapStore(state => state.setMapLevel);
+  const locationSearchMapCenter = useLocationSearchMapStore(state => state.locationSearchMapCenter);
+  const setLocationSearchMapCenter = useLocationSearchMapStore(state => state.setLocationSearchMapCenter);
+  const locationSearchMapLevel = useLocationSearchMapStore(state => state.locationSearchMapLevel);
+  const setlLocationSearchMapLevel = useLocationSearchMapStore(state => state.setLocationSearchMapLevel);
   const mapCenterCarList = useTrackCarStore(state => state.mapCenterCarList);
   const mapLevelCarList = useTrackCarStore(state => state.mapLevelCarList);
   const markedCar = useMarkedCarStore(state => state.markedCar);
@@ -39,7 +39,7 @@ function MapBasic ({ maxLevel }: MapTestProps) {
     .then(data => setPositions(data));
   }, []);
 
-  // 차량 클릭 시 기존 지도 인스턴스의 center/level 만 변경
+  // carList에서 차량 클릭 시 기존 지도 인스턴스의 center/level 만 변경
   useEffect(() => {
     if(!mapInstance.current) return;
     const target = new kakao.maps.LatLng(
@@ -56,21 +56,33 @@ function MapBasic ({ maxLevel }: MapTestProps) {
 
     // 지도 생성
     mapInstance.current = new kakao.maps.Map(mapContainerRef.current, {
-      center: new kakao.maps.LatLng(mapCenter.lat, mapCenter.lng),
-      level: mapLevel,
+      center: new kakao.maps.LatLng(locationSearchMapCenter.lat, locationSearchMapCenter.lng),
+      level: locationSearchMapLevel,
     });
     mapInstance.current.setMaxLevel(maxLevel);
 
+    // 지도에서 중심좌표 레벨 추적 후 상태 저장
     const mapCenterLevelEvent = () => {
       if(!mapInstance.current) return;
       const center = mapInstance.current.getCenter();
-      setMapCenter({ lat: center.getLat(), lng: center.getLng()});
-      setMapLevel(mapInstance.current.getLevel());
+      setLocationSearchMapCenter({ lat: center.getLat(), lng: center.getLng()});
+      setlLocationSearchMapLevel(mapInstance.current.getLevel());
     }
     kakao.maps.event.addListener(mapInstance.current, "idle", mapCenterLevelEvent);
 
+    // 화면 리사이즈 시 중심좌표 재설정
+    const handleResize = () => {
+      if (!mapInstance.current) return;
+      kakao.maps.event.trigger(mapInstance.current!, 'resize');
+      mapInstance.current!.panTo(
+        new kakao.maps.LatLng(37.5665, 126.9780)
+      );
+    };
+    window.addEventListener('resize', handleResize);
+
     return () => {
       kakao.maps.event.removeListener(mapInstance.current!, 'idle', mapCenterLevelEvent);
+      window.removeEventListener('resize', handleResize);
     };
   }, []);
 
@@ -82,16 +94,16 @@ function MapBasic ({ maxLevel }: MapTestProps) {
       map: mapInstance.current,
       averageCenter: true,
       minLevel: 6,
-        styles: [{
-                  width : '50px', 
-                  height : '50px',
-                  backgroundColor: 'green',
-                  borderRadius: '50%',
-                  opacity: '0.7',
-                  color: '#FFFFFF',
-                  textAlign: 'center',
-                  fontWeight: 'bold',
-                  lineHeight: '31px'
+      styles: [{
+                width : '50px', 
+                height : '50px',
+                backgroundColor: 'green',
+                borderRadius: '50%',
+                opacity: '0.7',
+                color: '#FFFFFF',
+                textAlign: 'center',
+                fontWeight: 'bold',
+                lineHeight: '31px'
             }]
     });
 
@@ -272,4 +284,4 @@ function MapBasic ({ maxLevel }: MapTestProps) {
   );
 };
 
-export default MapBasic;
+export default MapLocationSearch;

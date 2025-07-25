@@ -19,16 +19,28 @@ type SelectedCarStore = {
     setSelectedCar: (car: CarInfo | null) => void;
 }
 
+type CarStatusBtnStore = {
+    carStatusBtn: string;
+    setCarStatusBtn: (selectedCarStatusBtn: string) => void;
+}
+
 type CarStatusOptionStore = {
     carStatusOption: string;
     setCarStatusOption: (selectedCarStatusOption: string) => void;
 }
 
-type MapStateStore = {
-    mapCenter: { lat: number; lng: number; };
-    mapLevel: number;
-    setMapCenter: (center: { lat: number; lng:number; }) => void;
-    setMapLevel: (level: number) => void;
+type LocationSearchMapStateStore = {
+    locationSearchMapCenter: { lat: number; lng: number; };
+    locationSearchMapLevel: number;
+    setLocationSearchMapCenter: (center: { lat: number; lng:number; }) => void;
+    setLocationSearchMapLevel: (level: number) => void;
+}
+
+type HomeMapStateStore = {
+    homeMapCenter: { lat: number; lng: number; };
+    homeMapLevel: number;
+    setHomeMapCenter: (center: { lat: number; lng: number }) => void;
+    setHomeMapLevel: (level: number) => void;
 }
 
 type MapStateStoreCarList = {
@@ -51,21 +63,35 @@ export const useSelectCarStore = create<SelectedCarStore>((set) => ({
     setSelectedCar: (car) => set({ selectedCar: car})
 }));
 
-// Home.tsx와 CarList.tsx에서 전체, 운행중, 미운행, 점검중 체크박스 또는 옵션창을 클릭하여
+// Home.tsx에서 전체, 운행중, 미운행, 점검중 체크박스를 클릭하여 
+// 지도에 클러스터링하여 표시할 때 사용
+export const useCarStatusBtnStore = create<CarStatusBtnStore>((set) => ({
+    carStatusBtn: "전체",
+    setCarStatusBtn: (selectedCarStatusBtn) => set({carStatusBtn: selectedCarStatusBtn})
+}))
+
+// CarList.tsx에서 전체, 운행중, 미운행, 점검중 옵션창을 클릭하여
 // 지도에 클러스터링하여 표시할 때 사용
 export const useCarStatusOptionStore = create<CarStatusOptionStore>((set) => ({
     carStatusOption: "전체",
     setCarStatusOption: (selectedCarStatusOption) => set({ carStatusOption: selectedCarStatusOption })
 }));
 
-// 지도를 확대/축소 및 중심이동하였을 때, 다른 페이지로 이동한 후 다시 돌아와도
+// LocationSearch.tsx에서 지도를 확대/축소 및 중심이동하였을 때, 다른 페이지로 이동한 후 다시 돌아와도
 // 원래 이전 지도의 모습을 유지하도록 할 때 사용
-export const useMapStore = create<MapStateStore>((set) => ({
-    mapCenter: { lat: 37.5660, lng: 126.9775},
-    mapLevel: 13,
-    setMapCenter: (center) => set({mapCenter: center}),
-    setMapLevel: (level) => set({mapLevel: level})
+export const useLocationSearchMapStore = create<LocationSearchMapStateStore>((set) => ({
+    locationSearchMapCenter: { lat: 37.5660, lng: 126.9775},
+    locationSearchMapLevel: 13,
+    setLocationSearchMapCenter: (center) => set({locationSearchMapCenter: center}),
+    setLocationSearchMapLevel: (level) => set({locationSearchMapLevel: level})
 }));
+
+export const useHomeMapStore = create<HomeMapStateStore>((set) => ({
+    homeMapCenter: { lat: 37.5660, lng: 126.9775 },
+    homeMapLevel: 13,
+    setHomeMapCenter: (center) => set({homeMapCenter: center}),
+    setHomeMapLevel: (level) => set({homeMapLevel: level})
+}))
 
 // carList에서 한 차량을 클릭했을 때, 해당 차량을 확대하여 보여주는 데 사용
 export const useTrackCarStore = create<MapStateStoreCarList>((set) => ({

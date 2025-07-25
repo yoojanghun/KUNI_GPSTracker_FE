@@ -18,7 +18,7 @@ const data = [
     { name: 6, 운행횟수: 1000 },
 ];
 
-export default function SimpleLineChart() {
+function SimpleLineChart() {
     return (
     <div className="w-[100%] h-[100%]">
         <ResponsiveContainer>
@@ -33,3 +33,5 @@ export default function SimpleLineChart() {
     </div>
     );
 }
+
+export default SimpleLineChart
