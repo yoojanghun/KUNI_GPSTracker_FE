@@ -4,19 +4,18 @@ import notWorking from "../../assets/car-status-icons/not-working.svg";
 import checkingIndicator from "../../assets/car-status-icons/checking-indicator.svg";
 import notWorkingIndicator from "../../assets/car-status-icons/not-working-indicator.svg";
 import workingIndicator from "../../assets/car-status-icons/working-indicator.svg";
-import calendar from "@/assets/Calendar.png";
 import styles from "./Home.module.css";
 
-import SimpleLineChart from "@/Components/chart";
-import MapBasic from "@/Components/Map/MapBasic";
-import { useCarStatusOptionStore } from "@/Store/carStatus";
-import {  MapPin } from "lucide-react";
+import SimpleLineChart from "@/Components/Chart";
+import MapHome from "@/Components/Map/MapHome";
+import { useCarStatusBtnStore } from "@/Store/carStatus";
+import { MapPin, Calendar } from "lucide-react";
 
 function Home() {
     const percentage = 30;
 
-    const carStatusOption = useCarStatusOptionStore(state => state.carStatusOption);
-    const setCarStatusOption = useCarStatusOptionStore(state => state.setCarStatusOption);
+    const carStatusBtn = useCarStatusBtnStore(state => state.carStatusBtn);
+    const setCarStatusBtn = useCarStatusBtnStore(state => state.setCarStatusBtn);
 
     return (
         <main className="flex-1 box-border p-5">
@@ -83,7 +82,7 @@ function Home() {
                     </div>
                     <div className={`${styles["icon"]} border box-border pr-4 pt-4 pb-4 h-[100%] rounded-xl`}>
                         <div className="flex items-center ml-4 mb-5 font-bold">
-                            <img src={calendar} alt="캘린더 아이콘" className="w-6 h-6 mr-2"/>
+                            <Calendar className="w-6 h-6 mr-2"/>
                             <span className="text-xl">이 주의 일별 운행 건수</span>
                         </div>
                         <div className="w-[100%] h-[90%]">
@@ -100,31 +99,31 @@ function Home() {
                         <div className="flex justify-around w-[75%]">
                             <label className="flex items-center font-bold mr-1 min-w-[60px]">
                                 <input type="checkbox" value="전체"
-                                        onChange={(e) => setCarStatusOption(e.target.value)}
-                                        checked={carStatusOption === "전체"} 
+                                        onChange={(e) => setCarStatusBtn(e.target.value)}
+                                        checked={carStatusBtn === "전체"} 
                                         className="w-4 h-4 mr-1"/>
                                 <span>전체</span>
                             </label>
                             <label className="flex items-center font-bold mr-1 min-w-[100px]">
                                 <input type="checkbox" value="운행중" 
-                                        onChange={(e) => setCarStatusOption(e.target.value)}
-                                        checked={carStatusOption === "운행중"}
+                                        onChange={(e) => setCarStatusBtn(e.target.value)}
+                                        checked={carStatusBtn === "운행중"}
                                         className="w-4 h-4 mr-1"/>
                                 <img src={workingIndicator} className="mr-1 w-6" />
                                 <span>운행중</span>
                             </label>
                             <label className="flex items-center font-bold mr-1 min-w-[100px]">
                                 <input type="checkbox" value="미운행" 
-                                        onChange={(e) => setCarStatusOption(e.target.value)}
-                                        checked={carStatusOption === "미운행"}
+                                        onChange={(e) => setCarStatusBtn(e.target.value)}
+                                        checked={carStatusBtn === "미운행"}
                                         className="w-4 h-4 mr-1"/>
                                 <img src={notWorkingIndicator} className="mr-1 w-6" />
                                 <span>미운행</span>
                             </label>
                             <label className="flex items-center font-bold mr-1 min-w-[100px]">
                                 <input type="checkbox" value="수리중"
-                                        onChange={(e) => setCarStatusOption(e.target.value)}
-                                        checked={carStatusOption === "수리중"}
+                                        onChange={(e) => setCarStatusBtn(e.target.value)}
+                                        checked={carStatusBtn === "수리중"}
                                         className="w-4 h-4 mr-1"/>
                                 <img src={checkingIndicator} className="mr-1 w-6" />
                                 <span>점검중</span>
@@ -132,7 +131,7 @@ function Home() {
                         </div>
                     </div>
                     <div className="w-[100%] h-[91%]">
-                        <MapBasic maxLevel={13} />
+                        <MapHome maxLevel={13} />
                     </div>
                 </div>
             </div>

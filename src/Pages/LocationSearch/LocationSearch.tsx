@@ -1,14 +1,14 @@
 import { useRef } from 'react';
 import Draggable from 'react-draggable';
 import CarList from "@/Components/CarList/CarList.tsx";
-import MapBasic from "@/Components/Map/MapBasic.tsx";
+import MapLocationSearch from "@/Components/Map/MapLocationSearch";
 
 function LocationSearch() {
     const nodeRef = useRef<HTMLDivElement>(null);
 
     return (
         <main className="flex-1 box-border relative">
-            <MapBasic maxLevel={12} />
+            <MapLocationSearch maxLevel={12} />
             <Draggable nodeRef={nodeRef} bounds="parent" cancel="label">
                 <div ref={nodeRef} className="absolute top-4 left-4 z-20 w-[200px] cursor-grab">
                     <CarList />

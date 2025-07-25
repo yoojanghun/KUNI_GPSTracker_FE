@@ -1,8 +1,20 @@
-import { Search, Truck } from "lucide-react";        
-import arrowLeft from "@/assets/arrow-left.png";
+import { 
+    Search, 
+    Truck, 
+    ArrowLeft,
+    ChevronDown,
+    ChevronUp 
+} from "lucide-react";  
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/Components/ui/select";     
 import styles from "./CarList.module.css";
 import { useEffect, useRef, useState } from "react";
-import type { CarInfo } from "@/Store/carStatus"
+import type { CarInfo } from "@/Store/carStatus";
 import { useSelectCarStore, useCarStatusOptionStore, useTrackCarStore } from "@/Store/carStatus";
 
 function CarList() {
@@ -64,17 +76,20 @@ function CarList() {
             <section className={`${styles["car-list"]} border w-75 max-h-130 flex flex-col rounded-xl bg-white box-border p-3`}>
                 <div className="flex justify-between items-center font-bold text-xl pr-1">
                     <button className="flex items-center cursor-pointer" onClick={() => setSelectedCar(null)}>
-                        <img src={arrowLeft} alt="뒤로가기 버튼" className="w-6 h-6 mr-2"/>
+                        <ArrowLeft className="w-6 h-6 mr-2"/>
                         <span className="text-lg font-bold">뒤로 가기</span>
                     </button>
-                    <select onChange={e => setCarStatusOption(e.target.value)} 
-                            value={carStatusOption} 
-                            className="border-2 px-1 cursor-pointer rounded-sm">
-                        <option value="전체">전체</option>
-                        <option value="운행중">운행중</option>
-                        <option value="미운행">미운행</option>
-                        <option value="수리중">점검중</option>
-                    </select>
+                    <Select value={carStatusOption} onValueChange={setCarStatusOption}>
+                    <SelectTrigger className="border-2 px-1 cursor-pointer rounded-sm min-w-[85px]">
+                        <SelectValue placeholder="전체" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="전체">전체</SelectItem>
+                        <SelectItem value="운행중">운행중</SelectItem>
+                        <SelectItem value="미운행">미운행</SelectItem>
+                        <SelectItem value="수리중">점검중</SelectItem>
+                    </SelectContent>
+                </Select>
                 </div>
                 <p className="font-bold opacity-20 ml-1">
                     {selectedCar.number}
@@ -105,28 +120,31 @@ function CarList() {
                 </table>}
                 <button ref={hideBtnRef} 
                     onClick={() => {setIsVisible(!isVisible)}} 
-                    className={`${styles["hide-btn"]} rounded-br-xl rounded-bl-xl h-6 border`}>
-                    {isVisible ? "🔺" : "🔻"}
+                    className={`${styles["hide-btn"]} rounded-br-xl rounded-bl-xl h-6 border flex justify-center`}>
+                    {isVisible ? <ChevronUp /> : <ChevronDown />}
                 </button>
             </section>
         )
     }
     
     return (
-        <section className={`${styles["car-list"]} border w-75 max-h-130 flex flex-col rounded-xl bg-white box-border p-3`}>
+        <section className={`${styles["car-list"]} border w-75 max-h-133 flex flex-col rounded-xl bg-white box-border p-3`}>
             <h3 className="flex justify-between items-center font-bold text-xl mb-2 pr-1">
                 <div className="flex items-center">
                     <Truck className="mr-2" />
                     <span className="text-xl">차량 리스트</span>
                 </div>
-                <select onChange={e => setCarStatusOption(e.target.value)} 
-                        value={carStatusOption} 
-                        className="border-2 px-1 cursor-pointer rounded-sm">
-                    <option value="전체">전체</option>
-                    <option value="운행중">운행중</option>
-                    <option value="미운행">미운행</option>
-                    <option value="수리중">점검중</option>
-                </select>
+                <Select value={carStatusOption} onValueChange={setCarStatusOption}>
+                    <SelectTrigger className="border-2 px-1 cursor-pointer rounded-sm min-w-[85px]">
+                        <SelectValue placeholder="전체" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="전체">전체</SelectItem>
+                        <SelectItem value="운행중">운행중</SelectItem>
+                        <SelectItem value="미운행">미운행</SelectItem>
+                        <SelectItem value="수리중">점검중</SelectItem>
+                    </SelectContent>
+                </Select>
             </h3>
 
             <form action="#" onSubmit={e => e.preventDefault()} className="mb-3">
@@ -167,8 +185,8 @@ function CarList() {
             )}
             <button ref={hideBtnRef} 
                 onClick={() => {setIsVisible(!isVisible)}} 
-                className={`${styles["hide-btn"]} rounded-br-xl rounded-bl-xl h-6 border`}>
-                {isVisible ? "🔺" : "🔻"}
+                className={`${styles["hide-btn"]} rounded-br-xl rounded-bl-xl h-6 border flex justify-center`}>
+                {isVisible ? <ChevronUp /> : <ChevronDown />}
             </button>
         </section>
         
