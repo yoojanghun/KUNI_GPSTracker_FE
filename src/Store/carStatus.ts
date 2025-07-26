@@ -52,12 +52,6 @@ type MapStateStoreCarList = {
     setMapLevelCarList: (level: number) => void;
 }
 
-type MarkedCarStore = {
-    markedCar: string[];
-    addMarkedCar: (marker: string) => void;
-    deleteMarkedCar: (marker: string) => void;
-}
-
 // carList에서 하나의 차량을 선택하였을 때 selectedCar에 해당 차량을 저장
 // selectedCar에 저장된 차량이 있으면 carList에서 차량 정보 표시
 export const useSelectCarStore = create<SelectedCarStore>((set) => ({
@@ -104,13 +98,3 @@ export const useTrackCarStore = create<MapStateStoreCarList>((set) => ({
     setMapCenterCarList: (center) => set({mapCenterCarList: center}),
     setMapLevelCarList: (level) => set({mapLevelCarList: level})
 }));
-
-// 지도에 표현된 마커를 클릭하면 정보를 보여주는 infoWindow가 생성된다.
-// infoWindow 생성 후 다른 페이지로 갔다가 돌아오면 infoWindow가 사라짐.
-// infoWindow가 생성된 마커들을 추적하는 데 사용
-// (state는 현재 저장소 "안에" 들어있는 값 전체를 의미)
-export const useMarkedCarStore = create<MarkedCarStore>((set) => ({
-    markedCar: [],
-    addMarkedCar: (marker) => set(state => ({markedCar: [...state.markedCar, marker]})),
-    deleteMarkedCar: (marker) => set(state => ({markedCar: state.markedCar.filter(carNumber => carNumber !== marker)}))
-}))

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import type { CarInfo, Position } from '@/Store/carStatus';
-import { useCarStatusBtnStore, useHomeMapStore, useMarkedCarStore } from '@/Store/carStatus';
+import { useCarStatusBtnStore, useHomeMapStore } from '@/Store/carStatus';
 
 type CarWithPath = Omit<CarInfo, "path"> & { path: Position[]; };
 
@@ -15,9 +15,6 @@ function MapHome ({ maxLevel }: MapTestProps) {
   const setHomeMapCenter = useHomeMapStore(state => state.setHomeMapCenter);
   const homeMapLevel = useHomeMapStore(state => state.homeMapLevel);
   const setHomeMapLevel = useHomeMapStore(state => state.setHomeMapLevel);
-  const markedCar = useMarkedCarStore(state => state.markedCar);
-  const addMarkedCar = useMarkedCarStore(state => state.addMarkedCar);
-  const deleteMarkedCar = useMarkedCarStore(state => state.deleteMarkedCar);
 
   const [positions, setPositions] = useState<CarWithPath[]>([]);      // positions에는 차량들의 리스트 객체들이 들어감
 
@@ -28,6 +25,10 @@ function MapHome ({ maxLevel }: MapTestProps) {
   const runningClustererRef = useRef<kakao.maps.MarkerClusterer | null>(null);
   const notRunningClustererRef = useRef<kakao.maps.MarkerClusterer | null>(null);
   const inspectedClustererRef = useRef<kakao.maps.MarkerClusterer | null>(null);
+
+  const runningMarkerRef = useRef<kakao.maps.MarkerImage | null>(null);
+  const notRunningMarkerRef = useRef<kakao.maps.MarkerImage | null>(null);
+  const inspectedMarkerRef = useRef<kakao.maps.MarkerImage | null>(null);
 
   // 차량의 현재 위치 (예시 데이터)
   useEffect(() => {
@@ -98,7 +99,7 @@ function MapHome ({ maxLevel }: MapTestProps) {
     };
   }, []);
 
-  // 차량별 클러스터링
+  // 차량별 클러스터링, 차량별 마커 디자인
   useEffect(() => {
     if(!mapInstance.current) return;
     // 전체 차량 클러스터러 생성
@@ -137,6 +138,13 @@ function MapHome ({ maxLevel }: MapTestProps) {
             }]
     });
 
+    // 운행중 차량 마커 생성
+    runningMarkerRef.current = new kakao.maps.MarkerImage(
+      "/marker-working.png",
+      new kakao.maps.Size(30, 42),
+      {offset: new kakao.maps.Point(15, 30)}
+    )
+
     // 미운행 차량 클러스터러 생성
     notRunningClustererRef.current = new kakao.maps.MarkerClusterer({
       map: mapInstance.current,
@@ -155,6 +163,13 @@ function MapHome ({ maxLevel }: MapTestProps) {
             }]
     });
 
+    // 미운행 차량 마커 생성
+    notRunningMarkerRef.current = new kakao.maps.MarkerImage(
+      "/marker-notWorking.png",
+      new kakao.maps.Size(30, 42),
+      {offset: new kakao.maps.Point(15, 30)}
+    )
+
     // 수리중 차량 클러스터러 생성
     inspectedClustererRef.current = new kakao.maps.MarkerClusterer({
       map: mapInstance.current,
@@ -172,9 +187,17 @@ function MapHome ({ maxLevel }: MapTestProps) {
                 lineHeight: '31px'
             }]
     });
+
+    // 수리중 차량 마커 생성
+    inspectedMarkerRef.current = new kakao.maps.MarkerImage(
+      "/marker-inspected.png",
+      new kakao.maps.Size(30, 42),
+      {offset: new kakao.maps.Point(15, 30)}
+    )
+
   }, [])
 
-  // 마커 생성, 만들어진 마커로 지도 클러스터링
+  // 마커와 클러스터링 생성, 만들어진 마커로 지도 클러스터링
   useEffect(() => {
     if (!mapInstance.current) return;
     const kakao = (window as any).kakao;
@@ -184,15 +207,16 @@ function MapHome ({ maxLevel }: MapTestProps) {
     notRunningClustererRef.current?.clear();
     inspectedClustererRef.current?.clear();
 
-    const createMarkers = (status: string) =>
+    const createMarkersByStatus = (status: string, markerImage: kakao.maps.MarkerImage) =>
       positions
-        .filter(p => p.status === status || status === "전체")
+        .filter(p => p.status === status)
         .map(p => {
           const lastPoint = p.path[p.path.length - 1]; // 마지막 위치 객체
 
           // 1) Marker 생성
           const marker = new kakao.maps.Marker({
             position: new kakao.maps.LatLng(lastPoint.lat, lastPoint.lng),
+            image: markerImage
           });
 
           // 2) InfoWindow 생성
@@ -206,36 +230,78 @@ function MapHome ({ maxLevel }: MapTestProps) {
             </div>`;
           const infowindow = new kakao.maps.InfoWindow({ content: iwContent });
           
-          if(markedCar.includes(p.number)) {
-            infowindow.open(mapInstance.current, marker);
-          }
-
           // 3) 이벤트 리스너 등록 (클릭하면 열기)
           kakao.maps.event.addListener(marker, "click", () => {
             if(infowindow.getMap()) {
               infowindow.close();
-              deleteMarkedCar(p.number);
             }
             else {
               infowindow.open(mapInstance.current, marker);
-              addMarkedCar(p.number);
             }
           })
+
           return marker;
         }
     );
 
+    const createMarkers = () => 
+      positions
+        .map(p => {
+          const lastPoint = p.path[p.path.length-1];
+
+          let markerImage: kakao.maps.MarkerImage | null = null;
+
+          if(p.status === "운행중") markerImage = runningMarkerRef.current;
+          else if(p.status === "미운행") markerImage = notRunningMarkerRef.current;
+          else if(p.status === "수리중") markerImage = inspectedMarkerRef.current;
+          else markerImage = null;
+
+          // 1) Marker 생성
+          const marker = new kakao.maps.Marker({
+            position: new kakao.maps.LatLng(lastPoint.lat, lastPoint.lng),
+            image: markerImage
+          });
+
+          // 2) InfoWindow 생성
+          const iwContent = `
+            <div style="padding:5px; font-size:1rem;">
+              <span>${p.number}</span><br>
+              <span>${p.name}</span><br>
+              <span>${p.status}</span><br>
+              <a href="https://map.kakao.com/link/to/${p.number},${lastPoint.lat},${lastPoint.lng}"
+                style="color:blue; font-size: 0.8rem;" margin-left:4px;" target="_blank">길찾기</a>
+            </div>`;
+          const infowindow = new kakao.maps.InfoWindow({ content: iwContent });
+            
+          // 3) 이벤트 리스너 등록 (클릭하면 열기)
+          kakao.maps.event.addListener(marker, "click", () => {
+            if(infowindow.getMap()) {
+              infowindow.close();
+            }
+            else {
+              infowindow.open(mapInstance.current, marker);
+            }
+          })
+          // 상태값은 상태 업데이트 요청후(by set함수) 다음 렌더링이 일어날 때 반영된다.
+
+          return marker;
+        })
+
     if (carStatusBtn === "전체") {
-      totalClustererRef.current?.addMarkers(createMarkers('전체'));
+      if(!runningMarkerRef.current) return;
+      totalClustererRef.current?.addMarkers(createMarkers());
     }
     else if (carStatusBtn === "운행중") {
-      runningClustererRef.current?.addMarkers(createMarkers('운행중'));
+      if(!runningMarkerRef.current) return;
+      runningClustererRef.current?.addMarkers(createMarkersByStatus('운행중', runningMarkerRef.current));
     }
     else if (carStatusBtn === "미운행") {
-      notRunningClustererRef.current?.addMarkers(createMarkers('미운행'));
+      if(!notRunningMarkerRef.current) return;
+      notRunningClustererRef.current?.addMarkers(createMarkersByStatus('미운행', notRunningMarkerRef.current));
     }
     else {
-      inspectedClustererRef.current?.addMarkers(createMarkers('수리중'));
+      if(!inspectedMarkerRef.current) return;
+      inspectedClustererRef.current?.addMarkers(createMarkersByStatus('수리중', inspectedMarkerRef.current));
     }
 
   }, [carStatusBtn, positions]);

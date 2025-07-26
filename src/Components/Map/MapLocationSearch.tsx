@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import type { CarInfo, Position } from '@/Store/carStatus';
-import { useCarStatusOptionStore, useLocationSearchMapStore, useMarkedCarStore, useTrackCarStore } from '@/Store/carStatus';
+import { useCarStatusOptionStore, useLocationSearchMapStore, useTrackCarStore } from '@/Store/carStatus';
 import { useKakaoLoader } from 'react-kakao-maps-sdk';
 
 type CarWithPath = Omit<CarInfo, "path"> & { path: Position[]; };
@@ -18,9 +18,6 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
   const setlLocationSearchMapLevel = useLocationSearchMapStore(state => state.setLocationSearchMapLevel);
   const mapCenterCarList = useTrackCarStore(state => state.mapCenterCarList);
   const mapLevelCarList = useTrackCarStore(state => state.mapLevelCarList);
-  const markedCar = useMarkedCarStore(state => state.markedCar);
-  const addMarkedCar = useMarkedCarStore(state => state.addMarkedCar);
-  const deleteMarkedCar = useMarkedCarStore(state => state.deleteMarkedCar);
 
   const [positions, setPositions] = useState<CarWithPath[]>([]);      // positions에는 차량들의 리스트 객체들이 들어감
 
@@ -116,7 +113,7 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
     };
   }, []);
 
-  // 차량별 클러스터링, 차량별 마커
+  // 차량별 클러스터링, 차량별 마커 디자인
   useEffect(() => {
     if(!mapInstance.current) return;
     // 전체 차량 클러스터러 생성
@@ -214,7 +211,7 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
 
   }, [])
 
-  // 마커 생성, 만들어진 마커로 지도 클러스터링
+  // 마커와 클러스터링 생성, 만들어진 마커로 지도 클러스터링
   useEffect(() => {
     if (!mapInstance.current) return;
     const kakao = (window as any).kakao;
@@ -248,20 +245,15 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
           const infowindow = new kakao.maps.InfoWindow({ content: iwContent });
           
           // 3) 이벤트 리스너 등록 (클릭하면 열기)
-          if(markedCar.includes(p.number)) {
-            infowindow.open(mapInstance.current, marker);
-          }
-
           kakao.maps.event.addListener(marker, "click", () => {
             if(infowindow.getMap()) {
               infowindow.close();
-              deleteMarkedCar(p.number);
             }
             else {
               infowindow.open(mapInstance.current, marker);
-              addMarkedCar(p.number);
             }
           })
+
           return marker;
         }
     );
@@ -296,20 +288,15 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
           const infowindow = new kakao.maps.InfoWindow({ content: iwContent });
             
           // 3) 이벤트 리스너 등록 (클릭하면 열기)
-          if(markedCar.includes(p.number)) {
-            infowindow.open(mapInstance.current, marker);
-          }
-
           kakao.maps.event.addListener(marker, "click", () => {
             if(infowindow.getMap()) {
               infowindow.close();
-              deleteMarkedCar(p.number);
             }
             else {
               infowindow.open(mapInstance.current, marker);
-              addMarkedCar(p.number);
             }
           })
+
           return marker;
         })
 
