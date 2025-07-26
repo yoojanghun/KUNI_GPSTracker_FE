@@ -32,6 +32,10 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
   const notRunningClustererRef = useRef<kakao.maps.MarkerClusterer | null>(null);
   const inspectedClustererRef = useRef<kakao.maps.MarkerClusterer | null>(null);
 
+  const runningMarkerRef = useRef<kakao.maps.MarkerImage | null>(null);
+  const notRunningMarkerRef = useRef<kakao.maps.MarkerImage | null>(null);
+  const inspectedMarkerRef = useRef<kakao.maps.MarkerImage | null>(null);
+
   // 차량의 현재 위치 (예시 데이터)
   useEffect(() => {
     fetch("/carListExample.json")
@@ -75,7 +79,7 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
       if (!mapInstance.current) return;
       kakao.maps.event.trigger(mapInstance.current!, 'resize');
       mapInstance.current.panTo(
-        new kakao.maps.LatLng(37.5665, 126.9780)
+        new kakao.maps.LatLng(36.0, 128.0)
       );
     };
     window.addEventListener('resize', handleResize);
@@ -112,7 +116,7 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
     };
   }, []);
 
-  // 차량별 클러스터링
+  // 차량별 클러스터링, 차량별 마커
   useEffect(() => {
     if(!mapInstance.current) return;
     // 전체 차량 클러스터러 생성
@@ -151,6 +155,13 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
             }]
     });
 
+    // 운행중 차량 마커 생성
+    runningMarkerRef.current = new kakao.maps.MarkerImage(
+      "/marker-working.png",
+      new kakao.maps.Size(30, 42),
+      {offset: new kakao.maps.Point(15, 30)}
+    )
+
     // 미운행 차량 클러스터러 생성
     notRunningClustererRef.current = new kakao.maps.MarkerClusterer({
       map: mapInstance.current,
@@ -169,6 +180,13 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
             }]
     });
 
+    // 미운행 차량 마커 생성
+    notRunningMarkerRef.current = new kakao.maps.MarkerImage(
+      "/marker-notWorking.png",
+      new kakao.maps.Size(30, 42),
+      {offset: new kakao.maps.Point(15, 30)}
+    )
+
     // 수리중 차량 클러스터러 생성
     inspectedClustererRef.current = new kakao.maps.MarkerClusterer({
       map: mapInstance.current,
@@ -186,6 +204,14 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
                 lineHeight: '31px'
             }]
     });
+
+    // 수리중 차량 마커 생성
+    inspectedMarkerRef.current = new kakao.maps.MarkerImage(
+      "/marker-inspected.png",
+      new kakao.maps.Size(30, 42),
+      {offset: new kakao.maps.Point(15, 30)}
+    )
+
   }, [])
 
   // 마커 생성, 만들어진 마커로 지도 클러스터링
@@ -198,15 +224,16 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
     notRunningClustererRef.current?.clear();
     inspectedClustererRef.current?.clear();
 
-    const createMarkers = (status: string) =>
+    const createMarkersByStatus = (status: string, markerImage: kakao.maps.MarkerImage) =>
       positions
-        .filter(p => p.status === status || status === '전체')
+        .filter(p => p.status === status)
         .map(p => {
           const lastPoint = p.path[p.path.length - 1]; // 마지막 위치 객체
 
           // 1) Marker 생성
           const marker = new kakao.maps.Marker({
             position: new kakao.maps.LatLng(lastPoint.lat, lastPoint.lng),
+            image: markerImage
           });
 
           // 2) InfoWindow 생성
@@ -220,11 +247,11 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
             </div>`;
           const infowindow = new kakao.maps.InfoWindow({ content: iwContent });
           
+          // 3) 이벤트 리스너 등록 (클릭하면 열기)
           if(markedCar.includes(p.number)) {
             infowindow.open(mapInstance.current, marker);
           }
 
-          // 3) 이벤트 리스너 등록 (클릭하면 열기)
           kakao.maps.event.addListener(marker, "click", () => {
             if(infowindow.getMap()) {
               infowindow.close();
@@ -239,17 +266,68 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
         }
     );
 
+    const createMarkers = () => 
+      positions
+        .map(p => {
+          const lastPoint = p.path[p.path.length-1];
+
+          let markerImage: kakao.maps.MarkerImage | null = null;
+
+          if(p.status === "운행중") markerImage = runningMarkerRef.current;
+          else if(p.status === "미운행") markerImage = notRunningMarkerRef.current;
+          else if(p.status === "수리중") markerImage = inspectedMarkerRef.current;
+          else markerImage = null;
+
+          // 1) Marker 생성
+          const marker = new kakao.maps.Marker({
+            position: new kakao.maps.LatLng(lastPoint.lat, lastPoint.lng),
+            image: markerImage
+          });
+
+          // 2) InfoWindow 생성
+          const iwContent = `
+            <div style="padding:5px; font-size:1rem;">
+              <span>${p.number}</span><br>
+              <span>${p.name}</span><br>
+              <span>${p.status}</span><br>
+              <a href="https://map.kakao.com/link/to/${p.number},${lastPoint.lat},${lastPoint.lng}"
+                style="color:blue; font-size: 0.8rem;" margin-left:4px;" target="_blank">길찾기</a>
+            </div>`;
+          const infowindow = new kakao.maps.InfoWindow({ content: iwContent });
+            
+          // 3) 이벤트 리스너 등록 (클릭하면 열기)
+          if(markedCar.includes(p.number)) {
+            infowindow.open(mapInstance.current, marker);
+          }
+
+          kakao.maps.event.addListener(marker, "click", () => {
+            if(infowindow.getMap()) {
+              infowindow.close();
+              deleteMarkedCar(p.number);
+            }
+            else {
+              infowindow.open(mapInstance.current, marker);
+              addMarkedCar(p.number);
+            }
+          })
+          return marker;
+        })
+
     if (carStatusOption === "전체") {
-      totalClustererRef.current?.addMarkers(createMarkers('전체'));
+      if(!runningMarkerRef.current) return;
+      totalClustererRef.current?.addMarkers(createMarkers());
     }
     else if (carStatusOption === "운행중") {
-      runningClustererRef.current?.addMarkers(createMarkers('운행중'));
+      if(!runningMarkerRef.current) return;
+      runningClustererRef.current?.addMarkers(createMarkersByStatus('운행중', runningMarkerRef.current));
     }
     else if (carStatusOption === "미운행") {
-      notRunningClustererRef.current?.addMarkers(createMarkers('미운행'));
+      if(!notRunningMarkerRef.current) return;
+      notRunningClustererRef.current?.addMarkers(createMarkersByStatus('미운행', notRunningMarkerRef.current));
     }
     else {
-      inspectedClustererRef.current?.addMarkers(createMarkers('수리중'));
+      if(!inspectedMarkerRef.current) return;
+      inspectedClustererRef.current?.addMarkers(createMarkersByStatus('수리중', inspectedMarkerRef.current));
     }
 
   }, [carStatusOption, positions]);
