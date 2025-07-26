@@ -74,11 +74,37 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
     const handleResize = () => {
       if (!mapInstance.current) return;
       kakao.maps.event.trigger(mapInstance.current!, 'resize');
-      mapInstance.current!.panTo(
+      mapInstance.current.panTo(
         new kakao.maps.LatLng(37.5665, 126.9780)
       );
     };
     window.addEventListener('resize', handleResize);
+
+    // 화면에서 드래그 범위를 벗어나면 지도의 중심으로 다시 위치
+    const bounds = new kakao.maps.LatLngBounds(
+      new kakao.maps.LatLng(33.0, 124.0),     // SouthWest
+      new kakao.maps.LatLng(39.0, 132.0)      // NorthEast
+    );
+
+    kakao.maps.event.addListener(mapInstance.current, "dragend", () => {
+      if (!mapInstance.current) return;
+
+      const center = mapInstance.current.getCenter();
+
+      if (!bounds.contain(center)) {
+        const sw = bounds.getSouthWest();
+        const ne = bounds.getNorthEast();
+        const boundedCenter = new kakao.maps.LatLng(
+          (sw.getLat() + ne.getLat()) / 2,
+          (sw.getLng() + ne.getLng()) / 2
+        );
+        mapInstance.current.panTo(boundedCenter);
+      }
+    });
+
+    // zoom 컨트롤러 생성
+    const zoomControl = new kakao.maps.ZoomControl();
+    mapInstance.current.addControl(zoomControl, kakao.maps.ControlPosition.BOTTOMRIGHT);
 
     return () => {
       kakao.maps.event.removeListener(mapInstance.current!, 'idle', mapCenterLevelEvent);
@@ -172,20 +198,15 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
     notRunningClustererRef.current?.clear();
     inspectedClustererRef.current?.clear();
 
-    const createMarkers = (status: string, imageUrl: string) =>
+    const createMarkers = (status: string) =>
       positions
-        .filter(p => p.status === status)
+        .filter(p => p.status === status || status === '전체')
         .map(p => {
           const lastPoint = p.path[p.path.length - 1]; // 마지막 위치 객체
 
           // 1) Marker 생성
           const marker = new kakao.maps.Marker({
             position: new kakao.maps.LatLng(lastPoint.lat, lastPoint.lng),
-            image: new kakao.maps.MarkerImage(
-              imageUrl,
-              new kakao.maps.Size(30, 30),
-              { offset: new kakao.maps.Point(15, 30) }
-            )
           });
 
           // 2) InfoWindow 생성
@@ -194,8 +215,6 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
               <span>${p.number}</span><br>
               <span>${p.name}</span><br>
               <span>${p.status}</span><br>
-              <a href="https://map.kakao.com/link/map/${p.number},${lastPoint.lat},${lastPoint.lng}"
-                style="color:blue; font-size: 0.8rem;" target="_blank">큰지도보기</a>
               <a href="https://map.kakao.com/link/to/${p.number},${lastPoint.lat},${lastPoint.lng}"
                 style="color:blue; font-size: 0.8rem;" margin-left:4px;" target="_blank">길찾기</a>
             </div>`;
@@ -221,60 +240,16 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
     );
 
     if (carStatusOption === "전체") {
-      const allMarkers = positions
-        .map(p => {
-          const lastPoint = p.path[p.path.length - 1];
-
-          // 1) Marker 생성
-          const marker = new kakao.maps.Marker({
-            position: new kakao.maps.LatLng(lastPoint.lat, lastPoint.lng),
-            image: new kakao.maps.MarkerImage(
-              "/vite.svg",
-              new kakao.maps.Size(30, 30),
-              { offset: new kakao.maps.Point(15, 30) }
-            )
-          });
-
-          // 2) InfoWindow 생성
-          const iwContent = `
-            <div style="padding:5px; font-size: 1rem;">
-              <span>${p.number}</span><br>
-              <span>${p.name}</span><br>
-              <span>${p.status}</span><br>
-              <a href="https://map.kakao.com/link/to/${p.number},${lastPoint.lat},${lastPoint.lng}"
-                style="color:blue; font-size: 0.8rem;" target="_blank">길찾기</a>
-            </div>`;
-          const infowindow = new kakao.maps.InfoWindow({ content: iwContent });
-
-          if(markedCar.includes(p.number)) {
-            infowindow.open(mapInstance.current, marker);
-          }
-          
-          // 3) 이벤트 리스너 등록 (클릭하면 열기)
-          kakao.maps.event.addListener(marker, "click", () => {
-            if (infowindow.getMap()) {
-              infowindow.close();
-              deleteMarkedCar(p.number);
-            } 
-            else {
-              infowindow.open(mapInstance.current, marker);
-              addMarkedCar(p.number);
-            }
-          });
-          return marker;
-        });
-
-      // 4) 클러스터러에 마커 추가
-      totalClustererRef.current?.addMarkers(allMarkers);
+      totalClustererRef.current?.addMarkers(createMarkers('전체'));
     }
     else if (carStatusOption === "운행중") {
-      runningClustererRef.current?.addMarkers(createMarkers('운행중', '/vite.svg'));
+      runningClustererRef.current?.addMarkers(createMarkers('운행중'));
     }
     else if (carStatusOption === "미운행") {
-      notRunningClustererRef.current?.addMarkers(createMarkers('미운행', '/vite.svg'));
+      notRunningClustererRef.current?.addMarkers(createMarkers('미운행'));
     }
     else {
-      inspectedClustererRef.current?.addMarkers(createMarkers('수리중', '/vite.svg'));
+      inspectedClustererRef.current?.addMarkers(createMarkers('수리중'));
     }
 
   }, [carStatusOption, positions]);

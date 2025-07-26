@@ -170,14 +170,13 @@ function CarList() {
                                 setMapLevelCarList(2);
                                 setSelectedCar(car);}}
                             className={`${styles["car-list__item"]} flex items-center rounded-lg box-border px-2 py-2`}>
-                        <span className={`p-1 px-2 font-bold mr-3 border text-sm rounded-sm ${iconSrc} min-w-[55px]`}>
-                            {car.status}
-                        </span>
-                        <p>
-                            <span className="font-bold">{car.number}</span>
-                            <br />
-                            <span className="opacity-50">{car.name}</span>
-                        </p>
+                            <span className={`p-1 px-2 font-bold mr-3 border text-sm rounded-sm ${iconSrc} min-w-[55px]`}>
+                                {car.status}
+                            </span>
+                            <p>
+                                <div className="font-bold h-5">{car.number}</div>
+                                <div className="opacity-50 h-5">{car.name}</div>
+                            </p>
                         </li>
                         );
                     })}
