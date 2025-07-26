@@ -61,7 +61,7 @@ function MapHome ({ maxLevel }: MapTestProps) {
       if (!mapInstance.current) return;
       kakao.maps.event.trigger(mapInstance.current!, 'resize');
       mapInstance.current!.panTo(
-        new kakao.maps.LatLng(37.5665, 126.9780)
+        new kakao.maps.LatLng(36.0, 128.0)
       );
     };
     window.addEventListener('resize', handleResize);
