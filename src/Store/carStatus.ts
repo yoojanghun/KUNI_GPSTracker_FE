@@ -29,6 +29,8 @@ type CarStatusOptionStore = {
     setCarStatusOption: (selectedCarStatusOption: string) => void;
 }
 
+const DEFAULT_CENTER = { lat: 36.0, lng: 128.0 };
+
 type LocationSearchMapStateStore = {
     locationSearchMapCenter: { lat: number; lng: number; };
     locationSearchMapLevel: number;
@@ -80,22 +82,24 @@ export const useCarStatusOptionStore = create<CarStatusOptionStore>((set) => ({
 // LocationSearch.tsx에서 지도를 확대/축소 및 중심이동하였을 때, 다른 페이지로 이동한 후 다시 돌아와도
 // 원래 이전 지도의 모습을 유지하도록 할 때 사용
 export const useLocationSearchMapStore = create<LocationSearchMapStateStore>((set) => ({
-    locationSearchMapCenter: { lat: 37.5660, lng: 126.9775},
+    locationSearchMapCenter: DEFAULT_CENTER,
     locationSearchMapLevel: 13,
     setLocationSearchMapCenter: (center) => set({locationSearchMapCenter: center}),
     setLocationSearchMapLevel: (level) => set({locationSearchMapLevel: level})
 }));
 
+// Home.tsx에서 지도를 확대/축소 및 중심이동하였을 때, 다른 페이지로 이동한 후 다시 돌아와도
+// 원래 이전 지도의 모습을 유지하도록 할 때 사용
 export const useHomeMapStore = create<HomeMapStateStore>((set) => ({
-    homeMapCenter: { lat: 37.5660, lng: 126.9775 },
-    homeMapLevel: 13,
+    homeMapCenter: DEFAULT_CENTER,
+    homeMapLevel: 12,
     setHomeMapCenter: (center) => set({homeMapCenter: center}),
     setHomeMapLevel: (level) => set({homeMapLevel: level})
 }))
 
 // carList에서 한 차량을 클릭했을 때, 해당 차량을 확대하여 보여주는 데 사용
 export const useTrackCarStore = create<MapStateStoreCarList>((set) => ({
-    mapCenterCarList: { lat: 37.5660, lng: 126.9775 },
+    mapCenterCarList: DEFAULT_CENTER,
     mapLevelCarList: 12,
     setMapCenterCarList: (center) => set({mapCenterCarList: center}),
     setMapLevelCarList: (level) => set({mapLevelCarList: level})
