@@ -33,6 +33,8 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
   const notRunningMarkerRef = useRef<kakao.maps.MarkerImage | null>(null);
   const inspectedMarkerRef = useRef<kakao.maps.MarkerImage | null>(null);
 
+  const activeInfoWindowRef = useRef<kakao.maps.InfoWindow | null>(null);
+
   // 차량의 현재 위치 (예시 데이터)
   useEffect(() => {
     fetch("/carListExample.json")
@@ -71,16 +73,6 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
     }
     kakao.maps.event.addListener(mapInstance.current, "idle", mapCenterLevelEvent);
 
-    // 화면 리사이즈 시 중심좌표 재설정
-    const handleResize = () => {
-      if (!mapInstance.current) return;
-      kakao.maps.event.trigger(mapInstance.current!, 'resize');
-      mapInstance.current.panTo(
-        new kakao.maps.LatLng(36.0, 128.0)
-      );
-    };
-    window.addEventListener('resize', handleResize);
-
     // 화면에서 드래그 범위를 벗어나면 지도의 중심으로 다시 위치
     const bounds = new kakao.maps.LatLngBounds(
       new kakao.maps.LatLng(33.0, 124.0),     // SouthWest
@@ -109,7 +101,6 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
 
     return () => {
       kakao.maps.event.removeListener(mapInstance.current!, 'idle', mapCenterLevelEvent);
-      window.removeEventListener('resize', handleResize);
     };
   }, []);
 
@@ -239,18 +230,31 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
               <span>${p.number}</span><br>
               <span>${p.name}</span><br>
               <span>${p.status}</span><br>
-              <a href="https://map.kakao.com/link/to/${p.number},${lastPoint.lat},${lastPoint.lng}"
-                style="color:blue; font-size: 0.8rem;" margin-left:4px;" target="_blank">길찾기</a>
             </div>`;
           const infowindow = new kakao.maps.InfoWindow({ content: iwContent });
           
-          // 3) 이벤트 리스너 등록 (클릭하면 열기)
-          kakao.maps.event.addListener(marker, "click", () => {
-            if(infowindow.getMap()) {
+          // 3) 이벤트 리스너 등록 (마우스 올리면 열기)
+          kakao.maps.event.addListener(marker, "mouseover", () => {
+            infowindow.open(mapInstance.current, marker);
+          })
+          kakao.maps.event.addListener(marker, "mouseout", () => {
+            if(activeInfoWindowRef.current !== infowindow){
               infowindow.close();
             }
+          })
+
+          // 4) 이벤트 리스너 등록 (클릭 => infoWindow 유지)
+          kakao.maps.event.addListener(marker, "click", () => {
+            if(activeInfoWindowRef.current === infowindow) {
+              infowindow.close();
+              activeInfoWindowRef.current = null;
+            }
             else {
+              if(activeInfoWindowRef.current) {
+                activeInfoWindowRef.current.close();
+              }
               infowindow.open(mapInstance.current, marker);
+              activeInfoWindowRef.current = infowindow;
             }
           })
 
@@ -282,18 +286,31 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
               <span>${p.number}</span><br>
               <span>${p.name}</span><br>
               <span>${p.status}</span><br>
-              <a href="https://map.kakao.com/link/to/${p.number},${lastPoint.lat},${lastPoint.lng}"
-                style="color:blue; font-size: 0.8rem;" margin-left:4px;" target="_blank">길찾기</a>
             </div>`;
           const infowindow = new kakao.maps.InfoWindow({ content: iwContent });
             
-          // 3) 이벤트 리스너 등록 (클릭하면 열기)
-          kakao.maps.event.addListener(marker, "click", () => {
-            if(infowindow.getMap()) {
+          // 3) 이벤트 리스너 등록 (마우스 올리면 열기)
+          kakao.maps.event.addListener(marker, "mouseover", () => {
+            infowindow.open(mapInstance.current, marker);
+          })
+          kakao.maps.event.addListener(marker, "mouseout", () => {
+            if(activeInfoWindowRef.current !== infowindow){
               infowindow.close();
             }
+          })
+
+          // 4) 이벤트 리스너 등록 (클릭 => infoWindow 유지)
+          kakao.maps.event.addListener(marker, "click", () => {
+            if(activeInfoWindowRef.current === infowindow) {
+              infowindow.close();
+              activeInfoWindowRef.current = null;
+            }
             else {
+              if(activeInfoWindowRef.current) {
+                activeInfoWindowRef.current.close();
+              }
               infowindow.open(mapInstance.current, marker);
+              activeInfoWindowRef.current = infowindow;
             }
           })
 
