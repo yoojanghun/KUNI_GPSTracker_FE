@@ -280,6 +280,7 @@ function MapHome ({ maxLevel }: MapTestProps) {
               activeInfoWindowRef.current = infowindow;
               marker.setImage(markerHoverImg);
               activeMarkerRef.current = marker;
+              activeMarkerImgRef.current = markerImg;
             }
           });
 
