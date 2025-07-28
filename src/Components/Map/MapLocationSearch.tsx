@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import type { CarInfo, Position } from '@/Store/carStatus';
-import { useCarStatusOptionStore, useLocationSearchMapStore, useTrackCarStore } from '@/Store/carStatus';
+import { useCarStatusOptionStore, useLocationSearchMapStore, useSelectCarStore, useTrackCarStore } from '@/Store/carStatus';
 import { useKakaoLoader } from 'react-kakao-maps-sdk';
 
 type CarWithPath = Omit<CarInfo, "path"> & { path: Position[]; };
@@ -11,6 +11,8 @@ type MapTestProps = {
 
 function MapLocationSearch ({ maxLevel }: MapTestProps) {
 
+  const selectedCar = useSelectCarStore(state => state.selectedCar);
+  const setSelectedCar = useSelectCarStore(state => state.setSelectedCar);
   const carStatusOption = useCarStatusOptionStore(state => state.carStatusOption);
   const locationSearchMapCenter = useLocationSearchMapStore(state => state.locationSearchMapCenter);
   const setLocationSearchMapCenter = useLocationSearchMapStore(state => state.setLocationSearchMapCenter);
@@ -262,15 +264,21 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
             </div>`;
           const infowindow = new kakao.maps.InfoWindow({ content: iwContent });
           
+          if(selectedCar?.number === p.number) {
+            marker.setImage(markerHoverImg);
+            infowindow.open(mapInstance.current, marker);
+            activeInfoWindowRef.current = infowindow;
+          }
+
           // 3) 이벤트 리스너 등록 (마우스 올리면 열기)
           kakao.maps.event.addListener(marker, "mouseover", () => {
-            infowindow.open(mapInstance.current, marker);
             marker.setImage(markerHoverImg);
+            infowindow.open(mapInstance.current, marker);
           })
           kakao.maps.event.addListener(marker, "mouseout", () => {
             if(activeInfoWindowRef.current !== infowindow) {
-              infowindow.close();
               marker.setImage(markerImg);
+              infowindow.close();
             }
           });
 
@@ -289,10 +297,12 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
               if(activeMarkerRef.current) {
                 activeMarkerRef.current.setImage(markerImg);
               }
+              marker.setImage(markerHoverImg);
               infowindow.open(mapInstance.current, marker);
               activeInfoWindowRef.current = infowindow;
-              marker.setImage(markerHoverImg);
               activeMarkerRef.current = marker;
+              activeMarkerImgRef.current = markerImg;
+              setSelectedCar(p);
             }
           });
 
@@ -340,15 +350,21 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
             </div>`;
           const infowindow = new kakao.maps.InfoWindow({ content: iwContent });
             
+          if(selectedCar?.number === p.number) {
+            marker.setImage(markerHoverImg);
+            infowindow.open(mapInstance.current, marker);
+            activeInfoWindowRef.current = infowindow;
+          }
+
           // 3) 이벤트 리스너 등록 (마우스 올리면 열기)
           kakao.maps.event.addListener(marker, "mouseover", () => {
-            infowindow.open(mapInstance.current, marker);
             marker.setImage(markerHoverImg);
+            infowindow.open(mapInstance.current, marker);
           })
           kakao.maps.event.addListener(marker, "mouseout", () => {
             if(activeInfoWindowRef.current !== infowindow) {
-              infowindow.close();
               marker.setImage(markerImg);
+              infowindow.close();
             }
           })
 
@@ -367,11 +383,12 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
               if(activeMarkerRef.current && activeMarkerImgRef.current) {
                 activeMarkerRef.current.setImage(activeMarkerImgRef.current);
               }
+              marker.setImage(markerHoverImg);
               infowindow.open(mapInstance.current, marker);
               activeInfoWindowRef.current = infowindow;
-              marker.setImage(markerHoverImg);
               activeMarkerRef.current = marker;
               activeMarkerImgRef.current = markerImg;
+              setSelectedCar(p);
             }
           })
 
@@ -395,7 +412,7 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
       inspectedClustererRef.current?.addMarkers(createMarkersByStatus('수리중', inspectedMarkerRef.current, inspectedHoverMarkerRef.current));
     }
 
-  }, [carStatusOption, positions]);
+  }, [carStatusOption, positions, selectedCar]);
 
   return (
     <div ref={mapContainerRef} style={{ width: '100%', height: '100%'}}/>
