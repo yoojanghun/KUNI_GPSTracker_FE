@@ -3,7 +3,8 @@ import {
     Truck, 
     ArrowLeft,
     ChevronDown,
-    ChevronUp 
+    ChevronUp,
+    X 
 } from "lucide-react";  
 import {
     Select,
@@ -11,11 +12,25 @@ import {
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from "@/Components/ui/select";     
-import styles from "./CarList.module.css";
+} from "@/Components/ui/select";  
+import {
+    Pagination,
+    PaginationContent,
+    PaginationItem,
+    PaginationLink,
+    PaginationNext,
+    PaginationPrevious,
+    PaginationEllipsis 
+} from "@/Components/ui/pagination"
+import {
+    type CarInfo,
+    useSelectCarStore, 
+    useCarStatusOptionStore, 
+    useTrackCarStore,  
+    usePaginationStore
+} from "@/Store/carStatus";
 import { useEffect, useRef, useState } from "react";
-import type { CarInfo } from "@/Store/carStatus";
-import { useSelectCarStore, useCarStatusOptionStore, useTrackCarStore } from "@/Store/carStatus";
+import styles from "./CarList.module.css";
 
 function CarList() {
 
@@ -27,6 +42,10 @@ function CarList() {
 
     const setCarStatusOption = useCarStatusOptionStore(state => state.setCarStatusOption);
     const carStatusOption = useCarStatusOptionStore(state => state.carStatusOption);
+
+    const page = usePaginationStore(state => state.page);
+    const setPage = usePaginationStore(state => state.setPage);
+    const totalPages = 10;                                              // 백엔드에서 제공 예정
 
     const [inputVal, setInputVal] = useState<string>("");
     const [currentCarList, setCurrentCarList] = useState<CarInfo[]>([])
@@ -105,6 +124,14 @@ function CarList() {
                             <td className={styles["td"]}>{selectedCar.name}</td>
                         </tr>
                         <tr>
+                            <th className={styles["th"]}>상태</th>
+                            <td className={styles["td"]}>
+                                <span className={`p-1 px-2 font-bold border text-sm rounded-sm ${carStatusClass[selectedCar.status]} min-w-[55px]`}>
+                                    {selectedCar.status}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
                             <th className={styles["th"]}>운행일자</th>
                             <td className={styles["td"]}>데이터 없음</td>
                         </tr>
@@ -128,7 +155,7 @@ function CarList() {
     }
     
     return (
-        <section className={`${styles["car-list"]} border w-75 max-h-133 flex flex-col rounded-xl bg-white box-border p-3`}>
+        <section className={`${styles["car-list"]} border w-75 max-h-145 flex flex-col rounded-xl bg-white box-border p-3`}>
             <h3 className="flex justify-between items-center font-bold text-xl mb-2 pr-1">
                 <div className="flex items-center">
                     <Truck className="mr-2" />
@@ -139,10 +166,10 @@ function CarList() {
                         <SelectValue placeholder="전체" />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="전체">전체</SelectItem>
-                        <SelectItem value="운행중">운행중</SelectItem>
-                        <SelectItem value="미운행">미운행</SelectItem>
-                        <SelectItem value="수리중">점검중</SelectItem>
+                        <SelectItem value="전체" className="cursor-pointer">전체</SelectItem>
+                        <SelectItem value="운행중" className="cursor-pointer">운행중</SelectItem>
+                        <SelectItem value="미운행" className="cursor-pointer">미운행</SelectItem>
+                        <SelectItem value="수리중" className="cursor-pointer">점검중</SelectItem>
                     </SelectContent>
                 </Select>
             </h3>
@@ -151,44 +178,76 @@ function CarList() {
                 <label className={`${styles["car-list__input"]} flex items-center border-none rounded px-2 py-1`}>
                     <Search className="w-4 h-4 mr-2" />
                     <input value={inputVal} onChange={handleInput} type="text" placeholder="차량 검색" className="w-full h-7 outline-none text-xl" />                        
-                    {inputVal && <button onClick={() => setInputVal("")} type="button" className="text-sm cursor-pointer opacity-30 mr-[3px]">X</button>}
+                    {inputVal && <button onClick={() => setInputVal("")} type="button" className="text-sm cursor-pointer opacity-30 mr-[3px] hover:bg-gray-400 rounded-full"><X /></button>}
                 </label>
             </form>
 
-                {/* car는 각 차량 객체 */}
+            {/* car는 각 차량 객체 */}
             {isVisible && (
-                <ul className="flex-1 overflow-y-auto space-y-2 pr-2 min-h-105 pb-2">
-                    {filteredCarList.map(car => {
-                        if (!car.path) return null;
-                        const iconSrc   = carStatusClass[car.status];
-                        const lastPoint = car.path[car.path.length - 1];
-
-                    return (
-                        <li key={car.number}
-                            onClick={() => {
-                                setMapCenterCarList({ lat: lastPoint.lat, lng: lastPoint.lng });
-                                setMapLevelCarList(2);
-                                setSelectedCar(car);}}
-                            className={`${styles["car-list__item"]} flex items-center rounded-lg box-border px-2 py-2`}>
-                            <span className={`p-1 px-2 font-bold mr-3 border text-sm rounded-sm ${iconSrc} min-w-[55px]`}>
-                                {car.status}
-                            </span>
-                            <div>
-                                <div className="font-bold h-5">{car.number}</div>
-                                <div className="opacity-50 h-5">{car.name}</div>
-                            </div>
-                        </li>
-                        );
-                    })}
-                </ul>
+                <>
+                    <ul className="flex-1 overflow-y-auto space-y-2 pr-2 min-h-105 pb-2">
+                        {filteredCarList.map(car => {
+                            if (!car.path) return null;
+                            const iconSrc   = carStatusClass[car.status];
+                            const lastPoint = car.path[car.path.length - 1];
+                            return (
+                                <li key={car.number}
+                                    onClick={() => {
+                                        setMapCenterCarList({ lat: lastPoint.lat, lng: lastPoint.lng });
+                                        setMapLevelCarList(2);
+                                        setSelectedCar(car);}}
+                                    className={`${styles["car-list__item"]} flex items-center rounded-lg box-border px-2 py-1.5`}>
+                                    <span className={`p-1 px-2 font-bold mr-3 border text-sm rounded-sm ${iconSrc} min-w-[55px]`}>
+                                        {car.status}
+                                    </span>
+                                    <div>
+                                        <div className="font-bold h-5">{car.number}</div>
+                                        <div className="opacity-50 h-5">{car.name}</div>
+                                    </div>
+                                </li>
+                                );
+                        })}
+                    </ul>
+                    <Pagination className="mt-1">
+                        <PaginationContent>
+                            <PaginationItem>
+                                <PaginationPrevious 
+                                    href="#"
+                                    onClick={() => page > 1 && setPage(page - 1)}
+                                    aria-disabled={page === 1}/>
+                            </PaginationItem>
+                            {[...Array(totalPages)].map((_, i) => (
+                                <PaginationItem>
+                                    <PaginationLink
+                                        href="#"
+                                        onClick={() => setPage(i + 1)}
+                                        isActive={page === i + 1}>
+                                        {i + 1}
+                                    </PaginationLink>
+                                </PaginationItem>
+                                ))
+                            }
+                            {totalPages > 5 && 
+                                (<PaginationItem>
+                                    <PaginationEllipsis />
+                                </PaginationItem>)}
+                            <PaginationItem>
+                                <PaginationNext 
+                                    href="#"
+                                    onClick={() => page < totalPages && setPage(page + 1)}
+                                    aria-disabled={page === totalPages} />
+                            </PaginationItem>
+                        </PaginationContent>
+                    </Pagination>
+                </>
             )}
+
             <button ref={hideBtnRef} 
                 onClick={() => {setIsVisible(!isVisible)}} 
                 className={`${styles["hide-btn"]} rounded-br-xl rounded-bl-xl h-6 border flex justify-center`}>
                 {isVisible ? <ChevronUp /> : <ChevronDown />}
             </button>
         </section>
-        
     );
 }
 
