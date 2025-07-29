@@ -7,7 +7,6 @@
     border-color: hsla(0, 0%, 0%, 0.2);
 }
 .car-list__item {
-    box-shadow: 2px 2px 2px hsla(0, 0%, 0%, 0.2);
     transition: all 0.3s ease-in-out;
     cursor: pointer;
 }

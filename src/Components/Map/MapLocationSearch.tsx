@@ -125,7 +125,7 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
       clustererRef.current = new kakao.maps.MarkerClusterer({
       map: mapInstance.current,
       averageCenter: true,
-      minLevel: 6,
+      minLevel: 7,
       styles: [{
                 width : '60px', 
                 height : '60px',
