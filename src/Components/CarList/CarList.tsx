@@ -173,10 +173,10 @@ function CarList() {
                             <span className={`p-1 px-2 font-bold mr-3 border text-sm rounded-sm ${iconSrc} min-w-[55px]`}>
                                 {car.status}
                             </span>
-                            <p>
+                            <div>
                                 <div className="font-bold h-5">{car.number}</div>
                                 <div className="opacity-50 h-5">{car.name}</div>
-                            </p>
+                            </div>
                         </li>
                         );
                     })}
