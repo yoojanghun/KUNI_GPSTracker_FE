@@ -97,121 +97,53 @@ function MapHome ({ maxLevel }: MapTestProps) {
 
   // 차량별 클러스터링, 차량별 마커 디자인
   useEffect(() => {
-    if(!mapInstance.current) return;
-    // 전체 차량 클러스터러 생성
-    totalClustererRef.current = new kakao.maps.MarkerClusterer({
+    const clusterers = [
+      { clustererRef: totalClustererRef, backgroundColor: 'hsla(121, 41%, 45%, 0.8)' },
+      { clustererRef: runningClustererRef, backgroundColor: 'hsla(217, 89%, 65%, 0.8)' },
+      { clustererRef: notRunningClustererRef, backgroundColor: 'hsla(5, 80%, 58%, 0.8)' },
+      { clustererRef: inspectedClustererRef, backgroundColor: 'hsla(35, 100%, 58%, 0.8)' },
+    ]
+
+    clusterers.forEach(({ clustererRef, backgroundColor }) => {
+      if(!mapInstance.current) return;
+      clustererRef.current = new kakao.maps.MarkerClusterer({
       map: mapInstance.current,
       averageCenter: true,
       minLevel: 6,
       styles: [{
-                width : '50px', 
-                height : '50px',
-                backgroundColor: 'green',
+                width : '60px', 
+                height : '60px',
+                fontSize: "1.2em",
+                color: 'white',
+                backgroundColor: backgroundColor,
                 borderRadius: '50%',
-                opacity: '0.7',
-                color: '#FFFFFF',
-                textAlign: 'center',
                 fontWeight: 'bold',
-                lineHeight: '31px'
-            }]
-    });
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center"
+              }]
+      })
+    })
+    
+    const markers = [
+      { markerRef: runningMarkerRef, hoverMarkerRef: runningHoverMarkerRef, url: "/marker-working.png" },
+      { markerRef: notRunningMarkerRef, hoverMarkerRef: notRunningHoverMarkerRef, url: "/marker-notWorking.png" },
+      { markerRef: inspectedMarkerRef, hoverMarkerRef: inspectedHoverMarkerRef, url: "/marker-inspected.png" },
+    ]
 
-    // 운행중 차량 클러스터러 생성
-    runningClustererRef.current = new kakao.maps.MarkerClusterer({
-      map: mapInstance.current,
-      averageCenter: true,
-      minLevel: 6,
-      styles: [{
-                width : '50px', 
-                height : '50px',
-                background: 'blue',
-                borderRadius: '50%',
-                opacity: '0.7',
-                color: '#FFFFFF',
-                textAlign: 'center',
-                fontWeight: 'bold',
-                lineHeight: '31px'
-            }]
-    });
+    markers.forEach(({ markerRef, hoverMarkerRef, url }) => {
+      markerRef.current = new kakao.maps.MarkerImage(
+        url,
+        new kakao.maps.Size(30, 42),
+        { offset: new kakao.maps.Point(15, 30) }
+      )
 
-    // 운행중 차량 마커 생성
-    runningMarkerRef.current = new kakao.maps.MarkerImage(
-      "/marker-working.png",
-      new kakao.maps.Size(30, 42),
-      {offset: new kakao.maps.Point(15, 30)}
-    )
-
-    // mouseover 시 운행중 차량 마커 생성
-    runningHoverMarkerRef.current = new kakao.maps.MarkerImage(
-      "/marker-working.png",
-      new kakao.maps.Size(36, 50),
-      {offset: new kakao.maps.Point(18, 37)}
-    )
-
-    // 미운행 차량 클러스터러 생성
-    notRunningClustererRef.current = new kakao.maps.MarkerClusterer({
-      map: mapInstance.current,
-      averageCenter: true,
-      minLevel: 6,
-      styles: [{
-                width : '50px', 
-                height : '50px',
-                background: 'red',
-                borderRadius: '50%',
-                opacity: '0.7',
-                color: '#000',
-                textAlign: 'center',
-                fontWeight: 'bold',
-                lineHeight: '31px'
-            }]
-    });
-
-    // 미운행 차량 마커 생성
-    notRunningMarkerRef.current = new kakao.maps.MarkerImage(
-      "/marker-notWorking.png",
-      new kakao.maps.Size(30, 42),
-      {offset: new kakao.maps.Point(15, 30)}
-    )
-
-    // mouseover 시 미운행 차량 마커 생성
-    notRunningHoverMarkerRef.current = new kakao.maps.MarkerImage(
-      "/marker-notWorking.png",
-      new kakao.maps.Size(36, 50),
-      {offset: new kakao.maps.Point(18, 37)}
-    )
-
-    // 수리중 차량 클러스터러 생성
-    inspectedClustererRef.current = new kakao.maps.MarkerClusterer({
-      map: mapInstance.current,
-      averageCenter: true,
-      minLevel: 6,
-      styles: [{
-                width : '50px', 
-                height : '50px',
-                background: 'orange',
-                borderRadius: '50%',
-                opacity: '0.7',
-                color: '#000',
-                textAlign: 'center',
-                fontWeight: 'bold',
-                lineHeight: '31px'
-            }]
-    });
-
-    // 수리중 차량 마커 생성
-    inspectedMarkerRef.current = new kakao.maps.MarkerImage(
-      "/marker-inspected.png",
-      new kakao.maps.Size(30, 42),
-      {offset: new kakao.maps.Point(15, 30)}
-    )
-
-    // mouseover 시 수리중 차량 마커 생성
-    inspectedHoverMarkerRef.current = new kakao.maps.MarkerImage(
-      "/marker-inspected.png",
-      new kakao.maps.Size(36, 50),
-      {offset: new kakao.maps.Point(18, 37)}
-    )
-
+      hoverMarkerRef.current = new kakao.maps.MarkerImage(
+        url,
+        new kakao.maps.Size(36, 50),
+        { offset: new kakao.maps.Point(18, 37) }
+      )
+    })
   }, [])
 
   // 마커와 클러스터링 생성, 만들어진 마커로 지도 클러스터링
@@ -228,115 +160,47 @@ function MapHome ({ maxLevel }: MapTestProps) {
     activeMarkerRef.current = null;
     activeMarkerImgRef.current = null;
 
-    const createMarkersByStatus = (status: string, markerImg: kakao.maps.MarkerImage, markerHoverImg: kakao.maps.MarkerImage) =>
-      positions
-        .filter(p => p.status === status)
+    if(!runningMarkerRef.current || !runningHoverMarkerRef.current || !notRunningMarkerRef.current || 
+        !notRunningHoverMarkerRef.current || !inspectedMarkerRef.current || !inspectedHoverMarkerRef.current) return;
+
+    const markerMap: Record<string, {default: kakao.maps.MarkerImage, hover: kakao.maps.MarkerImage}> = {
+      "운행중": {default: runningMarkerRef.current, hover: runningHoverMarkerRef.current},
+      "미운행": {default: notRunningMarkerRef.current, hover: notRunningHoverMarkerRef.current},
+      "수리중": {default: inspectedMarkerRef.current, hover: inspectedHoverMarkerRef.current}
+    }
+
+    const makeMarkers = (status?: string) => {
+      return positions
+        .filter(p => p.status === status || !status)
         .map(p => {
-          const lastPoint = p.path[p.path.length - 1]; // 마지막 위치 객체
+          const lastPoint = p.path[p.path.length - 1];
+          const {default: defaultImg, hover: hoverImg} = markerMap[p.status];
 
           // 1) Marker 생성
           const marker = new kakao.maps.Marker({
             position: new kakao.maps.LatLng(lastPoint.lat, lastPoint.lng),
-            image: markerImg
+            image: defaultImg
           });
 
           // 2) InfoWindow 생성
-          const iwContent = `
-            <div style="padding:5px; font-size:1rem;">
-              <span>${p.number}</span><br>
-              <span>${p.name}</span><br>
-              <span>${p.status}</span><br>
-            </div>`;
-          const infowindow = new kakao.maps.InfoWindow({ content: iwContent });
-          
+          const infowindow = new kakao.maps.InfoWindow({
+            content: `
+              <div style="padding:5px; font-size:1rem;">
+                <span>${p.number}</span><br>
+                <span>${p.name}</span><br>
+                <span>${p.status}</span><br>
+              </div>`
+          });
+
           // 3) 이벤트 리스너 등록 (마우스 올리면 열기)
           kakao.maps.event.addListener(marker, "mouseover", () => {
+            marker.setImage(hoverImg);
             infowindow.open(mapInstance.current, marker);
-            marker.setImage(markerHoverImg);
           })
           kakao.maps.event.addListener(marker, "mouseout", () => {
             if(activeInfoWindowRef.current !== infowindow) {
+              marker.setImage(defaultImg);
               infowindow.close();
-              marker.setImage(markerImg);
-            }
-          });
-
-          // 4) 이벤트 리스너 등록 (클릭 => infoWindow 유지)
-          kakao.maps.event.addListener(marker, "click", () => {
-            if(activeInfoWindowRef.current === infowindow) {
-              infowindow.close();
-              activeInfoWindowRef.current = null;
-              activeMarkerRef.current = null;
-              activeMarkerImgRef.current = null;
-            }
-            else {
-              if(activeInfoWindowRef.current) {
-                activeInfoWindowRef.current.close();
-              }
-              if(activeMarkerRef.current) {
-                activeMarkerRef.current.setImage(markerImg);
-              }
-              infowindow.open(mapInstance.current, marker);
-              activeInfoWindowRef.current = infowindow;
-              marker.setImage(markerHoverImg);
-              activeMarkerRef.current = marker;
-              activeMarkerImgRef.current = markerImg;
-            }
-          });
-
-          return marker;
-        }
-    );
-
-    const createMarkers = () => 
-      positions
-        .map(p => {
-          const lastPoint = p.path[p.path.length-1];
-
-          let markerImg: kakao.maps.MarkerImage | null = null;
-          let markerHoverImg: kakao.maps.MarkerImage | null = null;
-
-          if(p.status === "운행중") {
-            markerImg = runningMarkerRef.current;
-            markerHoverImg = runningHoverMarkerRef.current;
-          }
-          else if(p.status === "미운행") {
-            markerImg = notRunningMarkerRef.current;
-            markerHoverImg = notRunningHoverMarkerRef.current;
-          }
-          else if(p.status === "수리중") {
-            markerImg = inspectedMarkerRef.current;
-            markerHoverImg = inspectedHoverMarkerRef.current;
-          }
-          else {
-            markerImg = null;
-            markerHoverImg = null;
-          }
-
-          // 1) Marker 생성
-          const marker = new kakao.maps.Marker({
-            position: new kakao.maps.LatLng(lastPoint.lat, lastPoint.lng),
-            image: markerImg
-          });
-
-          // 2) InfoWindow 생성
-          const iwContent = `
-            <div style="padding:5px; font-size:1rem;">
-              <span>${p.number}</span><br>
-              <span>${p.name}</span><br>
-              <span>${p.status}</span><br>
-            </div>`;
-          const infowindow = new kakao.maps.InfoWindow({ content: iwContent });
-            
-          // 3) 이벤트 리스너 등록 (마우스 올리면 열기)
-          kakao.maps.event.addListener(marker, "mouseover", () => {
-            infowindow.open(mapInstance.current, marker);
-            marker.setImage(markerHoverImg);
-          })
-          kakao.maps.event.addListener(marker, "mouseout", () => {
-            if(activeInfoWindowRef.current !== infowindow) {
-              infowindow.close();
-              marker.setImage(markerImg);
             }
           })
           // 상태값은 상태 업데이트 요청후(by set함수) 다음 렌더링이 일어날 때 반영된다.
@@ -356,32 +220,32 @@ function MapHome ({ maxLevel }: MapTestProps) {
               if(activeMarkerRef.current && activeMarkerImgRef.current) {
                 activeMarkerRef.current.setImage(activeMarkerImgRef.current);
               }
+              marker.setImage(hoverImg);
               infowindow.open(mapInstance.current, marker);
               activeInfoWindowRef.current = infowindow;
-              marker.setImage(markerHoverImg);
               activeMarkerRef.current = marker;
-              activeMarkerImgRef.current = markerImg;
+              activeMarkerImgRef.current = defaultImg;
             }
           })
 
           return marker;
-        });
+        })
+    }
 
     if (carStatusBtn === "전체") {
       if(!runningMarkerRef.current) return;
-      totalClustererRef.current?.addMarkers(createMarkers());
-    }
-    else if (carStatusBtn === "운행중") {
-      if(!runningMarkerRef.current || !runningHoverMarkerRef.current) return;
-      runningClustererRef.current?.addMarkers(createMarkersByStatus('운행중', runningMarkerRef.current, runningHoverMarkerRef.current));
-    }
-    else if (carStatusBtn === "미운행") {
-      if(!notRunningMarkerRef.current || !notRunningHoverMarkerRef.current) return;
-      notRunningClustererRef.current?.addMarkers(createMarkersByStatus('미운행', notRunningMarkerRef.current, notRunningHoverMarkerRef.current));
+      totalClustererRef.current?.addMarkers(makeMarkers());
     }
     else {
-      if(!inspectedMarkerRef.current || !inspectedHoverMarkerRef.current) return;
-      inspectedClustererRef.current?.addMarkers(createMarkersByStatus('수리중', inspectedMarkerRef.current, inspectedHoverMarkerRef.current));
+      if(!runningClustererRef.current || !notRunningClustererRef.current || 
+          !inspectedClustererRef.current || !totalClustererRef.current) return;
+
+      const mapRef: Record<string, kakao.maps.MarkerClusterer> = {
+        "운행중": runningClustererRef.current,
+        "미운행": notRunningClustererRef.current,
+        "수리중": inspectedClustererRef.current
+      }
+      mapRef[carStatusBtn].addMarkers(makeMarkers(carStatusBtn));
     }
 
   }, [carStatusBtn, positions]);
