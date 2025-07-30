@@ -3,6 +3,8 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   MoreHorizontalIcon,
+  ChevronsLeft,
+  ChevronsRight
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -82,6 +84,23 @@ function PaginationPrevious({
   )
 }
 
+function PaginationDoublePrevious({
+  className,
+  ...props
+}: React.ComponentProps<typeof PaginationLink>) {
+  return (
+    <PaginationLink
+      aria-label="Go to previous page"
+      size="default"
+      className={cn("gap-1 px-2.5 sm:pl-2.5", className)}
+      {...props}
+    >
+      <ChevronsLeft />
+      <span className="hidden sm:block"></span>
+    </PaginationLink>
+  )
+}
+
 function PaginationNext({
   className,
   ...props
@@ -95,6 +114,23 @@ function PaginationNext({
     >
       <span className="hidden sm:block"></span>
       <ChevronRightIcon />
+    </PaginationLink>
+  )
+}
+
+function PaginationDoubleNext({
+  className,
+  ...props
+}: React.ComponentProps<typeof PaginationLink>) {
+  return (
+    <PaginationLink
+      aria-label="Go to next page"
+      size="default"
+      className={cn("gap-1 px-2.5 sm:pr-2.5", className)}
+      {...props}
+    >
+      <span className="hidden sm:block"></span>
+      <ChevronsRight />
     </PaginationLink>
   )
 }
@@ -124,4 +160,6 @@ export {
   PaginationPrevious,
   PaginationNext,
   PaginationEllipsis,
+  PaginationDoublePrevious,
+  PaginationDoubleNext
 }
