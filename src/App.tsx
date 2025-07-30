@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./Components/Navbar.tsx";
 import Home from "./Pages/Home/Home.tsx";
 import Management from "./Pages/Management/Management.tsx";
+import { DLogTest } from "./Pages/DriveLog/DLogTest.tsx";
 import { ManageTest } from "./Pages/Management/ManageTest.tsx";
 import DrivingLog from "./Pages/DriveLog/DrivingLog.tsx";
 import LocationSearch from "./Pages/LocationSearch/LocationSearch.tsx";
@@ -18,7 +19,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/location" element={<LocationSearch />}/>
           <Route path="/management" element={<ManageTest />} />
-          <Route path="/log" element={<DrivingLog />} />
+          <Route path="/log" element={<DLogTest />} />
           <Route path="/log/:Id" element={<DLogDetails />} />
         </Routes>
       </div>
