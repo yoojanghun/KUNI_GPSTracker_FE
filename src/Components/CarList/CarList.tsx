@@ -20,7 +20,8 @@ import {
     PaginationLink,
     PaginationNext,
     PaginationPrevious,
-    PaginationEllipsis 
+    PaginationDoublePrevious,
+    PaginationDoubleNext
 } from "@/Components/ui/pagination"
 import {
     type CarInfo,
@@ -45,7 +46,7 @@ function CarList() {
 
     const page = usePaginationStore(state => state.page);
     const setPage = usePaginationStore(state => state.setPage);
-    const totalPages = 10;                                              // 백엔드에서 제공 예정
+    const totalPages = 72;                                              // 백엔드에서 제공 예정
 
     const [inputVal, setInputVal] = useState<string>("");
     const [currentCarList, setCurrentCarList] = useState<CarInfo[]>([])
@@ -88,6 +89,24 @@ function CarList() {
         if(isMatchingCar.length > 0 && keyword !== "") {
             setIsVisible(true);
         }
+    }
+
+    // pagination 시 화면에 보이는 페이지 설정
+    const allPages = [...Array(totalPages)].map((_, i) => i + 1);       // [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]        
+
+    let visiblePages: number[] = [];
+
+    if(totalPages <= 5) {
+        visiblePages = allPages;
+    }
+    else if(page <= 3) {
+        visiblePages = allPages.slice(0, 5);            // 처음 5개 페이지
+    }
+    else if(page >= totalPages - 2){
+        visiblePages = allPages.slice(totalPages - 5)   // 마지막 5개 페이지
+    }
+    else{
+        visiblePages = allPages.slice(page - 3, page + 2);
     }
 
     if(selectedCar) {
@@ -155,7 +174,7 @@ function CarList() {
     }
     
     return (
-        <section className={`${styles["car-list"]} border w-75 max-h-145 flex flex-col rounded-xl bg-white box-border p-3`}>
+        <section className={`${styles["car-list"]} border w-80 max-h-145 flex flex-col rounded-xl bg-white box-border p-3`}>
             <h3 className="flex justify-between items-center font-bold text-xl mb-2 pr-1">
                 <div className="flex items-center">
                     <Truck className="mr-2" />
@@ -211,32 +230,43 @@ function CarList() {
                     <Pagination className="mt-1">
                         <PaginationContent>
                             <PaginationItem>
+                                <PaginationDoublePrevious
+                                    href="#"
+                                    onClick={() => page > 5 && setPage(page - 5)}
+                                    className="w-6 h-8 flex items-center justify-center cursor-pointer">
+                                </PaginationDoublePrevious>
+                            </PaginationItem>
+                            <PaginationItem>
                                 <PaginationPrevious 
                                     href="#"
                                     onClick={() => page > 1 && setPage(page - 1)}
-                                    aria-disabled={page === 1}/>
+                                    aria-disabled={page === 1} 
+                                    className="w-6 h-8 flex items-center justify-center" />
                             </PaginationItem>
-                            {[...Array(totalPages)].map((_, i) => (
+                            {visiblePages.map((p) => (                       // [4, 5, 6, 7, 8]
                                 <PaginationItem>
                                     <PaginationLink
                                         href="#"
-                                        onClick={() => setPage(i + 1)}
-                                        isActive={page === i + 1}>
-                                        {i + 1}
+                                        onClick={() => setPage(p)}
+                                        isActive={page === p}
+                                        className="w-8 h-8" >
+                                            {p}
                                     </PaginationLink>
                                 </PaginationItem>
                                 ))
                             }
-                            {totalPages > 5 && 
-                                (<PaginationItem>
-                                    <PaginationEllipsis />
-                                </PaginationItem>)}
                             <PaginationItem>
                                 <PaginationNext 
                                     href="#"
                                     onClick={() => page < totalPages && setPage(page + 1)}
-                                    aria-disabled={page === totalPages} />
+                                    aria-disabled={page === totalPages} 
+                                    className="w-6 h-8 flex items-center justify-center" />
                             </PaginationItem>
+                                <PaginationDoubleNext
+                                    href="#"
+                                    onClick={() => page < totalPages - 5 && setPage(page + 5)}
+                                    className="w-6 h-8 flex items-center justify-center cursor-pointer">
+                                </PaginationDoubleNext>
                         </PaginationContent>
                     </Pagination>
                 </>
