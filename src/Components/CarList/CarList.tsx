@@ -30,7 +30,9 @@ import {
     useTrackCarStore,  
     usePaginationStore
 } from "@/Store/carStatus";
+import { useDLogStore } from "@/Store/dlogStore";
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import styles from "./CarList.module.css";
 
 function CarList() {
@@ -51,6 +53,10 @@ function CarList() {
     const [inputVal, setInputVal] = useState<string>("");
     const [currentCarList, setCurrentCarList] = useState<CarInfo[]>([])
     const [isVisible, setIsVisible] = useState<boolean>(true);
+
+    const navigate = useNavigate();
+    const filter = useDLogStore((state) => state.filter);
+    const setFilter = useDLogStore((state) => state.setFilter);
 
     const hideBtnRef = useRef<HTMLButtonElement | null>(null);
 
@@ -132,38 +138,47 @@ function CarList() {
                 <p className="font-bold opacity-20 ml-1">
                     {selectedCar.number}
                 </p>
-                {isVisible && <table className="my-5">
-                    <tbody>
-                        <tr>
-                            <th className={styles["th"]}>차량번호</th>
-                            <td className={styles["td"]}>{selectedCar.number}</td>
-                        </tr>
-                        <tr>
-                            <th className={styles["th"]}>차량명</th>
-                            <td className={styles["td"]}>{selectedCar.name}</td>
-                        </tr>
-                        <tr>
-                            <th className={styles["th"]}>상태</th>
-                            <td className={styles["td"]}>
-                                <span className={`p-1 px-2 font-bold border text-sm rounded-sm ${carStatusClass[selectedCar.status]} min-w-[55px]`}>
-                                    {selectedCar.status}
-                                </span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th className={styles["th"]}>운행일자</th>
-                            <td className={styles["td"]}>데이터 없음</td>
-                        </tr>
-                        <tr>
-                            <th className={styles["th"]}>운행시간</th>
-                            <td className={styles["td"]}>데이터 없음</td>
-                        </tr>
-                        <tr>
-                            <th className={styles["th"]}>운행 거리</th>
-                            <td className={styles["td"]}>{selectedCar.mileage}</td>
-                        </tr>
-                    </tbody>
-                </table>}
+                {isVisible && 
+                    <>
+                        <table className="my-5">
+                            <tbody>
+                                <tr>
+                                    <th className={styles["th"]}>차량번호</th>
+                                    <td className={styles["td"]}>{selectedCar.number}</td>
+                                </tr>
+                                <tr>
+                                    <th className={styles["th"]}>차량명</th>
+                                    <td className={styles["td"]}>{selectedCar.name}</td>
+                                </tr>
+                                <tr>
+                                    <th className={styles["th"]}>상태</th>
+                                    <td className={styles["td"]}>
+                                        <span className={`p-1 px-2 font-bold border text-sm rounded-sm 
+                                                        ${carStatusClass[selectedCar.status]} min-w-[55px]`}>
+                                            {selectedCar.status}
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th className={styles["th"]}>운행일자</th>
+                                    <td className={styles["td"]}>데이터 없음</td>
+                                </tr>
+                                <tr>
+                                    <th className={styles["th"]}>운행시간</th>
+                                    <td className={styles["td"]}>데이터 없음</td>
+                                </tr>
+                                <tr>
+                                    <th className={styles["th"]}>운행 거리</th>
+                                    <td className={styles["td"]}>{selectedCar.mileage}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <button 
+                            onClick={() => {navigate("/log"); setFilter({...filter, carNumber: `${selectedCar.number}`});}}
+                            className="border cursor-pointer">
+                                운행일지 이동
+                        </button>
+                    </>}
                 <button ref={hideBtnRef} 
                     onClick={() => {setIsVisible(!isVisible)}} 
                     className={`${styles["hide-btn"]} rounded-br-xl rounded-bl-xl h-6 border flex justify-center`}>
@@ -197,7 +212,12 @@ function CarList() {
                 <label className={`${styles["car-list__input"]} flex items-center border-none rounded px-2 py-1`}>
                     <Search className="w-4 h-4 mr-2" />
                     <input value={inputVal} onChange={handleInput} type="text" placeholder="차량 검색" className="w-full h-7 outline-none text-xl" />                        
-                    {inputVal && <button onClick={() => setInputVal("")} type="button" className="text-sm cursor-pointer opacity-30 mr-[3px] hover:bg-gray-400 rounded-full"><X /></button>}
+                    {inputVal && 
+                        <button onClick={() => setInputVal("")} 
+                                type="button" 
+                                className="text-sm cursor-pointer opacity-30 mr-[3px] hover:bg-gray-400 rounded-full">
+                                    <X />
+                        </button>}
                 </label>
             </form>
 

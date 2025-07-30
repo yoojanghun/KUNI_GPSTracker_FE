@@ -1,6 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
-import type { CarInfo, Position } from '@/Store/carStatus';
-import { useCarStatusBtnStore, useHomeMapStore } from '@/Store/carStatus';
+import { 
+  type CarInfo,
+  type Position,
+  useCarStatusBtnStore, 
+  useHomeMapStore 
+} from '@/Store/carStatus';
+import styles from "./MapCustomOverlay.module.css";
 
 type CarWithPath = Omit<CarInfo, "path"> & { path: Position[]; };
 
@@ -33,7 +38,7 @@ function MapHome ({ maxLevel }: MapTestProps) {
   const inspectedMarkerRef = useRef<kakao.maps.MarkerImage | null>(null);
   const inspectedHoverMarkerRef = useRef<kakao.maps.MarkerImage | null>(null);
 
-  const activeInfoWindowRef = useRef<kakao.maps.InfoWindow | null>(null);
+  const activeOverlayRef = useRef<kakao.maps.CustomOverlay | null>(null);
   const activeMarkerRef = useRef<kakao.maps.Marker | null>(null);
   const activeMarkerImgRef = useRef<kakao.maps.MarkerImage | null>(null);
 
@@ -156,7 +161,7 @@ function MapHome ({ maxLevel }: MapTestProps) {
     notRunningClustererRef.current?.clear();
     inspectedClustererRef.current?.clear();
 
-    activeInfoWindowRef.current?.close();
+    activeOverlayRef.current?.setMap(null);
     activeMarkerRef.current = null;
     activeMarkerImgRef.current = null;
 
@@ -182,47 +187,52 @@ function MapHome ({ maxLevel }: MapTestProps) {
             image: defaultImg
           });
 
-          // 2) InfoWindow 생성
-          const infowindow = new kakao.maps.InfoWindow({
+          // 2) CustomOverlay 생성
+          const overlay = new kakao.maps.CustomOverlay({
             content: `
-              <div style="padding:5px; font-size:1rem;">
-                <span>${p.number}</span><br>
-                <span>${p.name}</span><br>
-                <span>${p.status}</span><br>
-              </div>`
+              <div class="${styles["overlay-bubble"]}">
+                <div class="p-3">
+                  <span>${p.number}</span><br>
+                  <span>${p.name}</span><br>
+                  <span>${p.status}</span><br>
+                </div>
+              </div>`,
+            position: marker.getPosition(),
+            xAnchor: 0.55,    
+            yAnchor: 1.5,  
           });
 
           // 3) 이벤트 리스너 등록 (마우스 올리면 열기)
           kakao.maps.event.addListener(marker, "mouseover", () => {
             marker.setImage(hoverImg);
-            infowindow.open(mapInstance.current, marker);
+            overlay.setMap(mapInstance.current);
           })
           kakao.maps.event.addListener(marker, "mouseout", () => {
-            if(activeInfoWindowRef.current !== infowindow) {
+            if(activeOverlayRef.current !== overlay) {
               marker.setImage(defaultImg);
-              infowindow.close();
+              overlay.setMap(null);
             }
           })
           // 상태값은 상태 업데이트 요청후(by set함수) 다음 렌더링이 일어날 때 반영된다.
 
           // 4) 이벤트 리스너 등록 (클릭 => infoWindow 유지)
           kakao.maps.event.addListener(marker, "click", () => {
-            if(activeInfoWindowRef.current === infowindow) {
-              infowindow.close();
-              activeInfoWindowRef.current = null;
+            if(activeOverlayRef.current === overlay) {
+              overlay.setMap(null);
+              activeOverlayRef.current = null;
               activeMarkerRef.current = null;
               activeMarkerImgRef.current = null;
             }
             else {
-              if(activeInfoWindowRef.current) {
-                activeInfoWindowRef.current.close();
+              if(activeOverlayRef.current) {
+                activeOverlayRef.current.setMap(null);
               }
               if(activeMarkerRef.current && activeMarkerImgRef.current) {
                 activeMarkerRef.current.setImage(activeMarkerImgRef.current);
               }
               marker.setImage(hoverImg);
-              infowindow.open(mapInstance.current, marker);
-              activeInfoWindowRef.current = infowindow;
+              overlay.setMap(mapInstance.current);
+              activeOverlayRef.current = overlay;
               activeMarkerRef.current = marker;
               activeMarkerImgRef.current = defaultImg;
             }
