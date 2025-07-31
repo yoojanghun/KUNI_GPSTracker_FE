@@ -1,6 +1,6 @@
 import type { getLogListRequest } from "./interfaces/getLogListRequest";
 import type { getLogListResponse } from "./interfaces/getLogListResponse";
-import { api } from "..";
+// import { api } from "..";
 import { mockApi } from "../mockApi";
 
 export const getLogList = async (request:getLogListRequest): Promise<getLogListResponse> => { 
