@@ -2,5 +2,8 @@ export interface getLogListRequest {
   vehicleNumber?: string,
   startTime?: string,
   endTime?: string,
-  pageable: number;
+  sort?: "asc" | "desc"
+  page: number,
+  size: number,
+  
 }

@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { currentDLog } from "@/Api/currentDLog.tsx";
+import { currentDLog } from "@/Api/currentDLog.ts";
 
 interface DLog {
   carNumber: string,

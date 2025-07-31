@@ -1,4 +1,4 @@
-interface record {
+export interface record {
   id: number,
   vehicleNumber: string,
   vehicleName: string,

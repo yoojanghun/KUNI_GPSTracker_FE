@@ -6,7 +6,11 @@ import { mockApi } from "../mockApi";
 export const getLogList = async (request:getLogListRequest): Promise<getLogListResponse> => { 
   const params = new URLSearchParams();
 
-  params.append("pageable", request.pageable.toString());
+  params.append("page", request.page.toString());
+  params.append("size", request.size.toString());
+  if (request.sort){
+    params.append("sort", request.sort);
+  }
   if (request.endTime){
     params.append("endTime", request.endTime);
   }

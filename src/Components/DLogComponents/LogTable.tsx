@@ -1,4 +1,5 @@
-import { useDLogStore } from "@/Store/dlogStore";
+import { useEffect, useCallback, useState, useRef } from "react";
+import { getLogList } from "@/Api/LogApi/getLogList";
 import { TablePagination } from "../TablePagination";
 
 import {
@@ -11,38 +12,43 @@ import {
   TableRow,
 } from "@/Components/ui/table";
 import { ChevronRight, ClockArrowDown, ClockArrowUp } from "lucide-react";
-import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+
+import type { record } from "@/Api/LogApi/interfaces/getLogListResponse";
 
 export function LogTable() {
   const navigate = useNavigate();
 
   const tableRef = useRef<HTMLDivElement>(null); // 테이블의 너비값을 전달하기 위한 wrapper
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 10; // TODO: 사용자 기기의 크기에 따라 개수 조절
 
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const handleSort = () => {
     setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
   };
 
-  const dlogs = useDLogStore((state) =>
-    state.filteredDLogs.length > 0 ? state.filteredDLogs : state.DLogs
-  );
+  const [logs, setLogs] = useState<record[]>([]);
+  const [totalPages, setTotalPages] = useState(1);
 
-  const sortedDLogs = [...dlogs].sort((a, b) => {
-    const aVal = a.startTime.slice(0, 10);
-    const bVal = b.startTime.slice(0, 10);
+  const fetchLogs = useCallback(async () => {
+    try {
+      const res = await getLogList({
+        page: currentPage - 1, 
+        size: itemsPerPage,
+        sort: sortDirection,
+      });
+      console.log(res.totalPage);
+      setLogs(res.content); 
+      setTotalPages(res.totalPage);
+    } catch (err) {
+      console.error("Error fetching logs:", err);
+    }
+  }, [currentPage, sortDirection]);
 
-    return sortDirection === "asc"
-      ? aVal.localeCompare(bVal)
-      : bVal.localeCompare(aVal);
-  });
-
-  const visibleDLogs = sortedDLogs.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  useEffect(() => {
+    fetchLogs();
+  }, [fetchLogs]);
 
 
   return (
@@ -88,20 +94,20 @@ export function LogTable() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {visibleDLogs.map((dlog) => (
-            <TableRow key={dlog.carNumber} className="text-center">
+          {logs.map((dlog) => (
+            <TableRow key={dlog.vehicleNumber} className="text-center">
               <TableCell></TableCell>
-              <TableCell className="font-medium">{dlog.carNumber}</TableCell>
-              <TableCell>{dlog.carName}</TableCell>
-              <TableCell>{dlog.startTime.replace("T", " ")}</TableCell>
-              <TableCell>{dlog.endTime.replace("T", " ")}</TableCell>
-              <TableCell>{dlog.distance.toLocaleString()} km</TableCell>
+              <TableCell className="font-medium">{dlog.vehicleNumber}</TableCell>
+              <TableCell>{dlog.vehicleName}</TableCell>
+              <TableCell>{dlog.onTime.replace("T", " ")}</TableCell>
+              <TableCell>{dlog.offTime.replace("T", " ")}</TableCell>
+              <TableCell>{dlog.sumDist.toLocaleString()} km</TableCell>
               <TableCell className="text-right ">
                 <ChevronRight
                   className="inline-block pr-2 cursor-pointer"
-                  onClick={() => navigate(`/log/${dlog.recordId}`, {
+                  onClick={() => navigate(`/log/${dlog.id}`, {
                     state: {
-                      id: dlog.recordId,
+                      id: dlog.id,
                     }
                   })}
                 />
@@ -113,7 +119,7 @@ export function LogTable() {
       </Table>
       <TablePagination
         tableRef={tableRef}
-        total={Math.ceil(dlogs.length / itemsPerPage)}
+        total={totalPages}
         current={currentPage}
         setCurrent={setCurrentPage}
       />

@@ -6,15 +6,16 @@ import { detailLog } from "@/Api/detailLog";
 export const handlers = [
   http.get("/api/record", (req) => {
     const url = new URL(req.request.url);
-    const pageable = url.searchParams.get("pageable");
-    const page = Number(pageable) || 0;
-    const pageSize = 10;
+    const page = parseInt(url.searchParams.get("page") ?? "0", 10);
+    const pageSize = parseInt(url.searchParams.get("size") ?? "10", 10);
+
 
     let filtered = currentDLog.content || [];
 
     const vehicleNumber = url.searchParams.get("vehicleNumber");
     const startTime = url.searchParams.get("startTime");
     const endTime = url.searchParams.get("endTime");
+    const sort = url.searchParams.get("sort");
 
     if (vehicleNumber) {
       filtered = filtered.filter(d => d.vehicleNumber.includes(vehicleNumber));
@@ -25,9 +26,19 @@ export const handlers = [
     if (endTime) {
       filtered = filtered.filter(d => new Date(d.offTime) <= new Date(endTime));
     }
+    if (sort) {
+      filtered = filtered.sort((a, b) => { 
+        const aVal = new Date(a.onTime).getTime();
+        const bVal = new Date(b.onTime).getTime();
+
+        return sort === 'asc'
+        ? aVal - bVal
+        : bVal - aVal
+       })
+    }
 
     const paged = filtered.slice(page * pageSize, (page + 1) * pageSize);
-    return HttpResponse.json({ content: paged }, { status: 200 });
+    return HttpResponse.json({ ...currentDLog, content: paged }, { status: 200 });
   }),
 
   http.get("/api/record/:id", (req) => { 
@@ -44,7 +55,7 @@ export const handlers = [
       }, { status: 404 });
     }
 
-    return HttpResponse.json(detail, {status: 200})
+    return HttpResponse.json(detail, {status:200})
    }),
 
   http.get("/api/dashboard", () => {
