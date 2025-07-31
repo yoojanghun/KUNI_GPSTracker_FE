@@ -7,5 +7,7 @@ interface record {
   sumDist: string
 }
 export interface getLogListResponse {
+  totalPage: number,
+  totalElements: number,
   content: record[]
 }
