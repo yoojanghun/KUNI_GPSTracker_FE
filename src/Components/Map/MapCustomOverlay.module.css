@@ -1,6 +1,6 @@
 .overlay-bubble{
   position: relative;
-  background: hsla(0, 0%, 100%);
+  background: hsl(0, 0%, 100%);
   -webkit-border-radius: 10px;
   -moz-border-radius: 10px;
   border-radius: .4em;
