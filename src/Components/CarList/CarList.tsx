@@ -4,7 +4,8 @@ import {
     ArrowLeft,
     ChevronDown,
     ChevronUp,
-    X 
+    X,
+    Folder
 } from "lucide-react";  
 import {
     Select,
@@ -175,7 +176,8 @@ function CarList() {
                         </table>
                         <button 
                             onClick={() => {navigate("/log"); setFilter({...filter, carNumber: `${selectedCar.number}`});}}
-                            className="border cursor-pointer">
+                            className="border cursor-pointer font-bold py-1 rounded-sm flex justify-center items-center">
+                                <Folder className="mr-1"/>
                                 운행일지 이동
                         </button>
                     </>}
@@ -244,7 +246,7 @@ function CarList() {
                                         <div className="opacity-50 h-5">{car.name}</div>
                                     </div>
                                 </li>
-                                );
+                            );
                         })}
                     </ul>
                     <Pagination className="mt-1">
