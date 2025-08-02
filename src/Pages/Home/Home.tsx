@@ -125,7 +125,7 @@ function Home() {
           >
             <div className="flex items-center ml-4 mb-5 font-bold">
               <Calendar className="w-6 h-6 mr-2" />
-              <span className="text-xl">이 주의 일별 운행 건수</span>
+              <span className="text-xl">이번주 일별 운행 건수</span>
             </div>
             <div className="w-[100%] h-[90%]">
               <SimpleLineChart />
