@@ -1,5 +1,11 @@
 import { api } from "../index";
-import type { CarStatusNum } from "./interfaces/CarStatusNum";
+
+export interface CarStatusNum {
+  vehicles: number;
+  active: number;
+  inactive: number;
+  inspect: number;
+}
 
 export async function fetchCarStatistics(): Promise<CarStatusNum> {
   const stats = await api.get("api/dashboard").json<CarStatusNum>();
