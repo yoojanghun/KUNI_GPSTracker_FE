@@ -121,9 +121,9 @@ function Home() {
                                 <span>미운행</span>
                             </label>
                             <label className="flex items-center font-bold mr-1 min-w-[100px]">
-                                <input type="checkbox" value="수리중"
+                                <input type="checkbox" value="점검중"
                                         onChange={(e) => setCarStatusBtn(e.target.value)}
-                                        checked={carStatusBtn === "수리중"}
+                                        checked={carStatusBtn === "점검중"}
                                         className="w-4 h-4 mr-1"/>
                                 <img src={checkingIndicator} className="mr-1 w-6" />
                                 <span>점검중</span>

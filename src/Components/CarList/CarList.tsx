@@ -64,7 +64,7 @@ function CarList() {
     const carStatusClass: Record<string, string> = {
         "운행중": "bg-[#c1d8ff] text-[#5491f5]",
         "미운행": "bg-[#ffcac6] text-[#e94b3e]",
-        "수리중": "bg-[#ffe4be] text-[#ffa62a]"
+        "점검중": "bg-[#ffe4be] text-[#ffa62a]"
     }
 
     useEffect(() => {
@@ -132,7 +132,7 @@ function CarList() {
                         <SelectItem value="전체">전체</SelectItem>
                         <SelectItem value="운행중">운행중</SelectItem>
                         <SelectItem value="미운행">미운행</SelectItem>
-                        <SelectItem value="수리중">점검중</SelectItem>
+                        <SelectItem value="점검중">점검중</SelectItem>
                     </SelectContent>
                 </Select>
                 </div>
