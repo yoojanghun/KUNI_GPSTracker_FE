@@ -37,7 +37,7 @@
     "number": "14라3098",
     "name": "Sorrento",
     "mileage": 38929,
-    "status": "수리중",
+    "status": "점검중",
     "path": [
                 { "lat": 37.5700, "lng": 126.9800, "time": 1710518400000 },
                 { "lat": 37.5705, "lng": 126.9804, "time": 1710518460000 },
@@ -278,7 +278,7 @@
     "number": "37차1747",
     "name": "Tucson",
     "mileage": 109631,
-    "status": "수리중",
+    "status": "점검중",
     "path": [
                 { "lat": 37.2803, "lng": 127.0191, "time": 1710518580000 },
                 { "lat": 37.2806, "lng": 127.0196, "time": 1710518640000 },
@@ -348,7 +348,7 @@
     "number": "26나1189",
     "name": "Tucson",
     "mileage": 17658,
-    "status": "수리중",
+    "status": "점검중",
     "path": [
       {
         "lat": 37.241215,
@@ -432,7 +432,7 @@
     "number": "81차0850",
     "name": "Sorrento",
     "mileage": 139786,
-    "status": "수리중",
+    "status": "점검중",
     "path": [
       {
         "lat": 37.310853,
@@ -460,7 +460,7 @@
     "number": "24카6335",
     "name": "Avante",
     "mileage": 98147,
-    "status": "수리중",
+    "status": "점검중",
     "path": [
       {
         "lat": 37.318763,
@@ -488,7 +488,7 @@
     "number": "51다6292",
     "name": "Tucson",
     "mileage": 135950,
-    "status": "수리중",
+    "status": "점검중",
     "path": [
       {
         "lat": 37.231725,
@@ -628,7 +628,7 @@
     "number": "94아8127",
     "name": "Sorrento",
     "mileage": 23496,
-    "status": "수리중",
+    "status": "점검중",
     "path": [
       {
         "lat": 37.299394,
@@ -684,7 +684,7 @@
     "number": "29라4217",
     "name": "Avante",
     "mileage": 107139,
-    "status": "수리중",
+    "status": "점검중",
     "path": [
       {
         "lat": 37.245141,
@@ -796,7 +796,7 @@
     "number": "36사1656",
     "name": "Sorrento",
     "mileage": 36826,
-    "status": "수리중",
+    "status": "점검중",
     "path": [
       {
         "lat": 37.321265,
@@ -824,7 +824,7 @@
     "number": "64사1076",
     "name": "Tucson",
     "mileage": 40475,
-    "status": "수리중",
+    "status": "점검중",
     "path": [
       {
         "lat": 37.253843,
@@ -852,7 +852,7 @@
     "number": "35라9692",
     "name": "Sonata",
     "mileage": 78605,
-    "status": "수리중",
+    "status": "점검중",
     "path": [
       {
         "lat": 37.260219,
