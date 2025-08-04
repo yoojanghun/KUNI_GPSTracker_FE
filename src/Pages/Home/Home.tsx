@@ -6,27 +6,51 @@ import notWorkingIndicator from "../../assets/car-status-icons/not-working-indic
 import workingIndicator from "../../assets/car-status-icons/working-indicator.svg";
 import styles from "./Home.module.css";
 
-import SimpleLineChart from "@/Components/Chart";
+import SimpleLineChart from "@/Components/chart";
 import MapHome from "@/Components/Map/MapHome";
 import { useCarStatusBtnStore } from "@/Store/carStatus";
 import { MapPin, Calendar } from "lucide-react";
 
-import { fetchCarStatistics } from "@/Api/HomeApi/CarStatistics";
-import { useEffect } from "react";
+import { type CarStatusNum, fetchCarStatistics } from "@/Api/HomeApi/CarStatistics";
+import { useEffect, useState, useRef } from "react";
 
 function Home() {
-  useEffect(() => {
-    fetchCarStatistics()
-      .then((data) => console.log("안녕", data))
-      .catch((error) => console.error(error));
-  }, []);
 
-  const percentage = 30;
-
+  const [carStat, setCarStat] = useState<CarStatusNum | null>(null);
+  // carStat = {vehicles: 500, active: 0, inactive: 500, inspect: 0}
+  const prevCarStatRef = useRef<CarStatusNum | null>(null);
   const carStatusBtn = useCarStatusBtnStore((state) => state.carStatusBtn);
   const setCarStatusBtn = useCarStatusBtnStore(
     (state) => state.setCarStatusBtn
   );
+
+  useEffect(() => {
+    const getStat = () => {
+      fetchCarStatistics()
+      .then((carStat) => {
+        if(JSON.stringify(prevCarStatRef.current) !== JSON.stringify(carStat)){
+          prevCarStatRef.current = carStat;
+          setCarStat(carStat);
+        }
+      })
+      .catch((error) => console.error(error));
+    }
+    getStat();      // 처음에 함수를 바로 호출하여 화면에 나타내기
+    const intervalId = setInterval(getStat, 5000);
+
+    return () => clearInterval(intervalId);
+  }, []);
+ 
+  if(!carStat) return;
+
+  const { 
+    vehicles: totalCarsNum, 
+    active: activeCarsNum, 
+    inactive: inactiveCarsNum, 
+    inspect: inspectedCarsNum 
+  } = carStat;
+
+  const percentage = Math.round((activeCarsNum / totalCarsNum) * 100);
 
   return (
     <main className="flex-1 box-border p-5">
@@ -37,7 +61,7 @@ function Home() {
           <img className="w-13 h-13 mr-3" src={total} alt="전체 차량 아이콘" />
           <div>
             <div>
-              <span className="text-3xl font-bold mr-2">2000</span>
+              <span className="text-3xl font-bold mr-2">{totalCarsNum}</span>
               <span className="text-sm opacity-60">전체 차량</span>
             </div>
             {/* <div>progress bar 여긴 없음</div> */}
@@ -54,13 +78,13 @@ function Home() {
             />
             <div>
               <div className="mr-6 min-w-[200px]">
-                <span className="text-3xl font-bold mr-3">{percentage}%</span>
-                <span className="text-sm opacity-60">미운행 차량 (1,001)</span>
+                <span className="text-3xl font-bold mr-3">{100 - percentage}%</span>
+                <span className="text-sm opacity-60">미운행 차량 ({inactiveCarsNum})</span>
               </div>
               <div className="w-50 h-2 mt-2 bg-gray-200 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-red-500"
-                  style={{ width: `${percentage}%` }}
+                  style={{ width: `${100 - percentage}%` }}
                 />
               </div>
             </div>
@@ -74,7 +98,7 @@ function Home() {
               />
               <div>
                 <span className="font-bold mr-1">점검중인 차량</span>
-                <span className="text-[14px] opacity-60">301대</span>
+                <span className="text-[14px] opacity-60">{inspectedCarsNum}대</span>
               </div>
             </div>
             <div className="flex items-center">
@@ -85,12 +109,12 @@ function Home() {
               />
               <div>
                 <span className="font-bold mr-1">미운행 차량</span>
-                <span className="text-[14px] opacity-60">700대</span>
+                <span className="text-[14px] opacity-60">{inactiveCarsNum}대</span>
               </div>
             </div>
           </div>
           <div className="flex flex-col items-center">
-            <span className="text-3xl font-bold mb-1">100%</span>
+            <span className="text-3xl font-bold mb-1">{percentage}%</span>
             <span className="opacity-60">가동률</span>
           </div>
         </div>
@@ -108,14 +132,14 @@ function Home() {
             <div>
               <div>
                 <span className="text-3xl font-bold mr-2">
-                  {100 - percentage}%
+                  {percentage}%
                 </span>
-                <span className="text-sm opacity-60">운행 중 차량 (999)</span>
+                <span className="text-sm opacity-60">운행중 차량 ({activeCarsNum})</span>
               </div>
               <div className="w-50 h-2 mt-2 bg-gray-200 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-blue-500"
-                  style={{ width: `${100 - percentage}%` }}
+                  style={{ width: `${percentage}%` }}
                 />
               </div>
             </div>

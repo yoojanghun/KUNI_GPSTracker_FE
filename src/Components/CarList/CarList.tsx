@@ -235,7 +235,7 @@ function CarList() {
             <SelectItem value="미운행" className="cursor-pointer">
               미운행
             </SelectItem>
-            <SelectItem value="수리중" className="cursor-pointer">
+            <SelectItem value="점검중" className="cursor-pointer">
               점검중
             </SelectItem>
           </SelectContent>
