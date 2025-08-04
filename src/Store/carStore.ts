@@ -1,92 +1,91 @@
 import { create } from "zustand";
-import { currentCarList } from "@/Api/currentCarList";
+import { getCarList } from "@/Api/ManageApi/getCarList";
+import type { carList } from "@/Api/ManageApi/interfaces/getCarListResponse";
+import type { getCarListRequest } from "@/Api/ManageApi/interfaces/getCarListRequest";
 
-interface Car {
-  number: string;   // 차량 번호
-  name: string;     // 차량명
-  mileage: number;  // 주행거리 (ex: "0km")
-  status: string;   // 상태 (ex: "미운행", "운행중")
+interface CarStoreState {
+  cars: carList[];
+  vehicleNumber: string;
+  status: getCarListRequest["status"];
+  totalPage: number;
+  totalElement: number;
+  currentPage: number;
+  size: number;
+  sort: getCarListRequest["sort"];
+
+  selected: Set<string>;
+  isAllSelected: () => boolean;
+  toggleSelectAll: () => void;
+  setSelected: (ids: string[]) => void;
+  setVehicleNumber: (vehicleNumber: string) => void;
+  setStatus: (currentStatus: getCarListRequest["status"]) => void;
+  clearSelected: () => void;
+
+  fetchCars: (
+    page?: number,
+    size?: number,
+    sort?: getCarListRequest["sort"],
+    vehicleNumber?: string,
+    status?: getCarListRequest["status"],
+  ) => Promise<void>;
 }
 
-interface CarStore {
-  // 속성
-  cars: Car[];                         // 전체 차량 리스트
-  filteredCars: Car[];                // 필터링된 차량 리스트
-  selected: Set<string>;              // 선택된 차량 번호들
-  filter: { carNumber: string; status: string };  // 검색 필터
+export const useCarStore = create<CarStoreState>((set, get) => ({
+  cars: [],
+  vehicleNumber: "",
+  status: "" as getCarListRequest["status"],
+  totalPage: 0,
+  totalElement: 0,
+  currentPage: 0,
+  size: 10,
+  sort: "createDate,ASC" as getCarListRequest["sort"],
 
-  // 함수
-  setFilter: (filter: { carNumber: string; status: string }) => void;
-  applyFilter: () => void;
-  addCar: (car: Car) => void;
-  deleteSelectedCars: () => void;
-  toggleSelect: (carNumber: string) => void;
-  toggleSelectAll: (visibleCars: Car[]) => void;
-}
-
-export const useCarStore = create<CarStore>((set, get) => ({
-  cars: currentCarList,
-  filteredCars: currentCarList,
   selected: new Set(),
-  filter: { carNumber: "", status: "" },
 
-  // 검색 조건 설정
-  setFilter: (filter) => set({ filter }),
-
-  // 필터 적용
-  applyFilter: () => {
-    const { cars, filter } = get();
-    const { carNumber, status } = filter;
-
-    const filtered = cars.filter((car) => {
-      const matchesNumber = car.number.includes(carNumber);
-      const matchesStatus = status === "" || car.status === status;
-
-      if (carNumber === "") {
-        return matchesStatus;
-      }
-
-      return matchesNumber && matchesStatus;
-    });
-
-    set({ filteredCars: filtered });
+  setVehicleNumber: (vehicleNumber) => {
+    console.log("vehicleNumber set: ", vehicleNumber);
+    set({vehicleNumber: vehicleNumber});
   },
 
-  // 차량 추가 (최상단 삽입)
-  addCar: (car) => {
-    const newCars = [car, ...get().cars];
-    set({ cars: newCars });
-    get().applyFilter();
+  setStatus: (currentStatus: getCarListRequest["status"]) => {
+    console.log("status set: ", currentStatus);
+    set({status: currentStatus});
   },
 
-  // 선택된 차량 삭제
-  deleteSelectedCars: () => {
-    const selected = get().selected;
-    const remaining = get().cars.filter((car) => !selected.has(car.number));
-    set({ cars: remaining, selected: new Set() });
-    get().applyFilter();
+  isAllSelected: () => {
+    const { selected, cars } = get();
+    return cars.length > 0 && selected.size === cars.length;
   },
 
-  // 단일 차량 선택 토글
-  toggleSelect: (carNumber) => {
-    const selected = new Set(get().selected);
-    if (selected.has(carNumber)) {
-      selected.delete(carNumber);
+  toggleSelectAll: () => {
+    const { cars, selected } = get();
+    if (selected.size === cars.length) {
+      set({ selected: new Set() });
     } else {
-      selected.add(carNumber);
+      set({ selected: new Set(cars.map((car) => car.carNumber)) });
     }
-    set({ selected });
   },
 
-  // 현재 페이지의 모든 차량 선택/해제
-  toggleSelectAll: (visibleCars) => {
-    const selected = new Set(get().selected);
-    const allSelected = visibleCars.every((car) => selected.has(car.number));
-    if (allSelected) {
-      visibleCars.forEach((car) => selected.delete(car.number));
-    } else {
-      visibleCars.forEach((car) => selected.add(car.number));
+  setSelected: (ids) => set({ selected: new Set(ids) }),
+
+  clearSelected: () => set({ selected: new Set() }),
+
+  fetchCars: async (page = get().currentPage, size = get().size, sort = get().sort, vehicleNumber = get().vehicleNumber, status = get().status) => {
+    try {
+        const res = await getCarList({ page, size, sort, vehicleNumber, status });
+        console.log("total Pages: ", res.totalPages);
+        console.log("total Elements: ", res.totalElements);
+        set({
+          cars: res.content,
+          totalPage: res.totalPages,
+          totalElement: res.totalElements,
+          currentPage: page,
+          size: size,
+          sort: sort,
+        });
+      
+    } catch (err) {
+      console.error("Failed to fetch cars", err);
     }
-    set({ selected });
   },
 }));

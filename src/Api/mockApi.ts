@@ -2,7 +2,7 @@ import ky from 'ky';
 import { handleResponse } from './hooks/handleResponse';
 
 export const instance = ky.create({
-  prefixUrl: '', // baseURL 설정
+  prefixUrl: 'http://localhost:5173', // baseURL 설정
   // headers: {
   //   Authorization: '',
   //   // 이후 헤더 항목 추가

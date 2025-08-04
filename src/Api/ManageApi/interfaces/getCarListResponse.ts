@@ -1,12 +1,12 @@
-
-
-interface carList {
+export interface carList {
   carNumber: string,
-  carName: string,
-  status: "active" | "inactive" | "inspecting",
-  drivingDistanceKm: number
+  type: string,
+  status: "ACTIVE" | "INACTIVE" | "INSPECTING",
+  totalDist: number
 }
 
 export interface getCarListResponse {
-  carLists: carList[]
+  totalPages: number,
+  totalElements: number,
+  content: carList[]
 }

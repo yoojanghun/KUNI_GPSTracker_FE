@@ -1,5 +1,5 @@
-// import * as React from "react"
-
+import { useState } from "react";
+import type { getCarListRequest } from "@/Api/ManageApi/interfaces/getCarListRequest";
 import {
   Select,
   SelectContent,
@@ -11,24 +11,26 @@ import {
 import { useCarStore } from "@/Store/carStore";
 
 export function StatusSelect() {
-  const filter = useCarStore((state) => state.filter);
-  const setFilter = useCarStore((state) => state.setFilter);
+  const setStatus = useCarStore((state) => state.setStatus);
+
+  const [localStatus, setLocalStatus] = useState<getCarListRequest["status"] | "">("");
 
   const handleChange = (value: string) => {
-    setFilter({ ...filter, status: value });
+    setLocalStatus(value as getCarListRequest["status"]);
+    setStatus(value as getCarListRequest["status"]); // 전역 상태에도 반영
   };
 
   return (
     <div className="w-[110px]">
-      <Select value={filter.status} onValueChange={handleChange}>
+      <Select value={localStatus} onValueChange={handleChange}>
         <SelectTrigger className="px-3 py-4">
           <SelectValue placeholder="현황" />
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>
-            <SelectItem value="운행중">운행중</SelectItem>
-            <SelectItem value="미운행">미운행</SelectItem>
-            <SelectItem value="수리중">수리중</SelectItem>
+            <SelectItem value="ACTIVE">운행중</SelectItem>
+            <SelectItem value="INACTIVE">미운행</SelectItem>
+            <SelectItem value="INSPECTING">수리중</SelectItem>
           </SelectGroup>
         </SelectContent>
       </Select>

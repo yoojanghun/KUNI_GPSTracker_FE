@@ -1,4 +1,6 @@
-import { api } from "..";
+// src/Api/ManageApi/getCarList.ts
+// import { api } from "..";
+import { mockApi } from "../mockApi";
 import type { getCarListRequest } from "./interfaces/getCarListRequest";
 import type { getCarListResponse } from "./interfaces/getCarListResponse";
 
@@ -8,7 +10,11 @@ export const getCarList = async (
   const params = new URLSearchParams();
 
   params.append("page", request.page.toString());
-  params.append("sort", request.sort);
+  params.append("size", request.size.toString());
+
+  if(request.sort) {
+    params.append("sort", request.sort);
+  }
 
   if (request.status) {
     params.append("status", request.status);
@@ -18,7 +24,7 @@ export const getCarList = async (
     params.append("vehicleNumber", request.vehicleNumber);
   }
 
-  const data = await api
+  const data = await mockApi
     .get(`api/vehicle?${params.toString()}`)
     .json<getCarListResponse>();
 

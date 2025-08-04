@@ -17,7 +17,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/location" element={<LocationSearch />}/>
-          <Route path="/management" element={<ManageTest />} />
+          <Route path="/management" element={<Management />} />
           <Route path="/log" element={<DrivingLog />} />
           <Route path="/log/:Id" element={<DLogDetails />} />
         </Routes>
