@@ -1,3 +1,5 @@
+// 운행중, 미운행, 점검중 차량 숫자
+
 import { api } from "../index";
 
 export interface CarStatusNum {

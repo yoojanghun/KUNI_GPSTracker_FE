@@ -97,7 +97,7 @@ export const useLocationSearchMapStore = create<LocationSearchMapStateStore>((se
 // 원래 이전 지도의 모습을 유지하도록 할 때 사용
 export const useHomeMapStore = create<HomeMapStateStore>((set) => ({
     homeMapCenter: DEFAULT_CENTER,
-    homeMapLevel: 12,
+    homeMapLevel: 13,
     setHomeMapCenter: (center) => set({homeMapCenter: center}),
     setHomeMapLevel: (level) => set({homeMapLevel: level})
 }))
