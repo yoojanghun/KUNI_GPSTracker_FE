@@ -23,9 +23,10 @@ export interface SelectedCar {
 	gpsRecordId: number;
 }
 
-export async function fetchSelectedCarStat(vehicleNumber: string, gpsRecordId: number): Promise<SelectedCar> {
-	const stats = await api.get(`api/location/${vehicleNumber}`, 
-		{searchParams: {gpsRecordId}})
+export async function fetchSelectedCarStat(vehicleNumber: string): Promise<SelectedCar> {
+	const stats = await api.get(`api/location/${vehicleNumber}`
+		// {searchParams: {gpsRecordId}}
+	)
 		.json<SelectedCar>();
 
 	return stats;
