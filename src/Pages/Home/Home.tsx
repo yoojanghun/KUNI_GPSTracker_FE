@@ -6,7 +6,7 @@ import notWorkingIndicator from "../../assets/car-status-icons/not-working-indic
 import workingIndicator from "../../assets/car-status-icons/working-indicator.svg";
 import styles from "./Home.module.css";
 
-import SimpleLineChart from "@/Components/chart";
+import CarsPerDayChart from "@/Components/CarsPerDayChart";
 import MapHome from "@/Components/Map/MapHome";
 import { useCarStatusBtnStore } from "@/Store/carStatus";
 import { MapPin, Calendar } from "lucide-react";
@@ -18,7 +18,8 @@ function Home() {
 
   const [carStat, setCarStat] = useState<CarStatusNum | null>(null);
   // carStat = {vehicles: 500, active: 0, inactive: 500, inspect: 0}
-  const prevCarStatRef = useRef<CarStatusNum | null>(null);
+  const prevCarStat = useRef<CarStatusNum | null>(null);
+
   const carStatusBtn = useCarStatusBtnStore((state) => state.carStatusBtn);
   const setCarStatusBtn = useCarStatusBtnStore(
     (state) => state.setCarStatusBtn
@@ -28,8 +29,8 @@ function Home() {
     const getStat = () => {
       fetchCarStatistics()
       .then((carStat) => {
-        if(JSON.stringify(prevCarStatRef.current) !== JSON.stringify(carStat)){
-          prevCarStatRef.current = carStat;
+        if(JSON.stringify(prevCarStat.current) !== JSON.stringify(carStat)){
+          prevCarStat.current = carStat;
           setCarStat(carStat);
         }
       })
@@ -152,7 +153,7 @@ function Home() {
               <span className="text-xl">이번주 일별 운행 건수</span>
             </div>
             <div className="w-[100%] h-[90%]">
-              <SimpleLineChart />
+              <CarsPerDayChart />
             </div>
           </div>
         </div>
