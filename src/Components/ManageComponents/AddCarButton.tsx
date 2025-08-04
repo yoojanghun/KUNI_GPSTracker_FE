@@ -3,7 +3,6 @@ import { Button } from "@/Components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogClose,
   DialogDescription,
   DialogFooter,
   DialogHeader,
@@ -20,7 +19,6 @@ import { carRegist } from "@/Api/ManageApi/carRegist";
 
 export function AddCarButton() {
   const [inputDialog, setInputDialog] = useState(false);
-  const [checkDialog, setCheckDialog] = useState(false);
   const [vehicleNumber, setVehicleNumber] = useState("");
   const [vehicleName, setVehicleName] = useState("");
   const [attemptedSubmit, setAttemptedSubmit] = useState(false);
@@ -112,11 +110,41 @@ export function AddCarButton() {
               <Button
                 type="button"
                 className="bg-[#8D99FF] gap-3 hover:bg-[#8D99FF]/80"
-                onClick={() => {
+                onClick={async () => {
                   setAttemptedSubmit(true);
                   if (isvehicleNumberValid() && isModelNameValid()) {
                     setInputDialog(false);
-                    setCheckDialog(true);
+                    const res = await carRegist({
+                      vehicleNumber,
+                      vehicleName,
+                    });
+                    setAttemptedSubmit(false);
+                    if (
+                      vehicleName === res.vehicleName &&
+                      vehicleNumber === res.vehicleNumber
+                    ) {
+                      toast(
+                        <span>
+                          <strong>{vehicleNumber}</strong> 차량이
+                          등록되었습니다.
+                        </span>,
+                        {
+                          icon: <CircleCheck />,
+                        }
+                      );
+                    } else {
+                      toast(
+                        <span>
+                          서버 오류로 인해 차량 등록에 실패하였습니다.
+                        </span>,
+                        {
+                          icon: <CircleX />,
+                        }
+                      );
+                    }
+
+                    setVehicleNumber("");
+                    setVehicleName("");
                   }
                 }}
               >
@@ -125,72 +153,6 @@ export function AddCarButton() {
             </DialogFooter>
           </DialogContent>
         </form>
-      </Dialog>
-      <Dialog open={checkDialog} onOpenChange={setCheckDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>차량 정보를 확인해 주세요</DialogTitle>
-            <DialogDescription>
-              <ul>
-                <li>차량 번호: {vehicleNumber}</li>
-                <li>차량명: {vehicleName}</li>
-              </ul>
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button
-                variant={"outline"}
-                type="button"
-                onClick={() => {
-                  setInputDialog(true);
-                }}
-              >
-                다시 입력
-              </Button>
-            </DialogClose>
-            <DialogClose asChild>
-              <Button
-                type="submit"
-                className="bg-[#8D99FF] gap-3 hover:bg-[#8D99FF]/80"
-                onClick={async () => {
-                  const res = await carRegist({
-                    vehicleNumber,
-                    vehicleName,
-                  });
-                  setInputDialog(false);
-                  setCheckDialog(false);
-                  setAttemptedSubmit(false);
-                  if (
-                    vehicleName === res.vehicleName &&
-                    vehicleNumber === res.vehicleNumber
-                  ) {
-                    toast(
-                      <span>
-                        <strong>{vehicleNumber}</strong> 차량이 등록되었습니다.
-                      </span>,
-                      {
-                        icon: <CircleCheck />,
-                      }
-                    );
-                  } else {
-                    toast(
-                      <span>서버 오류로 인해 차량 등록에 실패하였습니다.</span>,
-                      {
-                        icon: <CircleX />,
-                      }
-                    );
-                  }
-
-                  setVehicleNumber("");
-                  setVehicleName("");
-                }}
-              >
-                등록
-              </Button>
-            </DialogClose>
-          </DialogFooter>
-        </DialogContent>
       </Dialog>
     </>
   );

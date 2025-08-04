@@ -19,7 +19,6 @@ export default function CarTable() {
   const [sortKey, setSortKey] = useState<keyof carList>();
   const [sortDirection, setSortDirection] = useState("asc");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
   const tableRef = useRef<HTMLDivElement>(null); // 테이블의 너비값을 전달하기 위한 wrapper
 
   const cars = useCarStore((state) => state.cars);
@@ -29,6 +28,9 @@ export default function CarTable() {
   const toggleSelectAll = useCarStore((state) => state.toggleSelectAll);
   const isAllSelected = useCarStore((state) => state.isAllSelected);
   const fetchCars = useCarStore((state) => state.fetchCars);
+
+  const tableRowHeight = 60;
+  const itemsPerPage = Math.floor((window.innerHeight) / tableRowHeight);
 
   // 정렬 키를 생성하기 위한 로직, getSortParam(sortKey, sortDirection) 를 통해 키값을 얻을 수 있음
   const VALID_SORT_KEYS = [
@@ -61,7 +63,7 @@ export default function CarTable() {
   const fetchAndSetCars = useCallback(async () => {
     try {
       const sort = getSortParam(sortKey, sortDirection);
-      await fetchCars(currentPage - 1, itemsPerPage, sort);
+      await fetchCars({page: currentPage - 1, size: itemsPerPage, sort: sort});
     } catch (err) {
       console.error("Failed to fetch cars", err);
     }

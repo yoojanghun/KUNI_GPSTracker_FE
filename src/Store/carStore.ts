@@ -21,13 +21,13 @@ interface CarStoreState {
   setStatus: (currentStatus: getCarListRequest["status"]) => void;
   clearSelected: () => void;
 
-  fetchCars: (
-    page?: number,
-    size?: number,
-    sort?: getCarListRequest["sort"],
-    vehicleNumber?: string,
-    status?: getCarListRequest["status"],
-  ) => Promise<void>;
+  fetchCars: (params: {
+    page?: number;
+    size?: number;
+    sort?: getCarListRequest["sort"];
+    vehicleNumber?: string;
+    status?: getCarListRequest["status"];
+  }) => Promise<void>;
 }
 
 export const useCarStore = create<CarStoreState>((set, get) => ({
@@ -44,12 +44,12 @@ export const useCarStore = create<CarStoreState>((set, get) => ({
 
   setVehicleNumber: (vehicleNumber) => {
     console.log("vehicleNumber set: ", vehicleNumber);
-    set({vehicleNumber: vehicleNumber});
+    set({ vehicleNumber: vehicleNumber });
   },
 
   setStatus: (currentStatus: getCarListRequest["status"]) => {
     console.log("status set: ", currentStatus);
-    set({status: currentStatus});
+    set({ status: currentStatus });
   },
 
   isAllSelected: () => {
@@ -70,20 +70,25 @@ export const useCarStore = create<CarStoreState>((set, get) => ({
 
   clearSelected: () => set({ selected: new Set() }),
 
-  fetchCars: async (page = get().currentPage, size = get().size, sort = get().sort, vehicleNumber = get().vehicleNumber, status = get().status) => {
+  fetchCars: async ({
+    page = get().currentPage,
+    size = get().size,
+    sort = get().sort,
+    vehicleNumber = get().vehicleNumber,
+    status = get().status,
+  }) => {
     try {
-        const res = await getCarList({ page, size, sort, vehicleNumber, status });
-        console.log("total Pages: ", res.totalPages);
-        console.log("total Elements: ", res.totalElements);
-        set({
-          cars: res.content,
-          totalPage: res.totalPages,
-          totalElement: res.totalElements,
-          currentPage: page,
-          size: size,
-          sort: sort,
-        });
-      
+      const res = await getCarList({ page, size, sort, vehicleNumber, status });
+      console.log("total Pages: ", res.totalPages);
+      console.log("total Elements: ", res.totalElements);
+      set({
+        cars: res.content,
+        totalPage: res.totalPages,
+        totalElement: res.totalElements,
+        currentPage: page,
+        size: size,
+        sort: sort,
+      });
     } catch (err) {
       console.error("Failed to fetch cars", err);
     }
