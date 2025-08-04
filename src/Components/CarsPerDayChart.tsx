@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
+	LineChart,
+	Line,
+	XAxis,
+	YAxis,
+	CartesianGrid,
+	Tooltip,
+	ResponsiveContainer,
 } from "recharts";
 import { type ActiveCarStat, fetchActiveCarStat } from "@/Api/HomeApi/ActiveCarStat";
 
@@ -18,27 +18,27 @@ type ChartData = {
 
 function CarsPerDayChart() {
 	const [carsPerDay, setCarsPerDay] = useState<ActiveCarStat | null>(null);
-  // carsPerDay = {dayCount: [{day: "2025-07-28", totalCar: 0}, {day: "2025-07-29", totalCar: 0},}
+	// carsPerDay = {dayCount: [{day: "2025-07-28", totalCar: 0}, {day: "2025-07-29", totalCar: 0},}
 	const prevCarsPerDay = useRef<ActiveCarStat | null>(null);
 
-  useEffect(() => {
-  	const getStat = () => {
-      fetchActiveCarStat()
-        .then((carsPerDay) => {
+	useEffect(() => {
+		const getStat = () => {
+			fetchActiveCarStat()
+				.then((carsPerDay) => {
 					if(JSON.stringify(prevCarsPerDay.current) !== JSON.stringify(carsPerDay)){
 						prevCarsPerDay.current = carsPerDay;
 						setCarsPerDay(carsPerDay);
 					}
 				})
 				.catch((error) => console.error(error));
-      }
+		}
 		getStat();
 		const intervalId = setInterval(getStat, 5000);
 
 		return () => {
 			clearInterval(intervalId);
 		}
-  }, [])
+	}, [])
 
 	if(!carsPerDay) return;
 
@@ -59,19 +59,19 @@ function CarsPerDayChart() {
 		data[i].운행횟수 = Number(dayObjArr[i].totalCar);
 	}
 
-  return (
-  <div className="w-[100%] h-[100%]">
-    <ResponsiveContainer>
-      <LineChart data={data}>
-      <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="day"/>
-        <YAxis type="number" domain={[0, 600]}/>
-        <Tooltip />
-        <Line type="monotone" dataKey="운행횟수" stroke="#8884d8" />
-      </LineChart>
-    </ResponsiveContainer>
-  </div>
-  );
+	return (
+	<div className="w-[100%] h-[100%]">
+		<ResponsiveContainer>
+			<LineChart data={data}>
+			<CartesianGrid strokeDasharray="3 3" />
+			<XAxis dataKey="day"/>
+			<YAxis type="number" domain={[0, 600]}/>
+			<Tooltip />
+			<Line type="monotone" dataKey="운행횟수" stroke="#8884d8" />
+			</LineChart>
+		</ResponsiveContainer>
+	</div>
+	);
 }
 
 export default CarsPerDayChart
