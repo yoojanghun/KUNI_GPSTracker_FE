@@ -35,6 +35,7 @@ import { useDLogStore } from "@/Store/dlogStore";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./CarList.module.css";
+import { fetchSelectedCarStat } from "@/Api/CarList/SelectedCarInfo";
 
 function CarList() {
   const setSelectedCar = useSelectCarStore((state) => state.setSelectedCar);
@@ -74,11 +75,19 @@ function CarList() {
     점검중: "bg-[#ffe4be] text-[#ffa62a]",
   };
 
+  // 바로 아래 코드는 api/dashboard/map 에서 가져온 정보라고 가정
   useEffect(() => {
     fetch("/carListExample.json")
       .then((res) => res.json())
       .then((data) => setCurrentCarList(data));
   }, []);
+
+  useEffect(() => {
+    if(!selectedCar) return;
+    fetchSelectedCarStat(selectedCar.number)
+      .then(car => console.log(car)) 
+      .catch(error => console.error(error));
+  }, [selectedCar])
 
   // carList 목록에 보여지는 차량들
   const filteredCarList = currentCarList.filter((car) => {
