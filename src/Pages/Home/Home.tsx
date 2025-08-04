@@ -114,10 +114,10 @@ function Home() {
               </div>
             </div>
           </div>
-          <div className="flex flex-col items-center">
+          {/* <div className="flex flex-col items-center">
             <span className="text-3xl font-bold mb-1">{percentage}%</span>
             <span className="opacity-60">가동률</span>
-          </div>
+          </div> */}
         </div>
       </div>
       <div className="flex gap-4 h-[80%]">
