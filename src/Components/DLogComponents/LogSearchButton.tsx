@@ -4,27 +4,35 @@ import { useDLogStore } from "@/Store/dlogStore";
 import { toast } from "sonner";
 
 export function LogSearchButton() {
-  const applyFilter = useDLogStore((state) => state.applyFilter);
-  const filteredDLogs = useDLogStore((state) => state.filteredDLogs);
-  const { carNumber, startTime, endTime } = useDLogStore(
-    (state) => state.filter
-  );
+  const fetchDLogs = useDLogStore((state) => state.fetchDLogs);
+  const logs = useDLogStore((state) => state.DLogs);
+  const vehicleNumber = useDLogStore((state) => state.vehicleNumber);
+  const dateValidation = useDLogStore((state) => state.dateValidation);
+  const isDateValid = useDLogStore((state) => state.isDateValid);
+
+  const tableRowHeight = 60;
+  const itemsPerPage = Math.floor((window.innerHeight) / tableRowHeight);
 
   return (
     <div className="flex flex-col">
       <span className="text-transparent">-</span>
       <Button
-        onClick={() => {
-          if (!carNumber && !startTime && !endTime) {
-            toast("검색값을 입력해 주세요", {
+        onClick={async () => {
+          dateValidation();
+          if (!vehicleNumber && !isDateValid) {
+            toast("올바른 검색값을 입력해 주세요", {
               icon: <CircleAlert />,
             });
-          }
-          applyFilter();
-          if (filteredDLogs.length <= 0) {
-            toast("일치하는 기록이 없습니다", {
-              icon: <CircleAlert />,
-            });
+          } else {
+            await fetchDLogs({
+              size: itemsPerPage
+            })
+            if (logs.length <= 0) {
+              toast("일치하는 기록이 없습니다", {
+                icon: <CircleAlert />,
+              });
+            }
+          
           }
         }}
         className="bg-[#000000] gap-3 hover:bg-[#000000]/80"

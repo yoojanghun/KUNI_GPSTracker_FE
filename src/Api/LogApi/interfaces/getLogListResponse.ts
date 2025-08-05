@@ -1,4 +1,4 @@
-export interface record {
+export interface dlog {
   id: number,
   vehicleNumber: string,
   vehicleName: string,
@@ -9,5 +9,5 @@ export interface record {
 export interface getLogListResponse {
   totalPage: number,
   totalElements: number,
-  content: record[]
+  content: dlog[]
 }

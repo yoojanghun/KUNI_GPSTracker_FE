@@ -90,7 +90,7 @@ export const useCarStore = create<CarStoreState>((set, get) => ({
         sort: sort,
       });
     } catch (err) {
-      console.error("Failed to fetch cars", err);
+      console.error("차량 데이터 불러오기에 실패했습니다", err);
     }
   },
 }));

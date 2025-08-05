@@ -1,4 +1,4 @@
-import { api } from "..";
+// import { api } from "..";
 import { mockApi } from "../mockApi";
 import type { carDeleteRequest } from "./interfaces/carDeleteRequest";
 

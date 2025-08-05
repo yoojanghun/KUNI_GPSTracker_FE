@@ -1,92 +1,103 @@
 import { create } from "zustand";
-import { currentDLog } from "@/Api/currentDLog.ts";
-
-interface DLog {
-  carNumber: string,
-  carName: string,
-  startTime: string,
-  endTime: string,
-  distance: number,
-  recordId: string,
-}
+import type { dlog } from "@/Api/LogApi/interfaces/getLogListResponse";
+import { getLogList } from "@/Api/LogApi/getLogList";
 
 interface DLogStore {
   // 속성
-  DLogs: DLog[];
-  filteredDLogs: DLog[];
-  filter: { carNumber: string, startTime: string, endTime: string }
-  isDateValid: boolean
+  DLogs: dlog[];
+  totalPage: number;
+  totalElement: number;
+  vehicleNumber: string;
+  startTime: string;
+  endTime: string;
+  currentPage: number;
+  size: number;
+  sort: "asc" | "desc";
+  isDateValid: boolean;
 
   // 함수
-  setFilter: (
-    filter: { carNumber: string, startTime: string, endTime: string }
-  ) => void 
-  setIsDateValid: ( valid:boolean ) => void
-  applyFilter: () => void
-  findById: ( id:string ) => DLog
+  fetchDLogs: (params: {
+    vehicleNumber?: string;
+    startTime?: string;
+    endTime?: string;
+    sort?: "asc" | "desc";
+    page?: number;
+    size?: number;
+  }) => Promise<void>;
+
+  dateValidation: () => void;
+
+  setVehicleNumber: (vehicleNumber: string) => void;
+  setStartTime: (startTime: string) => void;
+  setEndTime: (endTime: string) => void;
+  setIsDateValid: (isValid: boolean) => void;
 }
 
 export const useDLogStore = create<DLogStore>((set, get) => ({
-  DLogs: currentDLog,
-  filteredDLogs: currentDLog,
-  filter: { carNumber: "", startTime: "", endTime: "" },
+  DLogs: [],
+  totalPage: 0,
+  totalElement: 0,
+  vehicleNumber: "",
+  startTime: "",
+  endTime: "",
+  currentPage: 0,
+  size: 10,
+  sort: "asc",
   isDateValid: true,
 
-  // 검색 조건 설정
-  setFilter: (filter) => set({ filter }),
-
-  setIsDateValid: (valid) => set({ isDateValid: valid }),
-
-  // TODO: 날짜 입력 섹션에서 제약조건 추가, 그에 따른 ui 상호작용 구현하기
-  // 필터 적용
-  applyFilter: () => { 
-  const { DLogs, filter } = get();
-  const { carNumber, startTime, endTime } = filter;
-  const filterStart = startTime.slice(0, 10);
-  const filterEnd = endTime.slice(0, 10);
-  const isTimeValid = (!filterStart && !filterEnd) || (!!filterStart && !!filterEnd);
-  let count = 0;
-
-  const filtered = DLogs.filter((DLog) => {
-    const matchesNumber = DLog.carNumber.includes(carNumber);
-
-    const startlogDate = DLog.startTime.slice(0, 10);
-    const endlogDate = DLog.endTime.slice(0, 10);
-    
-
-    const matchesStart = filterStart !== "" ? startlogDate >= filterStart : true;
-    const matchesEnd = filterEnd !== "" ? endlogDate <= filterEnd : true;
-
-    console.log("CarNum: ", DLog.carNumber);
-    console.log("start: ",startTime);
-    console.log("end: ", endTime);
-    console.log("mStart: ", matchesStart);
-    console.log("mEnd: ", matchesEnd);
-    console.log("count: ", count);
-    count++;
-
-    if (carNumber === "") {
-      return matchesStart && matchesEnd;
+  fetchDLogs: async ({
+    page = get().currentPage,
+    size = get().size,
+    vehicleNumber = get().vehicleNumber,
+    startTime = get().startTime,
+    endTime = get().endTime,
+    sort = get().sort,
+  }) => {
+    try {
+      const res = await getLogList({
+        page,
+        size,
+        vehicleNumber,
+        startTime,
+        endTime,
+        sort,
+      });
+      set({
+        DLogs: res.content,
+        totalPage: res.totalPage,
+        totalElement: res.totalElements,
+        currentPage: page,
+        size: size,
+        vehicleNumber: vehicleNumber,
+        startTime: startTime,
+        endTime: endTime,
+        sort: sort,
+      });
+    } catch (err) {
+      console.error("운행일지 데이터 불러오기에 실패했습니다", err);
     }
+  },
 
-    return matchesNumber && matchesStart && matchesEnd;
-  });
+  dateValidation: () => {
+    const { startTime, endTime, setIsDateValid } = get();
+    const start = new Date(startTime);
+    const end = new Date(endTime);
 
-  set({ filteredDLogs: filtered });
-  set({ isDateValid: isTimeValid });
-},
-findById: ( id ) => {
+    if (
+      start.getTime() > end.getTime() ||
+      (startTime === "" && endTime === "")
+    ) {
+      setIsDateValid(false);
+    } else {
+      setIsDateValid(true);
+    }
+  },
 
-  const { DLogs } = get();
-  const found = DLogs.find((log) => { 
-    console.log('DLog_id: ', log.recordId);
-    console.log('find_id: ', id);
-    return log.recordId === id 
-  });
+  setVehicleNumber: (vehicleNumber: string) => set({ vehicleNumber }),
 
-  if (found === undefined) {
-    throw new Error("일치하는 Id값이 없습니다.");
-  }
-  return found;
-},
-}))
+  setStartTime: (startTime: string) => set({ startTime }),
+
+  setEndTime: (endTime: string) => set({ endTime }),
+
+  setIsDateValid: (isValid: boolean) => set({ isDateValid: isValid }),
+}));

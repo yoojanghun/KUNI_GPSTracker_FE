@@ -1,7 +1,7 @@
 import { http, HttpResponse } from "msw";
 import currentCarList from "@/Api/currentCarList.json";
 import currentDLog from "@/Api/currentDLog.json";
-import { detailLog } from "@/Api/detailLog";
+import detailLog from "@/Api/detailLog.json";
 import type { carList } from "@/Api/ManageApi/interfaces/getCarListResponse";
 
 export const handlers = [
@@ -123,8 +123,9 @@ export const handlers = [
 
   http.get("/api/record/:id", (req) => {
     const { id } = req.params;
+    console.log("requested id: ",id);
 
-    const detail = detailLog.find((d) => d.recordId === id)?.data;
+    const detail = detailLog;
     if (!detail) {
       return HttpResponse.json(
         {

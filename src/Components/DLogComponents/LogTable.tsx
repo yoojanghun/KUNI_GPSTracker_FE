@@ -1,5 +1,4 @@
 import { useEffect, useCallback, useState, useRef } from "react";
-import { getLogList } from "@/Api/LogApi/getLogList";
 import { TablePagination } from "../TablePagination";
 
 import {
@@ -13,8 +12,8 @@ import {
 } from "@/Components/ui/table";
 import { ChevronRight, ClockArrowDown, ClockArrowUp } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useDLogStore } from "@/Store/dlogStore";
 
-import type { record } from "@/Api/LogApi/interfaces/getLogListResponse";
 
 export function LogTable() {
   const navigate = useNavigate();
@@ -28,27 +27,25 @@ export function LogTable() {
     setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
   };
 
-  const [logs, setLogs] = useState<record[]>([]);
-  const [totalPages, setTotalPages] = useState(1);
+  const fetchDLogs = useDLogStore((state) => state.fetchDLogs);
+  const totalPages = useDLogStore((state) => state.totalPage);
+  const logs = useDLogStore((state) => state.DLogs);
 
-  const fetchLogs = useCallback(async () => {
+  const fetchAndSetLogs = useCallback(async () => {
     try {
-      const res = await getLogList({
-        page: currentPage - 1, 
+      await fetchDLogs({
+        page: currentPage,
         size: itemsPerPage,
         sort: sortDirection,
-      });
-      console.log(res.totalPage);
-      setLogs(res.content); 
-      setTotalPages(res.totalPage);
+      })
     } catch (err) {
       console.error("Error fetching logs:", err);
     }
-  }, [currentPage, sortDirection]);
+  }, [currentPage, sortDirection, fetchDLogs]);
 
   useEffect(() => {
-    fetchLogs();
-  }, [fetchLogs]);
+    fetchAndSetLogs();
+  }, [fetchAndSetLogs]);
 
 
   return (

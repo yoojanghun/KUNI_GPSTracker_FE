@@ -1,3 +1,3 @@
 export interface getLogDetailRequest {
-  id: number;
+  id: string;
 }
