@@ -17,7 +17,7 @@ export interface SelectedCar {
 	vehicleNumber: string;
 	vehicleName: string;
 	drivingDate: string;
-	drivingTime: string;
+	drivingTime: number;
 	drivingDistanceKm: number;
 	location: Location;
 	gpsRecordId: number;
