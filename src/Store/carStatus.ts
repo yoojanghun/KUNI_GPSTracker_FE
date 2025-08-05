@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { type MapCarLocation, fetchMapCarLocation } from "@/Api/Map/MapCarLocation";
 
 export type Position = {
 	lat: number;
@@ -57,11 +58,24 @@ type MapStateStoreCarList = {
 	setMapLevelCarList: (level: number) => void;
 }
 
+interface MapState {
+	carLocations: MapCarLocation;
+	startPolling: () => void;
+}
+
 // carList에서 하나의 차량을 선택하였을 때 selectedCar에 해당 차량을 저장
 // selectedCar에 저장된 차량이 있으면 carList에서 차량 정보 표시
 export const useSelectCarStore = create<SelectedCarStore>((set) => ({
 	selectedCar: null,
 	setSelectedCar: (car) => set({ selectedCar: car})
+}));
+
+// carList에서 한 차량을 클릭했을 때, 해당 차량을 확대하여 보여주는 데 사용
+export const useTrackCarStore = create<MapStateStoreCarList>((set) => ({
+	mapCenterCarList: DEFAULT_CENTER,
+	mapLevelCarList: 12,
+	setMapCenterCarList: (center) => set({mapCenterCarList: center}),
+	setMapLevelCarList: (level) => set({mapLevelCarList: level})
 }));
 
 // Home.tsx에서 전체, 운행중, 미운행, 점검중 체크박스를 클릭하여 
@@ -102,38 +116,29 @@ export const useHomeMapStore = create<HomeMapStateStore>((set) => ({
 	setHomeMapLevel: (level) => set({homeMapLevel: level})
 }))
 
-// carList에서 한 차량을 클릭했을 때, 해당 차량을 확대하여 보여주는 데 사용
-export const useTrackCarStore = create<MapStateStoreCarList>((set) => ({
-	mapCenterCarList: DEFAULT_CENTER,
-	mapLevelCarList: 12,
-	setMapCenterCarList: (center) => set({mapCenterCarList: center}),
-	setMapLevelCarList: (level) => set({mapLevelCarList: level})
-}));
+// 아래는 차량이름, 번호, gps값을 담은 객체들의 배열
+// carLocations안에 챠량들의 이름, 번호, gps, status값의 객체들이 들어간다.
+// api/dashboard/map의 정보
+let pollingStarted = false;
 
-// 아래 코드는 차량 번호, 이름, 위도, 경도 값을 가져오는 코드. 첫번째 지도, 두 번째 지도, carList에서 쓰임
+export const useMapStore = create<MapState>((set) => ({
+	carLocations: [],
 
-// import { type MapCarLocation, fetchMapCarLocation } from "@/Api/Map/MapCarLocation";
+	startPolling: () => {
+		if(pollingStarted) return;
+		pollingStarted = true;
 
-// const [carLocationArr, setCarLocationArr] = useState<MapCarLocation | null>(null);
-// const prevCarLocationArr = useRef<MapCarLocation | null>(null);
-
-// useEffect(() => {
-//   const getStat = () => {
-//     fetchMapCarLocation()
-//       .then((carLocationArr) => {
-//         if(JSON.stringify(prevCarLocationArr.current) !== JSON.stringify(carLocationArr)) {
-//           prevCarLocationArr.current = carLocationArr;
-//           setCarLocationArr(carLocationArr);
-//         }
-//       })
-//       .catch((error) => console.error(error));
-//   }
-//   getStat();
-//   const intervalId = setInterval(getStat, 60000);    // 일단 60초에 한번씩 정보 받음(나중에 3초로 축소)
-
-//   return () => {
-//     clearInterval(intervalId);
-//   }
-// }, []);
-
-// if(!carLocationArr) return;
+		const getStat = async () => {
+			const data = await fetchMapCarLocation();
+			set(state => {
+				if(JSON.stringify(state.carLocations) !== JSON.stringify(data)) {
+					return {carLocations: data}
+				}
+				return {}
+			})
+		}
+		getStat();
+		
+		setInterval(getStat, 60_000);
+	},
+}))

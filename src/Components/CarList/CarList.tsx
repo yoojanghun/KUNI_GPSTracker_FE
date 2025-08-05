@@ -30,12 +30,13 @@ import {
   useCarStatusOptionStore,
   useTrackCarStore,
   usePaginationStore,
+  useMapStore,
 } from "@/Store/carStatus";
 import { useDLogStore } from "@/Store/dlogStore";
+import { type SelectedCar, fetchSelectedCarStat } from "@/Api/CarList/SelectedCarInfo";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./CarList.module.css";
-import { fetchSelectedCarStat } from "@/Api/CarList/SelectedCarInfo";
 
 function CarList() {
   const setSelectedCar = useSelectCarStore((state) => state.setSelectedCar);
@@ -62,6 +63,7 @@ function CarList() {
   const [inputVal, setInputVal] = useState<string>("");
   const [currentCarList, setCurrentCarList] = useState<CarInfo[]>([]);
   const [isVisible, setIsVisible] = useState<boolean>(true);
+  const [selectedCarInfo, setSelectedCarInfo] = useState<SelectedCar | null>(null);
 
   const navigate = useNavigate();
   const filter = useDLogStore((state) => state.filter);
@@ -69,23 +71,35 @@ function CarList() {
 
   const hideBtnRef = useRef<HTMLButtonElement | null>(null);
 
+  const carLocations = useMapStore(state => state.carLocations);
+  const startPolling = useMapStore(state => state.startPolling);
+
   const carStatusClass: Record<string, string> = {
     운행중: "bg-[#c1d8ff] text-[#5491f5]",
     미운행: "bg-[#ffcac6] text-[#e94b3e]",
     점검중: "bg-[#ffe4be] text-[#ffa62a]",
   };
 
-  // 바로 아래 코드는 api/dashboard/map 에서 가져온 정보라고 가정
+  // 아래 코드는 api/dashboard/map 에서 가져온 정보라고 가정
+  // 현재는 currentCarList의 정보로 차량들의 리스트를 나타내는데, zustand의 useMap을 이용해 
+  // carLocations로 차량들의 리스트를 나타낼 예정 
   useEffect(() => {
     fetch("/carListExample.json")
       .then((res) => res.json())
       .then((data) => setCurrentCarList(data));
   }, []);
 
+  // 아래 코드는 실제 api/dashboard/map 에서 가져온 정보 (지금은 빈 배열)
+  useEffect(() => {
+    startPolling();
+    console.log(carLocations);
+  }, [startPolling])
+
+  // carList.tsx에서 선택된 하나의 selectedCar 차량에 대한 정보를 얻기 위함
   useEffect(() => {
     if(!selectedCar) return;
-    fetchSelectedCarStat(selectedCar.number)
-      .then(car => console.log(car)) 
+    fetchSelectedCarStat(selectedCar.number, 0)
+      .then(car => setSelectedCarInfo(car)) 
       .catch(error => console.error(error));
   }, [selectedCar])
 
@@ -184,15 +198,15 @@ function CarList() {
                 </tr>
                 <tr>
                   <th className={styles["th"]}>운행일자</th>
-                  <td className={styles["td"]}>데이터 없음</td>
+                  <td className={styles["td"]}>{selectedCarInfo?.drivingDate}</td>
                 </tr>
                 <tr>
                   <th className={styles["th"]}>운행시간</th>
-                  <td className={styles["td"]}>데이터 없음</td>
+                  <td className={styles["td"]}>{selectedCarInfo?.drivingTime} 분</td>
                 </tr>
                 <tr>
                   <th className={styles["th"]}>운행 거리</th>
-                  <td className={styles["td"]}>{selectedCar.mileage}</td>
+                  <td className={styles["td"]}>{selectedCarInfo?.drivingDistanceKm} KM</td>
                 </tr>
               </tbody>
             </table>
