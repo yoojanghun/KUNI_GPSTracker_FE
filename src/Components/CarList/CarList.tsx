@@ -34,6 +34,7 @@ import {
 } from "@/Store/carStatus";
 import { useDLogStore } from "@/Store/dlogStore";
 import { type SelectedCar, fetchSelectedCarStat } from "@/Api/CarList/SelectedCarInfo";
+import { fetchTotalCarsList } from "@/Api/CarList/TotalCars";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./CarList.module.css";
@@ -80,16 +81,25 @@ function CarList() {
     점검중: "bg-[#ffe4be] text-[#ffa62a]",
   };
 
-  // 아래 코드는 api/dashboard/map 에서 가져온 정보라고 가정
-  // 현재는 currentCarList의 정보로 차량들의 리스트를 나타내는데, zustand의 useMap을 이용해 
-  // carLocations로 차량들의 리스트를 나타낼 예정 
+  // 아래 코드는 api/vehicle (차량 목록 조회) 에서 가져온 정보라고 가정
+  // 현재는 currentCarList의 정보로 차량들의 리스트를 나타냄. 
   useEffect(() => {
     fetch("/carListExample.json")
       .then((res) => res.json())
       .then((data) => setCurrentCarList(data));
   }, []);
 
-  // 아래 코드는 실제 api/dashboard/map 에서 가져온 정보 (지금은 빈 배열)
+  // 실제 api/vehicle (차량 목록 조회)에서 가져온 정보.
+  // carList에서 paigination을 이용한 차량 목록들을 나타내기 위해 사용함.
+  // parameter로 carStatusOption 넘기기 ("" 부분)
+  useEffect(() => {
+    fetchTotalCarsList(page - 1, 7, "")
+      .then(totalCars => console.log(totalCars))
+      .catch(error => console.log(error));
+  }, [page])
+
+  // api/dashboard/map 에서 가져온 정보 (지금은 빈 배열)
+  // 차량의 위치를 marker로 나타내기 위해 사용함.
   useEffect(() => {
     startPolling();
     console.log(carLocations);
