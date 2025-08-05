@@ -31,6 +31,7 @@ import {
   useTrackCarStore,
   usePaginationStore,
   useMapStore,
+  useSelectedCarLatLng,
 } from "@/Store/carStatus";
 import { useDLogStore } from "@/Store/dlogStore";
 import { type SelectedCar, fetchSelectedCarStat } from "@/Api/CarList/SelectedCarInfo";
@@ -57,6 +58,13 @@ function CarList() {
     (state) => state.carStatusOption
   );
 
+  const setSelectedCarLatLng = useSelectedCarLatLng(
+    (state) => state.setLatLng
+  )
+  const setSelectedCarNumber = useSelectedCarLatLng(
+    (state) => state.setCarNumber
+  )
+
   const page = usePaginationStore((state) => state.page);
   const setPage = usePaginationStore((state) => state.setPage);
   const totalPages = 72; // 백엔드에서 제공 예정
@@ -65,6 +73,7 @@ function CarList() {
   const [currentCarList, setCurrentCarList] = useState<CarInfo[]>([]);
   const [isVisible, setIsVisible] = useState<boolean>(true);
   const [selectedCarInfo, setSelectedCarInfo] = useState<SelectedCar | null>(null);
+  // const selectedCarInfoRef = useRef<SelectedCar | null>
 
   const navigate = useNavigate();
   const filter = useDLogStore((state) => state.filter);
@@ -105,13 +114,35 @@ function CarList() {
     console.log(carLocations);
   }, [startPolling])
 
-  // carList.tsx에서 선택된 하나의 selectedCar 차량에 대한 정보를 얻기 위함
+  // 초기엔 gpsRecordId값은 0
+  // 뒤로 가기 버튼 누르면 selectedCar가 null로 변해서 아예 처음부터 다시 시작해버림
   useEffect(() => {
-    if(!selectedCar) return;
+    if (!selectedCar) {
+      setSelectedCarInfo(null);
+      return;
+    }
     fetchSelectedCarStat(selectedCar.number, 0)
-      .then(car => setSelectedCarInfo(car)) 
-      .catch(error => console.error(error));
-  }, [selectedCar])
+      .then(car => setSelectedCarInfo(car))
+      .catch(console.error);
+  }, [selectedCar]);
+
+  // gpsRecordId가 생성된 후에 함수의 파라미터로 넘김
+  useEffect(() => {
+    if (!selectedCar || selectedCarInfo?.gpsRecordId == null) return;
+
+    const intervalId = setInterval(() => {
+      fetchSelectedCarStat(selectedCar.number, selectedCarInfo.gpsRecordId)
+        .then(car => {
+          setSelectedCarInfo(car); 
+          setSelectedCarLatLng(car.location);
+          setSelectedCarNumber(car.vehicleNumber);
+          console.log(car.vehicleNumber,car.location);
+        })
+        .catch(console.error);
+    }, 3000);
+
+    return () => clearInterval(intervalId);
+  }, [selectedCar, selectedCarInfo?.gpsRecordId]);
 
   // carList 목록에 보여지는 차량들
   const filteredCarList = currentCarList.filter((car) => {
@@ -215,8 +246,8 @@ function CarList() {
                   <td className={styles["td"]}>{selectedCarInfo?.drivingTime} 분</td>
                 </tr>
                 <tr>
-                  <th className={styles["th"]}>운행 거리</th>
-                  <td className={styles["td"]}>{selectedCarInfo?.drivingDistanceKm} KM</td>
+                  <th className={styles["th"]}>운행거리</th>
+                  <td className={styles["td"]}>{selectedCarInfo?.drivingDistanceKm} m</td>
                 </tr>
               </tbody>
             </table>

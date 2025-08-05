@@ -63,6 +63,14 @@ interface MapState {
 	startPolling: () => void;
 }
 
+type SelectedCarLatLng = {
+	carNumber: string | null;
+	latLng: {latitude: number | null; longitude: number | null};
+	setCarNumber: (carNum: string) => void;
+	setLatLng: (markerPos: {latitude: number; longitude: number}) => void;
+	clearSetLatLng: () => void;
+}
+
 // carList에서 하나의 차량을 선택하였을 때 selectedCar에 해당 차량을 저장
 // selectedCar에 저장된 차량이 있으면 carList에서 차량 정보 표시
 export const useSelectCarStore = create<SelectedCarStore>((set) => ({
@@ -83,7 +91,7 @@ export const useTrackCarStore = create<MapStateStoreCarList>((set) => ({
 export const useCarStatusBtnStore = create<CarStatusBtnStore>((set) => ({
 	carStatusBtn: "전체",
 	setCarStatusBtn: (selectedCarStatusBtn) => set({carStatusBtn: selectedCarStatusBtn})
-}))
+}));
 
 // CarList.tsx에서 전체, 운행중, 미운행, 점검중 옵션창을 클릭하여
 // 지도에 클러스터링하여 표시할 때 사용
@@ -114,7 +122,7 @@ export const useHomeMapStore = create<HomeMapStateStore>((set) => ({
 	homeMapLevel: 13,
 	setHomeMapCenter: (center) => set({homeMapCenter: center}),
 	setHomeMapLevel: (level) => set({homeMapLevel: level})
-}))
+}));
 
 // 아래는 차량이름, 번호, gps값을 담은 객체들의 배열
 // carLocations안에 챠량들의 이름, 번호, gps, status값의 객체들이 들어간다.
@@ -141,4 +149,14 @@ export const useMapStore = create<MapState>((set) => ({
 		
 		setInterval(getStat, 60_000);
 	},
+}));
+
+// CarList.tsx에서 하나의 차량을 선택 => carList.tsx에서 api를 통해 해당 차량 정보 획득
+// 그 정보 내엔 lat, lng값이 존재하는데, 그 값을 zustand에 저장하여 다른 파일에도 사용할 수 있도록
+export const useSelectedCarLatLng = create<SelectedCarLatLng>((set) => ({
+	carNumber: null,
+	latLng: {latitude: null, longitude: null},
+	setCarNumber: (carNum) => set({carNumber: carNum}),
+	setLatLng: (pos) => set({latLng: {latitude: pos.latitude, longitude: pos.longitude}}),
+	clearSetLatLng: () => set({latLng: {latitude: null, longitude: null}})
 }))

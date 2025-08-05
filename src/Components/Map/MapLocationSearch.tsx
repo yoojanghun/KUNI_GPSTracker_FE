@@ -5,6 +5,7 @@ import {
   useCarStatusOptionStore, 
   useLocationSearchMapStore, 
   useSelectCarStore, 
+  useSelectedCarLatLng, 
   useTrackCarStore 
 } from '@/Store/carStatus';
 import styles from "./MapCustomOverlay.module.css";
@@ -34,6 +35,9 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
   const setlLocationSearchMapLevel = useLocationSearchMapStore(state => state.setLocationSearchMapLevel);
   const mapCenterCarList = useTrackCarStore(state => state.mapCenterCarList);
   const mapLevelCarList = useTrackCarStore(state => state.mapLevelCarList);
+
+  const selectedCarLatLng = useSelectedCarLatLng(state => state.latLng);
+  const selectedCarNumber = useSelectedCarLatLng(state => state.carNumber);
 
   const [positions, setPositions] = useState<CarWithPath[]>([]);      // positions에는 차량들의 리스트 객체들이 들어감
 
@@ -263,6 +267,7 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
           } = markerMap[p.status];
 
           let marker = markersRef.current[p.number];        
+
           if(marker) {                                                // 지도에 표시된 차량이 이미 존재
             marker.setPosition(latLng);
             marker.setImage(defaultImg);
@@ -277,6 +282,7 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
               image: defaultImg,
               map: mapInstance.current
             });
+            markersRef.current[p.number] = marker;
 
             const overlay = new kakao.maps.CustomOverlay({            // 오버레이 생성 (한 번만 실행)
               content: `
@@ -383,6 +389,31 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
       overlayRef.current = {};
     }
   }, [carStatusOption, positions, selectedCar]);
+
+  useEffect(() => {
+  const { latitude, longitude } = selectedCarLatLng;
+  if (
+    !selectedCarNumber ||
+    latitude == null ||
+    longitude == null
+  ) {
+    return;
+  }
+
+  // 1) 해당 마커 가져오기
+  const marker = markersRef.current[selectedCarNumber];
+  // 2) 해당 오버레이 가져오기
+  const overlay = overlayRef.current[selectedCarNumber];
+
+  const newPos = new kakao.maps.LatLng(latitude, longitude);
+
+  if (marker) {
+    marker.setPosition(newPos);
+  }
+  if (overlay) {
+    overlay.setPosition(newPos);
+  }
+}, [selectedCarNumber, selectedCarLatLng]);
 
   return (
     <div ref={mapContainerRef} style={{ width: '100%', height: '100%'}}/>
