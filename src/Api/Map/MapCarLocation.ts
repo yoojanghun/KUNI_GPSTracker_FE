@@ -5,17 +5,17 @@
 import { api } from "../index";
 
 export interface CarLocation {
-    latitude: number;
-    longitude: number;
-    status: string;
-    vehicleNumber: string;
-    type: string;
+	latitude: number;
+	longitude: number;
+	status: string;
+	vehicleNumber: string;
+	type: string;
 }
 
 export type MapCarLocation = CarLocation[];
 
 export async function fetchMapCarLocation(): Promise<MapCarLocation> {
-    const stats = await api.get("api/dashboard/map").json<MapCarLocation>();
+	const stats = await api.get("api/dashboard/map").json<MapCarLocation>();
 
-    return stats;
+	return stats;
 }
