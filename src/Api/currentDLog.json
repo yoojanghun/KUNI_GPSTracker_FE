@@ -1,0 +1,406 @@
+{
+  "totalPage": 5,
+  "totalElements": 50,
+  "content": [
+    {
+      "id": 1,
+      "vehicleNumber": "99가6281",
+      "vehicleName": "K3",
+      "onTime": "2025-07-07T19:30:00",
+      "offTime": "2025-07-07T19:57:00",
+      "sumDist": "118"
+    },
+    {
+      "id": 2,
+      "vehicleNumber": "48아9889",
+      "vehicleName": "Tucson",
+      "onTime": "2025-07-09T07:00:00",
+      "offTime": "2025-07-09T07:27:00",
+      "sumDist": "127"
+    },
+    {
+      "id": 3,
+      "vehicleNumber": "28아9926",
+      "vehicleName": "K5",
+      "onTime": "2025-07-07T11:15:00",
+      "offTime": "2025-07-07T12:38:00",
+      "sumDist": "126"
+    },
+    {
+      "id": 4,
+      "vehicleNumber": "93하2572",
+      "vehicleName": "Avante",
+      "onTime": "2025-07-07T21:15:00",
+      "offTime": "2025-07-07T22:00:00",
+      "sumDist": "116"
+    },
+    {
+      "id": 5,
+      "vehicleNumber": "48아1563",
+      "vehicleName": "Avante",
+      "onTime": "2025-07-09T15:30:00",
+      "offTime": "2025-07-09T16:15:00",
+      "sumDist": "127"
+    },
+    {
+      "id": 6,
+      "vehicleNumber": "99가2119",
+      "vehicleName": "Avante",
+      "onTime": "2025-07-07T05:30:00",
+      "offTime": "2025-07-07T06:41:00",
+      "sumDist": "130"
+    },
+    {
+      "id": 7,
+      "vehicleNumber": "80자6117",
+      "vehicleName": "Sonata",
+      "onTime": "2025-07-07T23:15:00",
+      "offTime": "2025-07-08T00:38:00",
+      "sumDist": "100"
+    },
+    {
+      "id": 8,
+      "vehicleNumber": "80자8022",
+      "vehicleName": "Genesis G70",
+      "onTime": "2025-07-09T17:30:00",
+      "offTime": "2025-07-09T18:46:00",
+      "sumDist": "129"
+    },
+    {
+      "id": 9,
+      "vehicleNumber": "32나3733",
+      "vehicleName": "Sonata",
+      "onTime": "2025-07-07T13:00:00",
+      "offTime": "2025-07-07T13:45:00",
+      "sumDist": "110"
+    },
+    {
+      "id": 10,
+      "vehicleNumber": "99가1541",
+      "vehicleName": "K5",
+      "onTime": "2025-07-08T11:00:00",
+      "offTime": "2025-07-08T11:33:00",
+      "sumDist": "135"
+    },
+    {
+      "id": 11,
+      "vehicleNumber": "48아4046",
+      "vehicleName": "Tucson",
+      "onTime": "2025-07-07T17:30:00",
+      "offTime": "2025-07-07T17:49:00",
+      "sumDist": "112"
+    },
+    {
+      "id": 12,
+      "vehicleNumber": "63마6649",
+      "vehicleName": "Avante",
+      "onTime": "2025-07-07T09:30:00",
+      "offTime": "2025-07-07T10:43:00",
+      "sumDist": "120"
+    },
+    {
+      "id": 13,
+      "vehicleNumber": "99가2051",
+      "vehicleName": "Avante",
+      "onTime": "2025-07-07T13:45:00",
+      "offTime": "2025-07-07T14:35:00",
+      "sumDist": "127"
+    },
+    {
+      "id": 14,
+      "vehicleNumber": "32나1694",
+      "vehicleName": "Sonata",
+      "onTime": "2025-07-07T09:15:00",
+      "offTime": "2025-07-07T10:33:00",
+      "sumDist": "150"
+    },
+    {
+      "id": 15,
+      "vehicleNumber": "28아3627",
+      "vehicleName": "Genesis G70",
+      "onTime": "2025-07-09T23:45:00",
+      "offTime": "2025-07-10T00:11:00",
+      "sumDist": "128"
+    },
+    {
+      "id": 16,
+      "vehicleNumber": "80자4537",
+      "vehicleName": "Genesis G70",
+      "onTime": "2025-07-07T17:45:00",
+      "offTime": "2025-07-07T18:25:00",
+      "sumDist": "140"
+    },
+    {
+      "id": 17,
+      "vehicleNumber": "32나7610",
+      "vehicleName": "Genesis G70",
+      "onTime": "2025-07-08T13:45:00",
+      "offTime": "2025-07-08T14:27:00",
+      "sumDist": "117"
+    },
+    {
+      "id": 18,
+      "vehicleNumber": "28아4583",
+      "vehicleName": "K5",
+      "onTime": "2025-07-09T00:15:00",
+      "offTime": "2025-07-09T01:08:00",
+      "sumDist": "123"
+    },
+    {
+      "id": 19,
+      "vehicleNumber": "99가2628",
+      "vehicleName": "K3",
+      "onTime": "2025-07-09T11:00:00",
+      "offTime": "2025-07-09T12:17:00",
+      "sumDist": "100"
+    },
+    {
+      "id": 20,
+      "vehicleNumber": "63마5259",
+      "vehicleName": "Tucson",
+      "onTime": "2025-07-09T21:15:00",
+      "offTime": "2025-07-09T22:33:00",
+      "sumDist": "147"
+    },
+    {
+      "id": 21,
+      "vehicleNumber": "48아7925",
+      "vehicleName": "Genesis G70",
+      "onTime": "2025-07-08T19:15:00",
+      "offTime": "2025-07-08T20:38:00",
+      "sumDist": "121"
+    },
+    {
+      "id": 22,
+      "vehicleNumber": "48아1394",
+      "vehicleName": "Avante",
+      "onTime": "2025-07-09T17:45:00",
+      "offTime": "2025-07-09T19:15:00",
+      "sumDist": "139"
+    },
+    {
+      "id": 23,
+      "vehicleNumber": "99가1798",
+      "vehicleName": "K5",
+      "onTime": "2025-07-09T05:15:00",
+      "offTime": "2025-07-09T06:32:00",
+      "sumDist": "130"
+    },
+    {
+      "id": 24,
+      "vehicleNumber": "80자3821",
+      "vehicleName": "K5",
+      "onTime": "2025-07-07T09:00:00",
+      "offTime": "2025-07-07T09:39:00",
+      "sumDist": "130"
+    },
+    {
+      "id": 25,
+      "vehicleNumber": "65사6781",
+      "vehicleName": "K5",
+      "onTime": "2025-07-09T05:15:00",
+      "offTime": "2025-07-09T05:47:00",
+      "sumDist": "101"
+    },
+    {
+      "id": 26,
+      "vehicleNumber": "80자6297",
+      "vehicleName": "Avante",
+      "onTime": "2025-07-09T05:00:00",
+      "offTime": "2025-07-09T05:46:00",
+      "sumDist": "123"
+    },
+    {
+      "id": 27,
+      "vehicleNumber": "80자3920",
+      "vehicleName": "Genesis G70",
+      "onTime": "2025-07-07T21:45:00",
+      "offTime": "2025-07-07T22:55:00",
+      "sumDist": "137"
+    },
+    {
+      "id": 28,
+      "vehicleNumber": "88사2891",
+      "vehicleName": "Sonata",
+      "onTime": "2025-07-08T21:30:00",
+      "offTime": "2025-07-08T22:10:00",
+      "sumDist": "111"
+    },
+    {
+      "id": 29,
+      "vehicleNumber": "28아8457",
+      "vehicleName": "K3",
+      "onTime": "2025-07-09T05:30:00",
+      "offTime": "2025-07-09T06:33:00",
+      "sumDist": "143"
+    },
+    {
+      "id": 30,
+      "vehicleNumber": "63마4800",
+      "vehicleName": "Genesis G70",
+      "onTime": "2025-07-08T00:30:00",
+      "offTime": "2025-07-08T01:21:00",
+      "sumDist": "137"
+    },
+    {
+      "id": 31,
+      "vehicleNumber": "80자2981",
+      "vehicleName": "Sonata",
+      "onTime": "2025-07-08T07:30:00",
+      "offTime": "2025-07-08T08:15:00",
+      "sumDist": "144"
+    },
+    {
+      "id": 32,
+      "vehicleNumber": "93하2678",
+      "vehicleName": "Avante",
+      "onTime": "2025-07-08T19:00:00",
+      "offTime": "2025-07-08T19:40:00",
+      "sumDist": "141"
+    },
+    {
+      "id": 33,
+      "vehicleNumber": "32나8399",
+      "vehicleName": "Tucson",
+      "onTime": "2025-07-07T00:45:00",
+      "offTime": "2025-07-07T02:00:00",
+      "sumDist": "127"
+    },
+    {
+      "id": 34,
+      "vehicleNumber": "48바5316",
+      "vehicleName": "Genesis G70",
+      "onTime": "2025-07-07T05:30:00",
+      "offTime": "2025-07-07T06:40:00",
+      "sumDist": "124"
+    },
+    {
+      "id": 35,
+      "vehicleNumber": "65사5379",
+      "vehicleName": "K5",
+      "onTime": "2025-07-09T09:30:00",
+      "offTime": "2025-07-09T10:05:00",
+      "sumDist": "119"
+    },
+    {
+      "id": 36,
+      "vehicleNumber": "99가1422",
+      "vehicleName": "Avante",
+      "onTime": "2025-07-07T09:30:00",
+      "offTime": "2025-07-07T09:54:00",
+      "sumDist": "105"
+    },
+    {
+      "id": 37,
+      "vehicleNumber": "32나2917",
+      "vehicleName": "K3",
+      "onTime": "2025-07-09T15:45:00",
+      "offTime": "2025-07-09T16:28:00",
+      "sumDist": "116"
+    },
+    {
+      "id": 38,
+      "vehicleNumber": "28아1735",
+      "vehicleName": "K5",
+      "onTime": "2025-07-08T05:45:00",
+      "offTime": "2025-07-08T06:27:00",
+      "sumDist": "111"
+    },
+    {
+      "id": 39,
+      "vehicleNumber": "80자4336",
+      "vehicleName": "Tucson",
+      "onTime": "2025-07-09T05:45:00",
+      "offTime": "2025-07-09T06:18:00",
+      "sumDist": "147"
+    },
+    {
+      "id": 40,
+      "vehicleNumber": "99가3170",
+      "vehicleName": "Avante",
+      "onTime": "2025-07-07T17:45:00",
+      "offTime": "2025-07-07T18:35:00",
+      "sumDist": "114"
+    },
+    {
+      "id": 41,
+      "vehicleNumber": "65사1062",
+      "vehicleName": "Genesis G70",
+      "onTime": "2025-07-08T15:45:00",
+      "offTime": "2025-07-08T16:55:00",
+      "sumDist": "150"
+    },
+    {
+      "id": 42,
+      "vehicleNumber": "48바3264",
+      "vehicleName": "K5",
+      "onTime": "2025-07-07T11:30:00",
+      "offTime": "2025-07-07T12:55:00",
+      "sumDist": "121"
+    },
+    {
+      "id": 43,
+      "vehicleNumber": "80자7968",
+      "vehicleName": "K3",
+      "onTime": "2025-07-09T07:45:00",
+      "offTime": "2025-07-09T08:49:00",
+      "sumDist": "132"
+    },
+    {
+      "id": 44,
+      "vehicleNumber": "63마9431",
+      "vehicleName": "K5",
+      "onTime": "2025-07-09T09:45:00",
+      "offTime": "2025-07-09T10:07:00",
+      "sumDist": "128"
+    },
+    {
+      "id": 45,
+      "vehicleNumber": "48아2706",
+      "vehicleName": "K3",
+      "onTime": "2025-07-09T00:15:00",
+      "offTime": "2025-07-09T00:52:00",
+      "sumDist": "128"
+    },
+    {
+      "id": 46,
+      "vehicleNumber": "48아7667",
+      "vehicleName": "Genesis G70",
+      "onTime": "2025-07-09T07:15:00",
+      "offTime": "2025-07-09T08:16:00",
+      "sumDist": "109"
+    },
+    {
+      "id": 47,
+      "vehicleNumber": "88사8521",
+      "vehicleName": "K3",
+      "onTime": "2025-07-08T05:45:00",
+      "offTime": "2025-07-08T06:38:00",
+      "sumDist": "113"
+    },
+    {
+      "id": 48,
+      "vehicleNumber": "32나4807",
+      "vehicleName": "Tucson",
+      "onTime": "2025-07-08T15:00:00",
+      "offTime": "2025-07-08T15:18:00",
+      "sumDist": "133"
+    },
+    {
+      "id": 49,
+      "vehicleNumber": "63마7950",
+      "vehicleName": "Genesis G70",
+      "onTime": "2025-07-09T19:45:00",
+      "offTime": "2025-07-09T20:10:00",
+      "sumDist": "127"
+    },
+    {
+      "id": 50,
+      "vehicleNumber": "65사3896",
+      "vehicleName": "Avante",
+      "onTime": "2025-07-09T13:15:00",
+      "offTime": "2025-07-09T13:33:00",
+      "sumDist": "130"
+    }
+  ]
+}

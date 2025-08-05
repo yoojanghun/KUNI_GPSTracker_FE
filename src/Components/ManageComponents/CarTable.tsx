@@ -1,126 +1,167 @@
+import { useState, useEffect, useCallback, useRef } from "react";
 import {
   Table,
   TableBody,
   TableCell,
-  TableFooter,
-  TableHead,
   TableHeader,
+  TableHead,
   TableRow,
-} from "@/Components/ui/table"
-import { Checkbox } from "../ui/checkbox";
-import { TablePagination } from "../TablePagination";
-import { useRef, useState } from "react";
-import { useCarStore } from "../../Store/carStore";
+} from "@/Components/ui/table";
+import { Checkbox } from "@/Components/ui/checkbox";
+import { StatusBadge } from "@/Components/StatusBadge";
+import { TablePagination } from "@/Components/TablePagination";
+import type { carList } from "@/Api/ManageApi/interfaces/getCarListResponse";
 import { ArrowDownUp } from "lucide-react";
-import { StatusBadge } from "../StatusBadge";
+import type { getCarListRequest } from "@/Api/ManageApi/interfaces/getCarListRequest";
+import { useCarStore } from "@/Store/carStore";
 
-export function CarTable() {
-  const tableRef = useRef<HTMLDivElement>(null); // 테이블의 너비값을 전달하기 위한 wrapper
+export default function CarTable() {
+  const [sortKey, setSortKey] = useState<keyof carList>();
+  const [sortDirection, setSortDirection] = useState("asc");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const tableRef = useRef<HTMLDivElement>(null); // 테이블의 너비값을 전달하기 위한 wrapper
 
-  const [sortKey, setSortKey] = useState<"number" | "name" | "mileage" | "status" | null>(null);
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-
-  const cars = useCarStore((state) => state.filteredCars.length > 0 ? state.filteredCars : state.cars);
-  const selectedCars = useCarStore((state) => state.selected);
-  const toggleSelection = useCarStore((state) => state.toggleSelect);
+  const cars = useCarStore((state) => state.cars);
+  const totalPages = useCarStore((state) => state.totalPage);
+  const selectedCars = Array.from(useCarStore((state) => state.selected));
+  const setSelected = useCarStore((state) => state.setSelected);
   const toggleSelectAll = useCarStore((state) => state.toggleSelectAll);
+  const isAllSelected = useCarStore((state) => state.isAllSelected);
+  const fetchCars = useCarStore((state) => state.fetchCars);
 
-  const handleSort = (key: "number" | "name" | "mileage" | "status") => {
+  const tableRowHeight = 60;
+  const itemsPerPage = Math.floor((window.innerHeight) / tableRowHeight);
+
+  // 정렬 키를 생성하기 위한 로직, getSortParam(sortKey, sortDirection) 를 통해 키값을 얻을 수 있음
+  const VALID_SORT_KEYS = [
+    "createDate",
+    "carNumber",
+    "type",
+    "totalDist",
+    "status",
+  ] as const;
+
+  const isValidSortKey = (
+    key: string
+  ): key is (typeof VALID_SORT_KEYS)[number] => {
+    return VALID_SORT_KEYS.includes(key as any);
+  };
+
+  const getSortParam = (
+    key: keyof carList | undefined,
+    direction: string
+  ): getCarListRequest["sort"] => {
+    const dir = direction.toUpperCase() === "DESC" ? "DESC" : "ASC";
+    const defaultSort = `createDate,ASC` as getCarListRequest["sort"];
+
+    if (!key || !isValidSortKey(key)) return defaultSort;
+
+    const sortParam = `${key},${dir}` as getCarListRequest["sort"];
+    return sortParam;
+  };
+
+  const fetchAndSetCars = useCallback(async () => {
+    try {
+      const sort = getSortParam(sortKey, sortDirection);
+      await fetchCars({page: currentPage - 1, size: itemsPerPage, sort: sort});
+    } catch (err) {
+      console.error("Failed to fetch cars", err);
+    }
+  }, [currentPage, sortKey, sortDirection, fetchCars]);
+
+  useEffect(() => {
+    fetchAndSetCars();
+  }, [fetchAndSetCars]);
+
+  const handleSort = (key: keyof carList) => {
     if (sortKey === key) {
-      setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
+      setSortDirection(sortDirection === "ASC" ? "DESC" : "ASC");
     } else {
       setSortKey(key);
-      setSortDirection("asc");
+      setSortDirection("ASC");
     }
   };
 
-  const sortedCars = [...cars].sort((a, b) => {
-    if (!sortKey) return 0;
-
-    const aValue = a[sortKey];
-    const bValue = b[sortKey];
-
-    if (typeof aValue === "number" && typeof bValue === "number") {
-      return sortDirection === "asc" ? aValue - bValue : bValue - aValue;
-    }
-
-    if (typeof aValue === "string" && typeof bValue === "string") {
-      return sortDirection === "asc"
-        ? aValue.localeCompare(bValue)
-        : bValue.localeCompare(aValue);
-    }
-
-    return 0;
-  });
-
-  const visibleCars = sortedCars.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-  const isAllSelected = visibleCars.every((car) => selectedCars.has(car.number));
-
   return (
-    <div ref={tableRef} 
-    className="h-[470px] w-full flex flex-col gap-4 p-1"
-    >
-    <Table className="table-fixed w-full">
-      <TableHeader>
-        <TableRow>
-          <TableHead className="w-[100px] text-center cursor-pointer" onClick={() => handleSort("number")}>
-            <div className="flex items-center justify-center gap-1">
-              <ArrowDownUp size={14} />
-              <span>차량 번호</span>
-            </div>
-          </TableHead>
-          <TableHead className="text-center cursor-pointer" onClick={() => handleSort("name")}>
-            <div className="flex items-center justify-center gap-1">
-              <ArrowDownUp size={14} />
-              <span>차량명</span>
-            </div>
-          </TableHead>
-          <TableHead className="text-center cursor-pointer" onClick={() => handleSort("mileage")}>
-            <div className="flex items-center justify-center gap-1">
-              <ArrowDownUp size={14} />
-              <span>주행거리</span>
-            </div>
-          </TableHead>
-          <TableHead className="text-center cursor-pointer" onClick={() => handleSort("status")}>
-            <div className="flex items-center justify-center gap-1">
-              <ArrowDownUp size={14} />
-              <span>상태</span>
-            </div>
-          </TableHead>
-          <TableHead className="text-right">
-            <Checkbox checked={isAllSelected} onCheckedChange={() => toggleSelectAll(visibleCars)} />
-          </TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {visibleCars.map((car) => (
-          <TableRow key={car.number} className="text-center">
-            <TableCell className="font-medium">{car.number}</TableCell>
-            <TableCell>{car.name}</TableCell>
-            <TableCell>{car.mileage.toLocaleString()} km</TableCell>
-            <TableCell><StatusBadge status={car.status} /></TableCell>
-            <TableCell className="text-right">
+    <div ref={tableRef}>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead
+              className="text-center cursor-pointer"
+              onClick={() => handleSort("carNumber")}
+            >
+              <div className="flex items-center justify-center gap-1">
+                <ArrowDownUp size={14} />
+                <span>차량 번호</span>
+              </div>
+            </TableHead>
+            <TableHead
+              className="text-center cursor-pointer"
+              onClick={() => handleSort("type")}
+            >
+              <div className="flex items-center justify-center gap-1">
+                <ArrowDownUp size={14} />
+                <span>차량명</span>
+              </div>
+            </TableHead>
+            <TableHead
+              className="text-center cursor-pointer"
+              onClick={() => handleSort("totalDist")}
+            >
+              <div className="flex items-center justify-center gap-1">
+                <ArrowDownUp size={14} />
+                <span>주행거리</span>
+              </div>
+            </TableHead>
+            <TableHead
+              className="text-center cursor-pointer"
+              onClick={() => handleSort("status")}
+            >
+              <div className="flex items-center justify-center gap-1">
+                <ArrowDownUp size={14} />
+                <span>상태</span>
+              </div>
+            </TableHead>
+            <TableHead className="text-right">
               <Checkbox
-                checked={selectedCars.has(car.number)}
-                onCheckedChange={() => toggleSelection(car.number)}
+                checked={isAllSelected()}
+                onCheckedChange={() => toggleSelectAll()}
               />
-            </TableCell>
+            </TableHead>
           </TableRow>
-        ))}
-      </TableBody>
-      <TableFooter>
-        
-      </TableFooter>
-    </Table>
+        </TableHeader>
+        <TableBody>
+          {cars.map((car) => (
+            <TableRow key={car.carNumber} className="text-center">
+              <TableCell className="font-medium">{car.carNumber}</TableCell>
+              <TableCell>{car.type}</TableCell>
+              <TableCell>{car.totalDist.toLocaleString()} km</TableCell>
+              <TableCell>
+                <StatusBadge status={car.status} />
+              </TableCell>
+              <TableCell className="text-right">
+                <Checkbox
+                  checked={selectedCars.includes(car.carNumber)}
+                  onCheckedChange={() => {
+                    if (selectedCars.includes(car.carNumber)) {
+                      setSelected(selectedCars.filter(id => id !== car.carNumber));
+                    } else {
+                      setSelected([...selectedCars, car.carNumber]);
+                    }
+                  }}
+                />
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
       <TablePagination
-      tableRef={tableRef}
-      total={Math.ceil(cars.length / itemsPerPage)}
-      current={currentPage}
-      setCurrent={setCurrentPage}
-    />
-    
+        tableRef={tableRef}
+        total={totalPages}
+        current={currentPage}
+        setCurrent={setCurrentPage}
+      />
     </div>
   );
 }

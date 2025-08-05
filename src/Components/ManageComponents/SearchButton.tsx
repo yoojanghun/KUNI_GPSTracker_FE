@@ -3,11 +3,11 @@ import { Search } from "lucide-react";
 import { useCarStore } from "../../Store/carStore";
 
 export function SearchButton() {
-  const applyFilter = useCarStore((state) => state.applyFilter);
+  const fetchCars = useCarStore((state) => state.fetchCars);
 
   return (
     <Button
-      onClick={applyFilter}
+      onClick={() => { fetchCars({page: 0}) }}
       className="bg-[#000000] gap-3 hover:bg-[#000000]/80"
     >
       <Search strokeWidth={3} size={20} /> 검색

@@ -11,10 +11,13 @@ export function ManageInputs() {
         <SearchInput />
         <StatusSelect />
         <SearchButton />
-        <DeleteButton />
       </div>
 
+      <div className="flex gap-3">
       <AddCarButton />
+      <DeleteButton />
+      </div>
+
     </div>
   );
 }

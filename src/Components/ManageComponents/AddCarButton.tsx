@@ -3,7 +3,6 @@ import { Button } from "@/Components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogClose,
   DialogDescription,
   DialogFooter,
   DialogHeader,
@@ -13,26 +12,24 @@ import {
 
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
-import { CircleCheck, Plus } from "lucide-react";
-import { useCarStore } from "../../Store/carStore";
+import { CircleCheck, CircleX, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { carRegist } from "@/Api/ManageApi/carRegist";
 
 export function AddCarButton() {
   const [inputDialog, setInputDialog] = useState(false);
-  const [checkDialog, setCheckDialog] = useState(false);
-  const [carNum, setCarNum] = useState("");
-  const [modelName, setModelName] = useState("");
+  const [vehicleNumber, setVehicleNumber] = useState("");
+  const [vehicleName, setVehicleName] = useState("");
   const [attemptedSubmit, setAttemptedSubmit] = useState(false);
-  const addCar = useCarStore((state) => state.addCar);
 
   // TODO: react-hook-form 도입 고려 (리펙토링 시)
   // 입력값 유효성 검사
-  const isCarNumValid = () => {
-    return carNum.trim() !== ""; // && ;
+  const isvehicleNumberValid = () => {
+    return vehicleNumber.trim() !== ""; // && ;
   };
   const isModelNameValid = () => {
-    return modelName.trim() !== ""; // && ;
+    return vehicleName.trim() !== ""; // && ;
   };
 
   return (
@@ -58,32 +55,34 @@ export function AddCarButton() {
             <div className="grid gap-4">
               <div className="grid gap-3">
                 <Label
-                  htmlFor="carNum"
+                  htmlFor="vehicleNumber"
                   className={
-                    attemptedSubmit && !isCarNumValid()
+                    attemptedSubmit && !isvehicleNumberValid()
                       ? "text-red-500 font-semibold"
                       : ""
                   }
                 >
-                  {attemptedSubmit && !isCarNumValid()
+                  {attemptedSubmit && !isvehicleNumberValid()
                     ? "차량 번호를 입력해주세요"
                     : "차량 번호"}
                 </Label>
                 <Input
-                  id="carNum"
-                  name="carNum"
+                  id="vehicleNumber"
+                  name="vehicleNumber"
                   placeholder="예: 34나3434"
                   className={cn(
                     "placeholder:text-[#ACACAC]",
-                    attemptedSubmit && !isCarNumValid() && "border-red-500"
+                    attemptedSubmit &&
+                      !isvehicleNumberValid() &&
+                      "border-red-500"
                   )}
-                  value={carNum}
-                  onChange={(e) => setCarNum(e.target.value)}
+                  value={vehicleNumber}
+                  onChange={(e) => setVehicleNumber(e.target.value)}
                 />
               </div>
               <div className="grid gap-3">
                 <Label
-                  htmlFor="modelName"
+                  htmlFor="vehicleName"
                   className={
                     attemptedSubmit && !isModelNameValid()
                       ? "text-red-500 font-semibold"
@@ -95,15 +94,15 @@ export function AddCarButton() {
                     : "차량명"}
                 </Label>
                 <Input
-                  id="modelName"
-                  name="modelName"
+                  id="vehicleName"
+                  name="vehicleName"
                   placeholder="예: Genesis GV80"
                   className={cn(
                     "placeholder:text-[#ACACAC]",
                     attemptedSubmit && !isModelNameValid() && "border-red-500"
                   )}
-                  value={modelName}
-                  onChange={(e) => setModelName(e.target.value)}
+                  value={vehicleName}
+                  onChange={(e) => setVehicleName(e.target.value)}
                 />
               </div>
             </div>
@@ -111,11 +110,41 @@ export function AddCarButton() {
               <Button
                 type="button"
                 className="bg-[#8D99FF] gap-3 hover:bg-[#8D99FF]/80"
-                onClick={() => {
+                onClick={async () => {
                   setAttemptedSubmit(true);
-                  if (isCarNumValid() && isModelNameValid()) {
+                  if (isvehicleNumberValid() && isModelNameValid()) {
                     setInputDialog(false);
-                    setCheckDialog(true);
+                    const res = await carRegist({
+                      vehicleNumber,
+                      vehicleName,
+                    });
+                    setAttemptedSubmit(false);
+                    if (
+                      vehicleName === res.vehicleName &&
+                      vehicleNumber === res.vehicleNumber
+                    ) {
+                      toast(
+                        <span>
+                          <strong>{vehicleNumber}</strong> 차량이
+                          등록되었습니다.
+                        </span>,
+                        {
+                          icon: <CircleCheck />,
+                        }
+                      );
+                    } else {
+                      toast(
+                        <span>
+                          서버 오류로 인해 차량 등록에 실패하였습니다.
+                        </span>,
+                        {
+                          icon: <CircleX />,
+                        }
+                      );
+                    }
+
+                    setVehicleNumber("");
+                    setVehicleName("");
                   }
                 }}
               >
@@ -124,60 +153,6 @@ export function AddCarButton() {
             </DialogFooter>
           </DialogContent>
         </form>
-      </Dialog>
-      <Dialog open={checkDialog} onOpenChange={setCheckDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>차량 정보를 확인해 주세요</DialogTitle>
-            <DialogDescription>
-              <ul>
-                <li>차량 번호: {carNum}</li>
-                <li>차량명: {modelName}</li>
-              </ul>
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button
-                variant={"outline"}
-                type="button"
-                onClick={() => {
-                  setInputDialog(true);
-                }}
-              >
-                다시 입력
-              </Button>
-            </DialogClose>
-            <DialogClose asChild>
-              <Button
-                type="submit"
-                className="bg-[#8D99FF] gap-3 hover:bg-[#8D99FF]/80"
-                onClick={() => {
-                  addCar({
-                    number: carNum,
-                    name: modelName,
-                    mileage: 0,
-                    status: "미운행",
-                  });
-                  setInputDialog(false);
-                  setCheckDialog(false);
-                  setAttemptedSubmit(false);
-                  toast(
-                    <span>
-                      <strong>{carNum}</strong> 차량이 등록되었습니다.
-                    </span>,{
-                      icon: <CircleCheck />
-                    }
-                  )
-                  setCarNum("");
-                  setModelName("");
-                }}
-              >
-                등록
-              </Button>
-            </DialogClose>
-          </DialogFooter>
-        </DialogContent>
       </Dialog>
     </>
   );

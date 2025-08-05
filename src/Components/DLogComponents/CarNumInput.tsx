@@ -2,11 +2,10 @@ import { Input } from "@/Components/ui/input";
 import { useDLogStore } from "@/Store/dlogStore";
 
 export function CarNumInput() {
-  const filter = useDLogStore((state) => state.filter);
-  const setFilter = useDLogStore((state) => state.setFilter);
-
+  const { setVehicleNumber, vehicleNumber } = useDLogStore();
+ 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFilter({ ...filter, carNumber: e.target.value });
+    setVehicleNumber(e.target.value)
   };
 
   return (
@@ -16,7 +15,7 @@ export function CarNumInput() {
       </label>
       <Input
         type="text"
-        value={filter.carNumber}
+        value={vehicleNumber}
         onChange={handleChange}
         placeholder="차량 번호 검색"
         className="bg-[#FAFAFA] placeholder:text-[#DCDCDC]"

@@ -10,123 +10,115 @@ import {
   Map,
   Play,
 } from "lucide-react";
-import { useDLogStore } from "@/Store/dlogStore";
 import { DLogHeader } from "./DLogHeader";
 import { makeOverlayHTML } from "@/Components/DLogComponents/MapOverlay";
 import { detailLog } from "@/Api/detailLog";
 import indicator from "../../Components/Indicators.svg";
+import { getLogDetail } from "@/Api/LogApi/getLogDetail";
+import type { getLogDetailResponse } from "@/Api/LogApi/interfaces/getLogDetailResponse";
 
 export function DLogDetails() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<kakao.maps.Map | null>(null);
+  const [log, setLog] = useState<getLogDetailResponse | null>(null);
+  const [startAddr, setStartAddr] = useState<string | null>(null);
+  const [endAddr, setEndAddr] = useState<string | null>(null);
 
   // id값과 일치하는 데이터 fetch
   const navigate = useNavigate();
   const { Id } = useParams();
 
-  if (Id === undefined) {
-    throw new Error(`id값이 없습니다. recordId: ${Id}`);
-  }
-
-  const findById = useDLogStore((state) => state.findById);
-  const { startTime, endTime, distance, carNumber, carName } =
-    findById(Id);
-
-  const detailData = detailLog.find((items) => items.recordId === Id )?.data;
-
-  if (detailData === undefined) {
-    throw new Error(`일치하는 상세 데이터가 없습니다. recordId: ${Id}`);
-  }
-
-  // 위도, 경도값 fetch 및 LatLng 객체로 변환
-  const startPosition = new kakao.maps.LatLng(
-    detailData.startLat,
-    detailData.startLong
-  );
-  const endPosition = new kakao.maps.LatLng(
-    detailData.endLat,
-    detailData.endLong
-  );
-  const centerPosition = new kakao.maps.LatLng(
-    (detailData.startLat + detailData.endLat) / 2,
-    (detailData.startLong + detailData.endLong) / 2
-  );
-
-    // geodecoder (좌표->주소) 객체 생성
-  const geodecoder = new kakao.maps.services.Geocoder();
-  const [ startAddr, setStartAddr ] = useState<string | null>(null);
-  const [ endAddr, setEndAddr ] = useState<string | null>(null);
-
-  geodecoder.coord2Address(
-    startPosition.getLng(),
-    startPosition.getLat(),
-    (result, status) => {
-      console.log('result: ', result);
-      console.log('status: ', status);
-      if (status === kakao.maps.services.Status.OK) {
-        const Addr = result[0].address.address_name;
-        setStartAddr(Addr);
-      }
-    }
-  );
-  geodecoder.coord2Address(
-    endPosition.getLng(),
-    endPosition.getLat(),
-    (result, status) => {
-      console.log('result: ', result);
-      console.log('status: ', status);
-      if (status === kakao.maps.services.Status.OK) {
-        const Addr = result[0].address.address_name;
-        setEndAddr(Addr);
-      }
-    }
-  );
-
-  
-
-
-  
-
-  // 마커 설정
-  const markerImage = new kakao.maps.MarkerImage(
-    indicator,
-    new kakao.maps.Size(28, 28),
-    { offset: new kakao.maps.Point(14, 14) }
-  );
-  const startMarker = new kakao.maps.Marker({
-    position: startPosition,
-    image: markerImage,
-  });
-  const endMarker = new kakao.maps.Marker({
-    position: endPosition,
-    image: markerImage,
-  });
-
-  // 커스텀 오버레이 생성
-  const startOverlay = new kakao.maps.CustomOverlay({
-    position: startPosition,
-    content: makeOverlayHTML("start", startPosition.getLat(), startPosition.getLng()),
-    yAnchor: 1.2,
-    xAnchor: 1.2,
-  });
-  const endOverlay = new kakao.maps.CustomOverlay({
-    position: endPosition,
-    content: makeOverlayHTML("end", endPosition.getLat(), endPosition.getLng()),
-    yAnchor: -0.2,
-    xAnchor: -0.2,
-  });
-
-  console.log('start: ', startAddr);
-  console.log('end: ', endAddr);
+  useEffect(() => {
+    if (!Id) return;
+    getLogDetail({ id: Id })
+      .then((log) => setLog(log))
+      .catch((err) => {
+        console.error("상세 기록 가져오기 실패", err);
+      });
+  }, [Id]);
 
   useEffect(() => {
-    if (!containerRef.current || !detailLog || !detailData.record.length) {
-      console.log('contRef: ', containerRef.current);
-      console.log('detailog: ', detailLog);
-      console.log('detail.record: ', detailData.record);
-      console.log('여기서 막힘');
+    if (!log) return;
+
+    // 위도, 경도값 fetch 및 LatLng 객체로 변환
+    const startPosition = new kakao.maps.LatLng(log.startLat, log.startLng);
+    const endPosition = new kakao.maps.LatLng(log.endLat, log.endLng);
+
+    // geodecoder (좌표->주소) 객체 생성
+    const geodecoder = new kakao.maps.services.Geocoder();
+
+    geodecoder.coord2Address(
+      startPosition.getLng(),
+      startPosition.getLat(),
+      (result, status) => {
+        if (status === kakao.maps.services.Status.OK) {
+          const Addr = result[0].address.address_name;
+          setStartAddr(Addr);
+        }
+      }
+    );
+    geodecoder.coord2Address(
+      endPosition.getLng(),
+      endPosition.getLat(),
+      (result, status) => {
+        if (status === kakao.maps.services.Status.OK) {
+          const Addr = result[0].address.address_name;
+          setEndAddr(Addr);
+        }
+      }
+    );
+  }, [log]);
+
+  useEffect(() => {
+    if (!log || !containerRef.current || !detailLog || !log.record.length) {
       return;
     }
+
+    // 위도, 경도값 fetch 및 LatLng 객체로 변환
+    const startPosition = new kakao.maps.LatLng(log.startLat, log.startLng);
+    const endPosition = new kakao.maps.LatLng(log.endLat, log.endLng);
+    const centerPosition = new kakao.maps.LatLng(
+      (log.startLat + log.endLat) / 2,
+      (log.startLng + log.endLng) / 2
+    );
+
+    // 마커 설정
+    const markerImage = new kakao.maps.MarkerImage(
+      indicator,
+      new kakao.maps.Size(28, 28),
+      { offset: new kakao.maps.Point(14, 14) }
+    );
+    const startMarker = new kakao.maps.Marker({
+      position: startPosition,
+      image: markerImage,
+    });
+    const endMarker = new kakao.maps.Marker({
+      position: endPosition,
+      image: markerImage,
+    });
+
+    // 커스텀 오버레이 생성
+    const startOverlay = new kakao.maps.CustomOverlay({
+      position: startPosition,
+      content: makeOverlayHTML(
+        "start",
+        startPosition.getLat(),
+        startPosition.getLng()
+      ),
+      yAnchor: 1.2,
+      xAnchor: 1.2,
+    });
+    const endOverlay = new kakao.maps.CustomOverlay({
+      position: endPosition,
+      content: makeOverlayHTML(
+        "end",
+        endPosition.getLat(),
+        endPosition.getLng()
+      ),
+      yAnchor: -0.2,
+      xAnchor: -0.2,
+    });
+
     const options = {
       center: centerPosition,
       level: 6,
@@ -135,9 +127,7 @@ export function DLogDetails() {
     mapRef.current = map;
 
     // 이동경로 설정
-    const path = detailData.record.map(
-      (k) => new kakao.maps.LatLng(k.lat, k.long)
-    );
+    const path = log.record.map((k) => new kakao.maps.LatLng(k.lat, k.lng));
     const polyline = new kakao.maps.Polyline({
       path: path,
       strokeWeight: 4,
@@ -150,22 +140,36 @@ export function DLogDetails() {
     startMarker.setMap(map);
     endMarker.setMap(map);
     polyline.setMap(map);
-    // overlay 추가
-    kakao.maps.event.addListener(startMarker, "mouseover", () => {
-      startOverlay.setMap(mapRef.current);
-    });
-    kakao.maps.event.addListener(startMarker, "mouseout", () => {
-      startOverlay.setMap(null);
-    });
-    kakao.maps.event.addListener(endMarker, "mouseover", () => {
-      endOverlay.setMap(mapRef.current);
-    });
-    kakao.maps.event.addListener(endMarker, "mouseout", () => {
-      endOverlay.setMap(null);
-    });
+    if (
+      startPosition.getLat === endPosition.getLat &&
+      startPosition.getLng === endPosition.getLng
+    ) {
+      startOverlay.setMap(map);
+      endOverlay.setMap(map);
+    } else {
+      // overlay 추가
+      kakao.maps.event.addListener(startMarker, "mouseover", () => {
+        startOverlay.setMap(mapRef.current);
+      });
+      kakao.maps.event.addListener(startMarker, "mouseout", () => {
+        startOverlay.setMap(null);
+      });
+      kakao.maps.event.addListener(endMarker, "mouseover", () => {
+        endOverlay.setMap(mapRef.current);
+      });
+      kakao.maps.event.addListener(endMarker, "mouseout", () => {
+        endOverlay.setMap(null);
+      });
+    }
+  }, [log]);
 
-    
-  }, []);
+  if (!Id) {
+    return <div>잘못된 접근입니다</div>;
+  }
+
+  if (!log) {
+    return <div>로딩 중...</div>;
+  }
 
   return (
     <div className="flex flex-col gap-6 py-8 w-full mx-auto">
@@ -173,7 +177,7 @@ export function DLogDetails() {
         <div className="flex items-center gap-3">
           <DLogHeader />
           <span className="whitespace-nowrap text-xl font-medium text-[#969696]">
-            {carNumber}, {carName}
+            {log.vehicleNumber}, {log.vehicleName}
           </span>
         </div>
         <div
@@ -192,7 +196,7 @@ export function DLogDetails() {
               시작 시간
             </div>
             <div className="text-[#969696] text-lg">
-              {startTime.replace("T", " ")}
+              {log.onTime.replace("T", " ")}
             </div>
           </div>
           <div className="border rounded-[12px] border-[#000000]/10 shadow-md px-8 py-6 justify-between gap-4 flex flex-col shrink-0">
@@ -201,14 +205,14 @@ export function DLogDetails() {
               종료 시간
             </div>
             <div className="text-[#969696] text-lg">
-              {endTime.replace("T", " ")}
+              {log.offTime.replace("T", " ")}
             </div>
           </div>
           <div className="border rounded-[12px] border-[#000000]/10 shadow-md px-6 py-6 justify-between gap-4 flex flex-col shrink-0">
             <div className="flex items-center gap-3 font-bold text-xl">
               <Clipboard size={22} />총 운행거리
             </div>
-            <div className="text-[#969696] text-lg">{distance} km</div>
+            <div className="text-[#969696] text-lg">{log.sumDist} km</div>
           </div>
           <div className="border rounded-[12px] border-[#000000]/10 shadow-md px-10 py-6 justify-between gap-8 flex w-full">
             <div className="flex flex-col gap-6">
@@ -216,7 +220,9 @@ export function DLogDetails() {
                 <Play size={22} />
                 시작 주소
               </div>
-              <div className="text-[#969696] text-sm">{!startAddr ? '주소 불러오는 중..' : startAddr}</div>
+              <div className="text-[#969696] text-sm">
+                {!startAddr ? "주소 불러오는 중.." : startAddr}
+              </div>
             </div>
             <Separator orientation="vertical" />
             <div className="flex flex-col gap-6">
@@ -224,7 +230,9 @@ export function DLogDetails() {
                 <CircleSlash size={22} />
                 종료 주소
               </div>
-              <div className="text-[#969696] text-sm">{!endAddr ? '주소 불러오는 중..' : endAddr}</div>
+              <div className="text-[#969696] text-sm">
+                {!endAddr ? "주소 불러오는 중.." : endAddr}
+              </div>
             </div>
           </div>
         </div>

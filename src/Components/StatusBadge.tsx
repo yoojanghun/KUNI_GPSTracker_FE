@@ -4,6 +4,16 @@ interface StatusBadgeProps {
   status: string;
 }
 
+const statusTextMap: Record<string, string> = {
+  INACTIVE: "미운행",
+  미운행: "미운행",
+
+  ACTIVE: "운행중",
+  운행중: "운행중",
+
+  INSPECTING: "수리중",
+  수리중: "수리중",
+};
 const statusColorMap: Record<StatusBadgeProps["status"], string> = {
   미운행: "bg-[#FFCAC6] text-[#E94B3E]",
   운행중: "bg-[#C1D8FF] text-[#5491F5]",
@@ -11,6 +21,7 @@ const statusColorMap: Record<StatusBadgeProps["status"], string> = {
 };
 
 export function StatusBadge({ status }: StatusBadgeProps) {
+  status = statusTextMap[status]
   return (
     <span
       className={cn(
