@@ -4,7 +4,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/Components/ui/popover
 import { Button } from "@/Components/ui/button";
 import { Label } from "@/Components/ui/label";
 import { CalendarDays } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 
 export function DateSelection() {
@@ -12,6 +12,15 @@ export function DateSelection() {
   const endTime = useDLogStore((state) => state.endTime);
   const setStartTime = useDLogStore((state) => state.setStartTime);
   const setEndTime = useDLogStore((state) => state.setEndTime);
+
+  useEffect(() => {
+    const today = new Date();
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(today.getDate() - 7);
+
+    setStartTime(oneWeekAgo.toLocaleDateString());
+    setEndTime(today.toLocaleDateString());
+  }, []);
 
   // Date validation: startTime must be before or equal endTime, or both empty
   const isDateValid =
