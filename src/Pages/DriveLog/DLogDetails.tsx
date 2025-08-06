@@ -121,7 +121,7 @@ export function DLogDetails() {
 
         const map = new kakao.maps.Map(containerRef.current!, {
           center: centerPosition,
-          level: 6,
+          level: 9,
         });
         mapRef.current = map;
 
@@ -213,7 +213,7 @@ export function DLogDetails() {
             <div className="flex items-center gap-3 font-bold text-xl">
               <Clipboard size={22} />총 운행거리
             </div>
-            <div className="text-[#969696] text-lg">{log.sumDist} km</div>
+            <div className="text-[#969696] text-lg">{(Number(log.sumDist) / 1000).toFixed(1).toLocaleString()} km</div>
           </div>
           <div className="border rounded-[12px] border-[#000000]/10 shadow-md px-10 py-6 justify-between gap-8 flex w-full">
             <div className="flex flex-col gap-6">

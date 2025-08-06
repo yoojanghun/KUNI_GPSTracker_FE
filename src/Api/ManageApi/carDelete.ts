@@ -4,24 +4,27 @@ import type { carDeleteRequest } from "./interfaces/carDeleteRequest";
 
 
 export const carDelete = async (request: carDeleteRequest): Promise<void> => { 
-  await api.delete('api/vehicle', {json: { vehicleNumber: request.vehicleNumber}});
+  await api.delete(`api/vehicle/${encodeURIComponent(request.vehicleNumber)}`);
 }
 
 export const carDeleteMany = async (
   carNumbers: string[],
   onSuccess?: () => void
 ): Promise<void> => {
-  try {
-    await Promise.all(
-      carNumbers.map((vehicleNumber) =>
-        carDelete({ vehicleNumber }).catch((err) =>
-          console.error(`차량 ${vehicleNumber} 삭제 실패`, err)
-        )
-      )
-    );
+  let hasError = false;
 
-    if (onSuccess) onSuccess();
-  } catch (e) {
-    console.error("삭제 중 오류 발생", e);
+  await Promise.all(
+    carNumbers.map((vehicleNumber) =>
+      carDelete({ vehicleNumber }).catch((err) => {
+        console.error(`차량 ${vehicleNumber} 삭제 실패`, err);
+        hasError = true;
+      })
+    )
+  );
+
+  if (hasError) {
+    throw new Error("일부 차량 삭제 실패");
   }
+
+  if (onSuccess) onSuccess();
 };

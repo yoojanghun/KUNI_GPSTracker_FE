@@ -71,10 +71,12 @@ export function DeleteButton() {
               });
 
               deleteTimerRef.current = setTimeout(async () => {
+                try {
                   await carDeleteMany(selectedArray, async () => {
-                    await fetchCars({size: itemsPerPage});
+                    await fetchCars({ size: itemsPerPage });
                     clearSelected();
                   });
+
                   toast(
                     hiddenCount > 0 ? (
                       <span>
@@ -88,7 +90,9 @@ export function DeleteButton() {
                     ),
                     { icon: <FileX2 /> }
                   );
-              
+                } catch (error) {
+                  toast("삭제에 실패했습니다", { icon: <CircleAlert /> });
+                }
               }, 3000);
             }}
           >
