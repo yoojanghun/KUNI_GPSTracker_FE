@@ -6,6 +6,7 @@ import {
   ChevronUp,
   X,
   Folder,
+  Wrench
 } from "lucide-react";
 import {
   Select,
@@ -34,6 +35,7 @@ import {
   useSelectedCarLatLng,
   useCarListPageStore,
 } from "@/Store/carStatus";
+import { useCarStore } from "@/Store/carStore";
 import { useDLogStore } from "@/Store/dlogStore";
 import { type SelectedCar, fetchSelectedCarStat } from "@/Api/CarList/SelectedCarInfo";
 import { fetchTotalCarsList } from "@/Api/CarList/TotalCars";
@@ -80,7 +82,8 @@ function CarList() {
   // const selectedCarInfoRef = useRef<SelectedCar | null>
 
   const navigate = useNavigate();
-  const setVehicleNumber = useDLogStore((state) => state.setVehicleNumber);
+  const setCarNumLog = useDLogStore((state) => state.setVehicleNumber);
+  const setCarNumManage = useCarStore((state) => state.setVehicleNumber);
 
   const hideBtnRef = useRef<HTMLButtonElement | null>(null);
 
@@ -256,12 +259,22 @@ function CarList() {
             </table>
             <button
               onClick={() => {
+                navigate("/management");
+                setCarNumManage(selectedCar.number);
+              }}
+              className="border cursor-pointer font-bold py-1 rounded-sm flex justify-center items-center mb-2"
+            >
+              <Wrench className="mr-1.5"/>
+              차량관리 이동
+            </button>
+            <button
+              onClick={() => {
                 navigate("/log");
-                setVehicleNumber(`${selectedCar.number}`);
+                setCarNumLog(selectedCar.number);
               }}
               className="border cursor-pointer font-bold py-1 rounded-sm flex justify-center items-center"
             >
-              <Folder className="mr-1" />
+              <Folder className="mr-1.5" />
               운행일지 이동
             </button>
           </>

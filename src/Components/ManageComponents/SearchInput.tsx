@@ -2,7 +2,7 @@ import { Input } from "@/Components/ui/input";
 import { useCarStore } from "../../Store/carStore";
 
 export function SearchInput() {
-  const setVehicleNumber = useCarStore((state) => state.setVehicleNumber);
+  const { setVehicleNumber, vehicleNumber } = useCarStore();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setVehicleNumber(e.target.value);
@@ -11,6 +11,7 @@ export function SearchInput() {
   return (
     <Input
       type="text"
+      value={vehicleNumber}
       onChange={handleChange}
       placeholder="차량번호로 검색"
       className="bg-[#FAFAFA] placeholder:text-[#DCDCDC]"
