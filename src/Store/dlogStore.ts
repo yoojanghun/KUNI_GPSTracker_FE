@@ -53,13 +53,16 @@ export const useDLogStore = create<DLogStore>((set, get) => ({
     endTime = get().endTime,
     sort = get().sort,
   }) => {
+    const adjustedEndTime = endTime
+      ? new Date(new Date(endTime).setDate(new Date(endTime).getDate() + 1)).toISOString()
+      : undefined;
     try {
       const res = await getLogList({
         page,
         size,
         vehicleNumber,
         startTime,
-        endTime,
+        endTime: adjustedEndTime,
         sort,
       });
       set({
