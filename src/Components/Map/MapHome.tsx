@@ -23,10 +23,7 @@ type CustomOverlayStyle = {
 function MapHome ({ maxLevel }: MapTestProps) {
 
   const carStatusBtn = useCarStatusBtnStore(state => state.carStatusBtn);
-  const homeMapCenter = useHomeMapStore(state => state.homeMapCenter);
-  const setHomeMapCenter = useHomeMapStore(state => state.setHomeMapCenter);
-  const homeMapLevel = useHomeMapStore(state => state.homeMapLevel);
-  const setHomeMapLevel = useHomeMapStore(state => state.setHomeMapLevel);
+  const { homeMapCenter, setHomeMapCenter, homeMapLevel, setHomeMapLevel } = useHomeMapStore();
 
   const [positions, setPositions] = useState<CarWithPath[]>([]);      // positions에는 차량들의 리스트 객체들이 들어감
 

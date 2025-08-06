@@ -14,8 +14,10 @@ export interface CarLocation {
 
 export type MapCarLocation = CarLocation[];
 
-export async function fetchMapCarLocation(): Promise<MapCarLocation> {
-	const stats = await api.get("api/dashboard/map").json<MapCarLocation>();
+export async function fetchMapCarLocation(status: string = ""): Promise<MapCarLocation> {
+	const stats = await api.get("api/dashboard/map",
+		{searchParams: {status}}
+	).json<MapCarLocation>();
 
 	return stats;
 }

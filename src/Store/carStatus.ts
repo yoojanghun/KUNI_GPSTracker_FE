@@ -1,5 +1,5 @@
-import { create } from "zustand";
 import { type MapCarLocation, fetchMapCarLocation } from "@/Api/Map/MapCarLocation";
+import { create } from "zustand";
 
 export type Position = {
 	lat: number;
@@ -63,9 +63,9 @@ type MapStateStoreCarList = {
 	setMapLevelCarList: (level: number) => void;
 }
 
-interface MapState {
+type CarLocations = {
 	carLocations: MapCarLocation;
-	startPolling: () => void;
+	startPolling: (status?: string) => void;
 }
 
 type SelectedCarLatLng = {
@@ -76,19 +76,21 @@ type SelectedCarLatLng = {
 	clearSetLatLng: () => void;
 }
 
-// carList에서 하나의 차량을 선택하였을 때 selectedCar에 해당 차량을 저장
+// carList.tsx에서 하나의 차량을 선택하였을 때 selectedCar에 해당 차량을 저장
 // 선택된 selectedCar은 carList.tsx에서 fetchSelectedCarStat의 파라미터로 사용
 export const useSelectCarStore = create<SelectedCarStore>((set) => ({
 	selectedCar: null,
 	setSelectedCar: (car) => set({ selectedCar: car})
 }));
 
+// carList.tsx에서 차량 리스트를 보여줄 지, 한 차량의 정보를 보여줄 지 결정할 때 사용
+// false => 차량 리스트, true => 한 차량 정보
 export const useCarListPageStore = create<CarListPageStore>((set) => ({
 	carListPage: false,
 	setCarListPage: (carListPage) => set({ carListPage: carListPage})
 }))
 
-// carList에서 한 차량을 클릭했을 때, 해당 차량을 확대하여 보여주는 데 사용
+// carList.tsx에서 한 차량을 클릭했을 때, 해당 차량을 확대하여 보여주는 데 사용
 export const useTrackCarStore = create<MapStateStoreCarList>((set) => ({
 	mapCenterCarList: DEFAULT_CENTER,
 	mapLevelCarList: 12,
@@ -137,29 +139,26 @@ export const useHomeMapStore = create<HomeMapStateStore>((set) => ({
 // 아래는 차량이름, 번호, gps값을 담은 객체들의 배열
 // carLocations안에 챠량들의 이름, 번호, gps, status값의 객체들이 들어간다.
 // api/dashboard/map의 정보
-let pollingStarted = false;
 
-export const useMapStore = create<MapState>((set) => ({
+let pollingStarted = false;		
+
+export const useMapCarLocationStore = create<CarLocations>((set) => ({
 	carLocations: [],
-
-	startPolling: () => {
+	
+	startPolling: (status) => {
 		if(pollingStarted) return;
-		pollingStarted = true;
-
-		const getStat = async () => {
-			const data = await fetchMapCarLocation();
-			set(state => {
-				if(JSON.stringify(state.carLocations) !== JSON.stringify(data)) {
-					return {carLocations: data}
-				}
-				return {}
-			})
+		pollingStarted = true;			// true일 때는 pollingStarted 못하도록
+		const getStat = () => {
+			fetchMapCarLocation(status)
+				.then(carLoc => set({carLocations: carLoc}))
+				.catch(error => console.error(error))
 		}
 		getStat();
-		
 		setInterval(getStat, 60_000);
-	},
-}));
+	}
+}))
+// React StrictMode에선 타이밍 체크용으로 두번 마운트(언마운트)했다 다시 마운트함. 
+// 여러 페이지에서 각각 마운트될 때마다 useEffect 실행되면 startPolling() 여러번 실행됨.
 
 // CarList.tsx에서 하나의 차량을 선택 => carList.tsx에서 api를 통해 해당 차량 정보 획득
 // 그 정보 내엔 lat, lng값이 존재하는데, 그 값을 zustand에 저장하여 다른 파일에도 사용할 수 있도록
