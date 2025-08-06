@@ -1,6 +1,6 @@
 // src/Api/ManageApi/getCarList.ts
-// import { api } from "..";
-import { mockApi } from "../mockApi";
+import { api } from "..";
+// import { mockApi } from "../mockApi";
 import type { getCarListRequest } from "./interfaces/getCarListRequest";
 import type { getCarListResponse } from "./interfaces/getCarListResponse";
 
@@ -24,7 +24,7 @@ export const getCarList = async (
     params.append("vehicleNumber", request.vehicleNumber);
   }
 
-  const data = await mockApi
+  const data = await api
     .get(`api/vehicle?${params.toString()}`)
     .json<getCarListResponse>();
 

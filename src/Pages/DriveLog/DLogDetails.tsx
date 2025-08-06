@@ -12,7 +12,6 @@ import {
 } from "lucide-react";
 import { DLogHeader } from "./DLogHeader";
 import { makeOverlayHTML } from "@/Components/DLogComponents/MapOverlay";
-import { detailLog } from "@/Api/detailLog";
 import indicator from "../../Components/Indicators.svg";
 import { getLogDetail } from "@/Api/LogApi/getLogDetail";
 import type { getLogDetailResponse } from "@/Api/LogApi/interfaces/getLogDetailResponse";
@@ -70,97 +69,99 @@ export function DLogDetails() {
   }, [log]);
 
   useEffect(() => {
-    if (!log || !containerRef.current || !detailLog || !log.record.length) {
-      return;
-    }
+    if (!log || !containerRef.current || !log.record.length) return;
 
-    // 위도, 경도값 fetch 및 LatLng 객체로 변환
-    const startPosition = new kakao.maps.LatLng(log.startLat, log.startLng);
-    const endPosition = new kakao.maps.LatLng(log.endLat, log.endLng);
-    const centerPosition = new kakao.maps.LatLng(
-      (log.startLat + log.endLat) / 2,
-      (log.startLng + log.endLng) / 2
-    );
+    const interval = setInterval(() => {
+      if (window.kakao && window.kakao.maps) {
+        clearInterval(interval);
 
-    // 마커 설정
-    const markerImage = new kakao.maps.MarkerImage(
-      indicator,
-      new kakao.maps.Size(28, 28),
-      { offset: new kakao.maps.Point(14, 14) }
-    );
-    const startMarker = new kakao.maps.Marker({
-      position: startPosition,
-      image: markerImage,
-    });
-    const endMarker = new kakao.maps.Marker({
-      position: endPosition,
-      image: markerImage,
-    });
+        const kakao = window.kakao;
 
-    // 커스텀 오버레이 생성
-    const startOverlay = new kakao.maps.CustomOverlay({
-      position: startPosition,
-      content: makeOverlayHTML(
-        "start",
-        startPosition.getLat(),
-        startPosition.getLng()
-      ),
-      yAnchor: 1.2,
-      xAnchor: 1.2,
-    });
-    const endOverlay = new kakao.maps.CustomOverlay({
-      position: endPosition,
-      content: makeOverlayHTML(
-        "end",
-        endPosition.getLat(),
-        endPosition.getLng()
-      ),
-      yAnchor: -0.2,
-      xAnchor: -0.2,
-    });
+        const startPosition = new kakao.maps.LatLng(log.startLat, log.startLng);
+        const endPosition = new kakao.maps.LatLng(log.endLat, log.endLng);
+        const centerPosition = new kakao.maps.LatLng(
+          (log.startLat + log.endLat) / 2,
+          (log.startLng + log.endLng) / 2
+        );
 
-    const options = {
-      center: centerPosition,
-      level: 6,
-    };
-    const map = new kakao.maps.Map(containerRef.current, options);
-    mapRef.current = map;
+        const markerImage = new kakao.maps.MarkerImage(
+          indicator,
+          new kakao.maps.Size(28, 28),
+          { offset: new kakao.maps.Point(14, 14) }
+        );
+        const startMarker = new kakao.maps.Marker({
+          position: startPosition,
+          image: markerImage,
+        });
+        const endMarker = new kakao.maps.Marker({
+          position: endPosition,
+          image: markerImage,
+        });
 
-    // 이동경로 설정
-    const path = log.record.map((k) => new kakao.maps.LatLng(k.lat, k.lng));
-    const polyline = new kakao.maps.Polyline({
-      path: path,
-      strokeWeight: 4,
-      strokeColor: "#000000",
-      strokeOpacity: 0.8,
-      strokeStyle: "solid",
-    });
+        const startOverlay = new kakao.maps.CustomOverlay({
+          position: startPosition,
+          content: makeOverlayHTML(
+            "start",
+            startPosition.getLat(),
+            startPosition.getLng()
+          ),
+          yAnchor: 1.2,
+          xAnchor: 1.2,
+        });
+        const endOverlay = new kakao.maps.CustomOverlay({
+          position: endPosition,
+          content: makeOverlayHTML(
+            "end",
+            endPosition.getLat(),
+            endPosition.getLng()
+          ),
+          yAnchor: -0.2,
+          xAnchor: -0.2,
+        });
 
-    // Map에 marker, polyline 추가
-    startMarker.setMap(map);
-    endMarker.setMap(map);
-    polyline.setMap(map);
-    if (
-      startPosition.getLat === endPosition.getLat &&
-      startPosition.getLng === endPosition.getLng
-    ) {
-      startOverlay.setMap(map);
-      endOverlay.setMap(map);
-    } else {
-      // overlay 추가
-      kakao.maps.event.addListener(startMarker, "mouseover", () => {
-        startOverlay.setMap(mapRef.current);
-      });
-      kakao.maps.event.addListener(startMarker, "mouseout", () => {
-        startOverlay.setMap(null);
-      });
-      kakao.maps.event.addListener(endMarker, "mouseover", () => {
-        endOverlay.setMap(mapRef.current);
-      });
-      kakao.maps.event.addListener(endMarker, "mouseout", () => {
-        endOverlay.setMap(null);
-      });
-    }
+        const map = new kakao.maps.Map(containerRef.current!, {
+          center: centerPosition,
+          level: 6,
+        });
+        mapRef.current = map;
+
+        const path = log.record.map((k) => new kakao.maps.LatLng(k.lat, k.lng));
+        const polyline = new kakao.maps.Polyline({
+          path: path,
+          strokeWeight: 4,
+          strokeColor: "#000000",
+          strokeOpacity: 0.8,
+          strokeStyle: "solid",
+        });
+
+        startMarker.setMap(map);
+        endMarker.setMap(map);
+        polyline.setMap(map);
+
+        if (
+          startPosition.getLat() === endPosition.getLat() &&
+          startPosition.getLng() === endPosition.getLng()
+        ) {
+          startOverlay.setMap(map);
+          endOverlay.setMap(map);
+        } else {
+          kakao.maps.event.addListener(startMarker, "mouseover", () => {
+            startOverlay.setMap(mapRef.current);
+          });
+          kakao.maps.event.addListener(startMarker, "mouseout", () => {
+            startOverlay.setMap(null);
+          });
+          kakao.maps.event.addListener(endMarker, "mouseover", () => {
+            endOverlay.setMap(mapRef.current);
+          });
+          kakao.maps.event.addListener(endMarker, "mouseout", () => {
+            endOverlay.setMap(null);
+          });
+        }
+      }
+    }, 100);
+
+    return () => clearInterval(interval);
   }, [log]);
 
   if (!Id) {

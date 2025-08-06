@@ -34,7 +34,7 @@ export function LogTable() {
   const fetchAndSetLogs = useCallback(async () => {
     try {
       await fetchDLogs({
-        page: currentPage,
+        page: currentPage - 1,
         size: itemsPerPage,
         sort: sortDirection,
       })

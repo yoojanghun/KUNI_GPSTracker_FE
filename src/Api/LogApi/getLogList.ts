@@ -1,7 +1,7 @@
 import type { getLogListRequest } from "./interfaces/getLogListRequest";
 import type { getLogListResponse } from "./interfaces/getLogListResponse";
-// import { api } from "..";
-import { mockApi } from "../mockApi";
+import { api } from "..";
+// import { mockApi } from "../mockApi";
 
 export const getLogList = async (request:getLogListRequest): Promise<getLogListResponse> => { 
   const params = new URLSearchParams();
@@ -22,7 +22,7 @@ export const getLogList = async (request:getLogListRequest): Promise<getLogListR
   }
 
 
-  const data = await mockApi
+  const data = await api
   .get(`api/record?${params.toString()}`)
   .json<getLogListResponse>();
 

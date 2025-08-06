@@ -53,21 +53,27 @@ export const useDLogStore = create<DLogStore>((set, get) => ({
     endTime = get().endTime,
     sort = get().sort,
   }) => {
+    const adjustedStartTime = startTime
+      ? new Date(new Date(startTime).setHours(0, 0, 0, 0)).toISOString()
+      : undefined;
     const adjustedEndTime = endTime
-      ? new Date(new Date(endTime).setDate(new Date(endTime).getDate() + 1)).toISOString()
+      ? new Date(new Date(endTime).setHours(23, 59, 59, 999)).toISOString()
       : undefined;
     try {
       const res = await getLogList({
         page,
         size,
         vehicleNumber,
-        startTime,
+        startTime: adjustedStartTime,
         endTime: adjustedEndTime,
         sort,
       });
+      console.log("totalPage: ", res.totalPages);
+      console.log("totalElements: ", res.totalElements);
+      console.log("currentPage: ", page);
       set({
         DLogs: res.content,
-        totalPage: res.totalPage,
+        totalPage: res.totalPages,
         totalElement: res.totalElements,
         currentPage: page,
         size: size,

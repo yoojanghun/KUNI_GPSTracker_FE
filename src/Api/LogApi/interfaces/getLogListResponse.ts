@@ -7,7 +7,7 @@ export interface dlog {
   sumDist: string
 }
 export interface getLogListResponse {
-  totalPage: number,
+  totalPages: number,
   totalElements: number,
   content: dlog[]
 }

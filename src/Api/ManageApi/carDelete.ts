@@ -1,10 +1,10 @@
-// import { api } from "..";
-import { mockApi } from "../mockApi";
+import { api } from "..";
+// import { mockApi } from "../mockApi";
 import type { carDeleteRequest } from "./interfaces/carDeleteRequest";
 
 
 export const carDelete = async (request: carDeleteRequest): Promise<void> => { 
-  await mockApi.delete('api/vehicle', {json: { vehicleNumber: request.vehicleNumber}});
+  await api.delete('api/vehicle', {json: { vehicleNumber: request.vehicleNumber}});
 }
 
 export const carDeleteMany = async (
