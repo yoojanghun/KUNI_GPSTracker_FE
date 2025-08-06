@@ -5,7 +5,6 @@ import { toast } from "sonner";
 
 export function LogSearchButton() {
   const fetchDLogs = useDLogStore((state) => state.fetchDLogs);
-  const logs = useDLogStore((state) => state.DLogs);
   const vehicleNumber = useDLogStore((state) => state.vehicleNumber);
   const dateValidation = useDLogStore((state) => state.dateValidation);
   const isDateValid = useDLogStore((state) => state.isDateValid);
@@ -27,7 +26,8 @@ export function LogSearchButton() {
             await fetchDLogs({
               size: itemsPerPage
             })
-            if (logs.length <= 0) {
+            const updatedLogs = useDLogStore.getState().DLogs;
+            if (updatedLogs.length <= 0) {
               toast("일치하는 기록이 없습니다", {
                 icon: <CircleAlert />,
               });
