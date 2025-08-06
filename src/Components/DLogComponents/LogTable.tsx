@@ -98,7 +98,7 @@ export function LogTable() {
               <TableCell>{dlog.vehicleName}</TableCell>
               <TableCell>{dlog.onTime.replace("T", " ")}</TableCell>
               <TableCell>{dlog.offTime.replace("T", " ")}</TableCell>
-              <TableCell>{dlog.sumDist.toLocaleString()} km</TableCell>
+              <TableCell>{(Number(dlog.sumDist) / 1000).toFixed(1).toLocaleString()} km</TableCell>
               <TableCell className="text-right ">
                 <ChevronRight
                   className="inline-block pr-2 cursor-pointer"
