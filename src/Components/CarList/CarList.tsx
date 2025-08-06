@@ -32,6 +32,7 @@ import {
   usePaginationStore,
   useMapStore,
   useSelectedCarLatLng,
+  useCarListPageStore,
 } from "@/Store/carStatus";
 import { useDLogStore } from "@/Store/dlogStore";
 import { type SelectedCar, fetchSelectedCarStat } from "@/Api/CarList/SelectedCarInfo";
@@ -41,8 +42,11 @@ import { useNavigate } from "react-router-dom";
 import styles from "./CarList.module.css";
 
 function CarList() {
-  const setSelectedCar = useSelectCarStore((state) => state.setSelectedCar);
   const selectedCar = useSelectCarStore((state) => state.selectedCar);
+  const setSelectedCar = useSelectCarStore((state) => state.setSelectedCar);
+
+  const carListPage = useCarListPageStore((state) => state.carListPage);
+  const setCarListPage = useCarListPageStore((state) => state.setCarListPage);
 
   const setMapCenterCarList = useTrackCarStore(
     (state) => state.setMapCenterCarList
@@ -76,8 +80,7 @@ function CarList() {
   // const selectedCarInfoRef = useRef<SelectedCar | null>
 
   const navigate = useNavigate();
-  const filter = useDLogStore((state) => state.filter);
-  const setFilter = useDLogStore((state) => state.setFilter);
+  const setVehicleNumber = useDLogStore((state) => state.setVehicleNumber);
 
   const hideBtnRef = useRef<HTMLButtonElement | null>(null);
 
@@ -188,7 +191,7 @@ function CarList() {
     visiblePages = allPages.slice(page - 3, page + 2);
   }
 
-  if (selectedCar) {
+  if (selectedCar && carListPage) {
     return (
       <section
         className={`${styles["car-list"]} border w-75 max-h-130 flex flex-col rounded-xl bg-white box-border p-3`}
@@ -196,7 +199,7 @@ function CarList() {
         <div className="flex justify-between items-center font-bold text-xl pr-1">
           <button
             className="flex items-center cursor-pointer"
-            onClick={() => setSelectedCar(null)}
+            onClick={() => setCarListPage(false)}
           >
             <ArrowLeft className="w-6 h-6 mr-2" />
             <span className="text-lg font-bold">뒤로 가기</span>
@@ -254,7 +257,7 @@ function CarList() {
             <button
               onClick={() => {
                 navigate("/log");
-                setFilter({ ...filter, carNumber: `${selectedCar.number}` });
+                setVehicleNumber(`${selectedCar.number}`);
               }}
               className="border cursor-pointer font-bold py-1 rounded-sm flex justify-center items-center"
             >
@@ -348,6 +351,7 @@ function CarList() {
                     });
                     setMapLevelCarList(2);
                     setSelectedCar(car);
+                    setCarListPage(true);
                   }}
                   className={`${styles["car-list__item"]} flex items-center rounded-lg box-border px-2 py-1.5`}
                 >

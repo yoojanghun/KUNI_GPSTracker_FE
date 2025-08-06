@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import { 
   type CarInfo, 
   type Position, 
+  useCarListPageStore, 
   useCarStatusOptionStore, 
   useLocationSearchMapStore, 
   useSelectCarStore, 
@@ -28,6 +29,7 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
 
   const selectedCar = useSelectCarStore(state => state.selectedCar);
   const setSelectedCar = useSelectCarStore(state => state.setSelectedCar);
+  const setCarListPage = useCarListPageStore(state => state.setCarListPage);
   const carStatusOption = useCarStatusOptionStore(state => state.carStatusOption);
   const locationSearchMapCenter = useLocationSearchMapStore(state => state.locationSearchMapCenter);
   const setLocationSearchMapCenter = useLocationSearchMapStore(state => state.setLocationSearchMapCenter);
@@ -341,6 +343,7 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
                 activeMarkerRef.current = marker;
                 activeMarkerImgRef.current = defaultImg;
                 setSelectedCar(p);
+                setCarListPage(true);
               }
             }
             kakao.maps.event.addListener(marker, "mouseover", setOverlay);

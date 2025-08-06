@@ -20,10 +20,10 @@ type SelectedCarStore = {
 	setSelectedCar: (car: CarInfo | null) => void;
 }
 
-// type CarListPageStore = {
-// 	carListPage: boolean;
-// 	setCarListPage: (carListPage: boolean) => void;
-// }
+type CarListPageStore = {
+	carListPage: boolean;
+	setCarListPage: (carListPage: boolean) => void;
+}
 
 type CarStatusBtnStore = {
 	carStatusBtn: string;
@@ -83,10 +83,10 @@ export const useSelectCarStore = create<SelectedCarStore>((set) => ({
 	setSelectedCar: (car) => set({ selectedCar: car})
 }));
 
-// export const useCarListPageStore = create<CarListPageStore>((set) => {
-// 	carListPage: true,
-// 	setCarListPage: (carListPage) => set({ carListPage: carListPage})
-// })
+export const useCarListPageStore = create<CarListPageStore>((set) => ({
+	carListPage: false,
+	setCarListPage: (carListPage) => set({ carListPage: carListPage})
+}))
 
 // carList에서 한 차량을 클릭했을 때, 해당 차량을 확대하여 보여주는 데 사용
 export const useTrackCarStore = create<MapStateStoreCarList>((set) => ({
