@@ -27,17 +27,16 @@ type CustomOverlayStyle = {
 
 function MapLocationSearch ({ maxLevel }: MapTestProps) {
 
-  const selectedCar = useSelectCarStore(state => state.selectedCar);
-  const setSelectedCar = useSelectCarStore(state => state.setSelectedCar);
+  const { selectedCar, setSelectedCar } = useSelectCarStore();
   const setCarListPage = useCarListPageStore(state => state.setCarListPage);
   const carStatusOption = useCarStatusOptionStore(state => state.carStatusOption);
-  const locationSearchMapCenter = useLocationSearchMapStore(state => state.locationSearchMapCenter);
-  const setLocationSearchMapCenter = useLocationSearchMapStore(state => state.setLocationSearchMapCenter);
-  const locationSearchMapLevel = useLocationSearchMapStore(state => state.locationSearchMapLevel);
-  const setlLocationSearchMapLevel = useLocationSearchMapStore(state => state.setLocationSearchMapLevel);
-  const mapCenterCarList = useTrackCarStore(state => state.mapCenterCarList);
-  const mapLevelCarList = useTrackCarStore(state => state.mapLevelCarList);
-
+  const { 
+    locationSearchMapCenter, 
+    setLocationSearchMapCenter, 
+    locationSearchMapLevel, 
+    setLocationSearchMapLevel
+  } = useLocationSearchMapStore();
+  const { mapCenterCarList, mapLevelCarList } = useTrackCarStore();
   const selectedCarLatLng = useSelectedCarLatLng(state => state.latLng);
   const selectedCarNumber = useSelectedCarLatLng(state => state.carNumber);
 
@@ -138,7 +137,7 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
       if(!mapInstance.current) return;
       const center = mapInstance.current.getCenter();
       setLocationSearchMapCenter({ lat: center.getLat(), lng: center.getLng()});
-      setlLocationSearchMapLevel(mapInstance.current.getLevel());
+      setLocationSearchMapLevel(mapInstance.current.getLevel());
     }
     kakao.maps.event.addListener(mapInstance.current, "idle", mapCenterLevelEvent);
 
@@ -394,29 +393,17 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
   }, [carStatusOption, positions, selectedCar]);
 
   useEffect(() => {
-  const { latitude, longitude } = selectedCarLatLng;
-  if (
-    !selectedCarNumber ||
-    latitude == null ||
-    longitude == null
-  ) {
-    return;
-  }
+    const { latitude, longitude } = selectedCarLatLng;
+    if (!selectedCarNumber || latitude == null || longitude == null) return;
 
-  // 1) 해당 마커 가져오기
-  const marker = markersRef.current[selectedCarNumber];
-  // 2) 해당 오버레이 가져오기
-  const overlay = overlayRef.current[selectedCarNumber];
+    const marker = markersRef.current[selectedCarNumber];
+    const overlay = overlayRef.current[selectedCarNumber];
 
-  const newPos = new kakao.maps.LatLng(latitude, longitude);
+    const newPos = new kakao.maps.LatLng(latitude, longitude);
 
-  if (marker) {
-    marker.setPosition(newPos);
-  }
-  if (overlay) {
-    overlay.setPosition(newPos);
-  }
-}, [selectedCarNumber, selectedCarLatLng]);
+    if (marker) marker.setPosition(newPos);
+    if (overlay) overlay.setPosition(newPos);
+  }, [selectedCarNumber, selectedCarLatLng]);
 
   return (
     <div ref={mapContainerRef} style={{ width: '100%', height: '100%'}}/>

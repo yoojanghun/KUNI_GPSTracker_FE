@@ -31,7 +31,6 @@ import {
   useCarStatusOptionStore,
   useTrackCarStore,
   usePaginationStore,
-  useMapStore,
   useSelectedCarLatLng,
   useCarListPageStore,
 } from "@/Store/carStatus";
@@ -44,35 +43,18 @@ import { useNavigate } from "react-router-dom";
 import styles from "./CarList.module.css";
 
 function CarList() {
-  const selectedCar = useSelectCarStore((state) => state.selectedCar);
-  const setSelectedCar = useSelectCarStore((state) => state.setSelectedCar);
-
-  const carListPage = useCarListPageStore((state) => state.carListPage);
-  const setCarListPage = useCarListPageStore((state) => state.setCarListPage);
-
-  const setMapCenterCarList = useTrackCarStore(
-    (state) => state.setMapCenterCarList
-  );
-  const setMapLevelCarList = useTrackCarStore(
-    (state) => state.setMapLevelCarList
-  );
-
-  const setCarStatusOption = useCarStatusOptionStore(
-    (state) => state.setCarStatusOption
-  );
-  const carStatusOption = useCarStatusOptionStore(
-    (state) => state.carStatusOption
-  );
+  const { selectedCar, setSelectedCar } = useSelectCarStore();
+  const { carListPage, setCarListPage } = useCarListPageStore();
+  const { setMapCenterCarList, setMapLevelCarList} = useTrackCarStore();
+  const { carStatusOption, setCarStatusOption } = useCarStatusOptionStore();
 
   const setSelectedCarLatLng = useSelectedCarLatLng(
     (state) => state.setLatLng
-  )
+  );
   const setSelectedCarNumber = useSelectedCarLatLng(
     (state) => state.setCarNumber
-  )
-
-  const page = usePaginationStore((state) => state.page);
-  const setPage = usePaginationStore((state) => state.setPage);
+  );
+  const { page, setPage } = usePaginationStore();
   const totalPages = 72; // 백엔드에서 제공 예정
 
   const [inputVal, setInputVal] = useState<string>("");
@@ -86,9 +68,6 @@ function CarList() {
   const setCarNumManage = useCarStore((state) => state.setVehicleNumber);
 
   const hideBtnRef = useRef<HTMLButtonElement | null>(null);
-
-  const carLocations = useMapStore(state => state.carLocations);
-  const startPolling = useMapStore(state => state.startPolling);
 
   const carStatusClass: Record<string, string> = {
     운행중: "bg-[#c1d8ff] text-[#5491f5]",
@@ -113,12 +92,6 @@ function CarList() {
       .catch(error => console.log(error));
   }, [page])
 
-  // api/dashboard/map 에서 가져온 정보 (지금은 빈 배열)
-  // 차량의 위치를 marker로 나타내기 위해 사용함.
-  useEffect(() => {
-    startPolling();
-    console.log(carLocations);
-  }, [startPolling])
 
   // 초기엔 gpsRecordId값은 0
   // 뒤로 가기 버튼 누르면 selectedCar가 null로 변해서 아예 처음부터 다시 시작해버림
