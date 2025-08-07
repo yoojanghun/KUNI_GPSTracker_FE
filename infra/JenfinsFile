@@ -10,7 +10,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 // 젠킨스에 등록된 프론트엔드 Git 레포지토리 주소를 입력해주세요.
-                git branch: 'infra', url: 'https://github.com/Kernel360/KUNI_GPSTracker_FE.git'
+                git branch: 'develop', url: 'https://github.com/Kernel360/KUNI_GPSTracker_FE.git'
             }
         }
 
@@ -18,11 +18,7 @@ pipeline {
             steps {
                 script {
                     // 프론트엔드 소스코드가 있는 디렉토리에서 Docker 빌드를 실행합니다.
-                    // Dockerfile.fe의 위치를 정확히 지정해야 합니다.
-                    // 이 예제에서는 Jenkinsfile.fe와 Dockerfile.fe가 같은 infra 폴더에 있고,
-                    // 실제 프론트엔드 소스는 체크아웃된 경로의 루트에 있다고 가정합니다.
-                    // 만약 프론트엔드 소스가 하위 디렉토리에 있다면 docker build 명령어의 경로를 수정해야 합니다.
-                    sh "docker build -t frontend-builder -f Dockerfile ."
+                    sh "docker build -t frontend-builder -f infra/DockerFile ."
                 }
             }
         }
