@@ -1,8 +1,8 @@
-import { http, HttpResponse } from "msw";
-import currentCarList from "@/Api/currentCarList.json";
-import currentDLog from "@/Api/currentDLog.json";
-import detailLog from "@/Api/detailLog.json";
-import type { carList } from "@/Api/ManageApi/interfaces/getCarListResponse";
+// import { http, HttpResponse } from "msw";
+// import currentCarList from "@/Api/currentCarList.json";
+// import currentDLog from "@/Api/currentDLog.json";
+// import detailLog from "@/Api/detailLog.json";
+// import type { carList } from "@/Api/ManageApi/interfaces/getCarListResponse";
 
 export const handlers = [
   // http.get("/api/vehicle", (req) => {
