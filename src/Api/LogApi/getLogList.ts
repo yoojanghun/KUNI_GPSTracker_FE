@@ -21,6 +21,7 @@ export const getLogList = async (request:getLogListRequest): Promise<getLogListR
     params.append("vehicleNumber", request.vehicleNumber);
   }
 
+  console.log("params: ", params.toString());
 
   const data = await api
   .get(`api/record?${params.toString()}`)

@@ -12,7 +12,7 @@ interface DLogStore {
   endTime: string;
   currentPage: number;
   size: number;
-  sort: "asc" | "desc";
+  sort: "onTime,ASC" | "onTime,DESC";
   isDateValid: boolean;
 
   // 함수
@@ -20,7 +20,7 @@ interface DLogStore {
     vehicleNumber?: string;
     startTime?: string;
     endTime?: string;
-    sort?: "asc" | "desc";
+    sort?: "onTime,ASC" | "onTime,DESC";
     page?: number;
     size?: number;
   }) => Promise<void>;
@@ -42,7 +42,7 @@ export const useDLogStore = create<DLogStore>((set, get) => ({
   endTime: "",
   currentPage: 0,
   size: 10,
-  sort: "asc",
+  sort: "onTime,ASC",
   isDateValid: true,
 
   fetchDLogs: async ({

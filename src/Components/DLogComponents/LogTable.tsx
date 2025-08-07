@@ -17,19 +17,20 @@ import { useDLogStore } from "@/Store/dlogStore";
 
 export function LogTable() {
   const navigate = useNavigate();
+  const fetchDLogs = useDLogStore((state) => state.fetchDLogs);
+  const totalPages = useDLogStore((state) => state.totalPage);
+  const logs = useDLogStore((state) => state.DLogs);
 
   const tableRef = useRef<HTMLDivElement>(null); // 테이블의 너비값을 전달하기 위한 wrapper
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10; // TODO: 사용자 기기의 크기에 따라 개수 조절
 
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const [sortDirection, setSortDirection] = useState<"onTime,ASC" | "onTime,DESC">("onTime,ASC");
   const handleSort = () => {
-    setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
+    setSortDirection((prev) => (prev === "onTime,ASC" ? "onTime,DESC" : "onTime,ASC"));
   };
 
-  const fetchDLogs = useDLogStore((state) => state.fetchDLogs);
-  const totalPages = useDLogStore((state) => state.totalPage);
-  const logs = useDLogStore((state) => state.DLogs);
+
 
   const fetchAndSetLogs = useCallback(async () => {
     try {
@@ -55,10 +56,10 @@ export function LogTable() {
           <TableRow>
             <TableHead className="w-[35px] text-start cursor-pointer">
               <div className="flex items-center justify-center gap-1">
-                {sortDirection === "asc" ? (
-                  <ClockArrowDown onClick={() => handleSort()} />
-                ) : (
+                {sortDirection === "onTime,ASC" ? (
                   <ClockArrowUp onClick={() => handleSort()} />
+                ) : (
+                  <ClockArrowDown onClick={() => handleSort()} />
                 )}
               </div>
             </TableHead>
