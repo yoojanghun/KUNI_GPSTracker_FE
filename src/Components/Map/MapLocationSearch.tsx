@@ -1,7 +1,5 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useEffect, useRef, useMemo } from 'react';
 import { 
-  type CarInfo, 
-  type Position, 
   useCarListPageStore, 
   useCarStatusOptionStore, 
   useLocationSearchMapStore, 
@@ -12,8 +10,6 @@ import {
 } from '@/Store/carStatus';
 import styles from "./MapCustomOverlay.module.css";
 import {} from 'react-kakao-maps-sdk';
-
-type CarWithPath = Omit<CarInfo, "path"> & { path: Position[]; };
 
 type MapTestProps = {
   maxLevel: number;
@@ -41,7 +37,7 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
   const selectedCarLatLng = useSelectedCarLatLng(state => state.latLng);
   const selectedCarNumber = useSelectedCarLatLng(state => state.carNumber);
 
-  const [positions, setPositions] = useState<CarWithPath[]>([]);      // positions에는 차량들의 리스트 객체들이 들어감
+  // const [positions, setPositions] = useState<CarWithPath[]>([]);      // positions에는 차량들의 리스트 객체들이 들어감
 
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<kakao.maps.Map | null>(null);
@@ -68,10 +64,6 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
   useEffect(() => {
     startPolling();
   }, []);
-
-  useEffect(() => {
-    console.log(carLocations);
-  }, [carLocations])
 
   const markerMap = useMemo<Record<string, CustomOverlayStyle>>(() => ({
     "ACTIVE": {
@@ -248,7 +240,7 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
 
   // 마커와 클러스터링 생성, 만들어진 마커로 지도 클러스터링
   useEffect(() => {
-    const currentCars = positions.map(p => p.vehicleNumber);
+    // const currentCars = positions.map(p => p.vehicleNumber);
 
     totalClustererRef.current?.clear();
     runningClustererRef.current?.clear();
@@ -299,7 +291,7 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
                 <div class="${styles["overlay-bubble"]}">
                   <div class="px-3 py-1 text-center">
                     <div class="font-bold">${p.vehicleNumber}</div>
-                    <div class="font-bold my-1">${p.vehicleNumber}</div>
+                    <div class="font-bold my-1">${p.type}</div>
                     <div class="${bgColor} ${textColor} p-1 font-bold rounded-sm text-center">
                       ${p.status}
                     </div>
@@ -369,14 +361,14 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
     }
 
     // 만약 api가 변경된 차량만 제공하게 되면 아래 코드는 필요 X
-    Object.keys(markersRef.current).forEach(key => {
-      if(!currentCars.includes(key)) {
-        markersRef.current[key].setMap(null);
-        overlayRef.current[key].setMap(null);
-        delete markersRef.current[key];
-        delete overlayRef.current[key];
-      }
-    })
+    // Object.keys(markersRef.current).forEach(key => {
+    //   if(!currentCars.includes(key)) {
+    //     markersRef.current[key].setMap(null);
+    //     overlayRef.current[key].setMap(null);
+    //     delete markersRef.current[key];
+    //     delete overlayRef.current[key];
+    //   }
+    // })
 
     if (carStatusOption === "전체") {
         totalClustererRef.current?.addMarkers(makeMarkers());
@@ -412,7 +404,7 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
       markersRef.current = {};
       overlayRef.current = {};
     }
-  }, [carStatusOption, positions, selectedCar]);
+  }, [carStatusOption, carLocations, selectedCar]);
 
   useEffect(() => {
     const { latitude, longitude } = selectedCarLatLng;

@@ -42,6 +42,13 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./CarList.module.css";
 
+type CarList = {
+  carNumber: string;
+  type: string;
+  status: string; 
+  totalDist: number;
+}
+
 function CarList() {
   const { selectedCar, setSelectedCar } = useSelectCarStore();
   const { carListPage, setCarListPage } = useCarListPageStore();
@@ -58,7 +65,7 @@ function CarList() {
   const totalPages = 72; // 백엔드에서 제공 예정
 
   const [inputVal, setInputVal] = useState<string>("");
-  const [currentCarList, setCurrentCarList] = useState<CarInfo[]>([]);
+  const [currentCarList, setCurrentCarList] = useState<CarList[]>([]);
   const [isVisible, setIsVisible] = useState<boolean>(true);
   const [selectedCarInfo, setSelectedCarInfo] = useState<SelectedCar | null>(null);
   // const selectedCarInfoRef = useRef<SelectedCar | null>
@@ -70,25 +77,25 @@ function CarList() {
   const hideBtnRef = useRef<HTMLButtonElement | null>(null);
 
   const carStatusClass: Record<string, string> = {
-    운행중: "bg-[#c1d8ff] text-[#5491f5]",
-    미운행: "bg-[#ffcac6] text-[#e94b3e]",
-    점검중: "bg-[#ffe4be] text-[#ffa62a]",
+    ACTIVE: "bg-[#c1d8ff] text-[#5491f5]",
+    INACTIVE: "bg-[#ffcac6] text-[#e94b3e]",
+    INSPECTING: "bg-[#ffe4be] text-[#ffa62a]",
   };
 
   // 아래 코드는 api/vehicle (차량 목록 조회) 에서 가져온 정보라고 가정
   // 현재는 currentCarList의 정보로 차량들의 리스트를 나타냄. 
-  useEffect(() => {
-    fetch("/carListExample.json")
-      .then((res) => res.json())
-      .then((data) => setCurrentCarList(data));
-  }, []);
+  // useEffect(() => {
+  //   fetch("/carListExample.json")
+  //     .then((res) => res.json())
+  //     .then((data) => setCurrentCarList(data));
+  // }, []);
 
   // 실제 api/vehicle (차량 목록 조회)에서 가져온 정보.
   // carList에서 paigination을 이용한 차량 목록들을 나타내기 위해 사용함.
   // parameter로 carStatusOption 넘기기 ("" 부분)
   useEffect(() => {
     fetchTotalCarsList(page - 1, 7, "")
-      .then(totalCars => console.log(totalCars))
+      .then(totalCars => setCurrentCarList(totalCars.content))
       .catch(error => console.log(error));
   }, [page])
 
@@ -100,7 +107,7 @@ function CarList() {
       setSelectedCarInfo(null);
       return;
     }
-    fetchSelectedCarStat(selectedCar.number, 0)
+    fetchSelectedCarStat(selectedCar.vehicleNumber, 0)
       .then(car => setSelectedCarInfo(car))
       .catch(console.error);
   }, [selectedCar]);
@@ -110,7 +117,7 @@ function CarList() {
     if (!selectedCar || selectedCarInfo?.gpsRecordId == null) return;
 
     const intervalId = setInterval(() => {
-      fetchSelectedCarStat(selectedCar.number, selectedCarInfo.gpsRecordId)
+      fetchSelectedCarStat(selectedCar.vehicleNumber, selectedCarInfo.gpsRecordId)
         .then(car => {
           setSelectedCarInfo(car); 
           setSelectedCarLatLng(car.location);
@@ -128,8 +135,8 @@ function CarList() {
     const keyword = inputVal.trim().toLowerCase();
 
     const matchesKeyWord =
-      car["name"].trim().toLowerCase().includes(keyword) ||
-      car["number"].trim().toLowerCase().includes(keyword);
+      car["type"].trim().toLowerCase().includes(keyword) ||
+      car["carNumber"].trim().toLowerCase().includes(keyword);
 
     const matchesStatus =
       car["status"] === carStatusOption || carStatusOption === "전체";
@@ -143,8 +150,8 @@ function CarList() {
     const keyword = event.target.value.trim().toLowerCase();
     const isMatchingCar = filteredCarList.filter((car) => {
       return (
-        car["name"].trim().toLowerCase().includes(keyword) ||
-        car["number"].trim().toLowerCase().includes(keyword)
+        car["type"].trim().toLowerCase().includes(keyword) ||
+        car["carNumber"].trim().toLowerCase().includes(keyword)
       );
     });
     if (isMatchingCar.length > 0 && keyword !== "") {
@@ -192,18 +199,18 @@ function CarList() {
             </SelectContent>
           </Select>
         </div>
-        <p className="font-bold opacity-20 ml-1">{selectedCar.number}</p>
+        <p className="font-bold opacity-20 ml-1">{selectedCar.vehicleNumber}</p>
         {isVisible && (
           <>
             <table className="my-5">
               <tbody>
                 <tr>
                   <th className={styles["th"]}>차량번호</th>
-                  <td className={styles["td"]}>{selectedCar.number}</td>
+                  <td className={styles["td"]}>{selectedCar.vehicleNumber}</td>
                 </tr>
                 <tr>
                   <th className={styles["th"]}>차량명</th>
-                  <td className={styles["td"]}>{selectedCar.name}</td>
+                  <td className={styles["td"]}>{selectedCar.type}</td>
                 </tr>
                 <tr>
                   <th className={styles["th"]}>상태</th>
@@ -233,7 +240,7 @@ function CarList() {
             <button
               onClick={() => {
                 navigate("/management");
-                setCarNumManage(selectedCar.number);
+                setCarNumManage(selectedCar.vehicleNumber);
               }}
               className="border cursor-pointer font-bold py-1 rounded-sm flex justify-center items-center mb-2"
             >
@@ -243,7 +250,7 @@ function CarList() {
             <button
               onClick={() => {
                 navigate("/log");
-                setCarNumLog(selectedCar.number);
+                setCarNumLog(selectedCar.vehicleNumber);
               }}
               className="border cursor-pointer font-bold py-1 rounded-sm flex justify-center items-center"
             >
@@ -319,21 +326,22 @@ function CarList() {
         </label>
       </form>
 
+{/* 하나의 차량을 filteredCarList에서 선택했으면, 그 차량과 같은 selectedInfo 가져옴.
+ 거기에 위도 경도 좌표 있음 */}
       {/* car는 각 차량 객체 */}
       {isVisible && (
         <>
           <ul className="flex-1 overflow-y-auto space-y-2 pr-2 min-h-105 pb-2">
             {filteredCarList.map((car) => {
-              if (!car.path) return null;
+              if (!car.latitude || !car.longitude) return null;
               const iconSrc = carStatusClass[car.status];
-              const lastPoint = car.path[car.path.length - 1];
               return (
                 <li
-                  key={car.number}
+                  key={car.carNumber}
                   onClick={() => {
                     setMapCenterCarList({
-                      lat: lastPoint.lat,
-                      lng: lastPoint.lng,
+                      lat: car.latitude,
+                      lng: car.longitude,
                     });
                     setMapLevelCarList(2);
                     setSelectedCar(car);
@@ -347,8 +355,8 @@ function CarList() {
                     {car.status}
                   </span>
                   <div>
-                    <div className="font-bold h-5">{car.number}</div>
-                    <div className="opacity-50 h-5">{car.name}</div>
+                    <div className="font-bold h-5">{car.carNumber}</div>
+                    <div className="opacity-50 h-5">{car.type}</div>
                   </div>
                 </li>
               );
