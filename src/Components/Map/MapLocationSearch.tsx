@@ -7,7 +7,8 @@ import {
   useLocationSearchMapStore, 
   useSelectCarStore, 
   useSelectedCarLatLng, 
-  useTrackCarStore 
+  useTrackCarStore,
+  useMapCarLocationStore
 } from '@/Store/carStatus';
 import styles from "./MapCustomOverlay.module.css";
 import {} from 'react-kakao-maps-sdk';
@@ -58,15 +59,22 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
   const markersRef = useRef<Record<string, kakao.maps.Marker>>({});
   const overlayRef = useRef<Record<string, kakao.maps.CustomOverlay>>({});
 
-  // 차량의 현재 위치 (예시 데이터)
+  const startPolling = useMapCarLocationStore(state => state.startPolling);
+  const carLocations = useMapCarLocationStore(state => state.carLocations);
+
+  // 실제로는 zustand에서 정의한 useMapCarLocationStore의 
+  // startPolling으로 위도, 경도, 상태중 하나 이상이 변한 값들만 가져옴.
+  // 또한 파라미터를 하나 더 추가해서 그게 false이면, 프로그램에서 삭제된 차량 => 마커 완전히 제거
   useEffect(() => {
-    fetch("/carListExample.json")
-    .then(res => res.json())
-    .then(data => setPositions(data));
+    startPolling();
   }, []);
 
+  useEffect(() => {
+    console.log(carLocations);
+  }, [carLocations])
+
   const markerMap = useMemo<Record<string, CustomOverlayStyle>>(() => ({
-    "운행중": {
+    "ACTIVE": {
       defaultMarkerImg: new kakao.maps.MarkerImage(
         "/marker-working.png",
         new kakao.maps.Size(30, 42),
@@ -80,7 +88,7 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
       bgColor: "bg-[#c1d8ff]", 
       textColor: "text-[#5491f5]"
     },
-    "미운행": {
+    "INACTIVE": {
       defaultMarkerImg: new kakao.maps.MarkerImage(
         "/marker-notWorking.png",
         new kakao.maps.Size(30, 42),
@@ -94,7 +102,7 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
       bgColor: "bg-[#ffcac6]", 
       textColor: "text-[#e94b3e]"
     },
-    "점검중": {
+    "INSPECTING": {
       defaultMarkerImg: new kakao.maps.MarkerImage(
         "/marker-inspected.png",
         new kakao.maps.Size(30, 42),
@@ -240,7 +248,7 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
 
   // 마커와 클러스터링 생성, 만들어진 마커로 지도 클러스터링
   useEffect(() => {
-    const currentCars = positions.map(p => p.number);
+    const currentCars = positions.map(p => p.vehicleNumber);
 
     totalClustererRef.current?.clear();
     runningClustererRef.current?.clear();
@@ -255,11 +263,10 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
 
     const makeMarkers = (status?: string) => {
       const createdMarkers: kakao.maps.Marker[] = [];
-      positions
+      carLocations
         .filter(p => p.status === status || !status)
         .forEach(p => {
-          const lastPoint = p.path[p.path.length - 1];
-          const latLng = new kakao.maps.LatLng(lastPoint.lat, lastPoint.lng);
+          const latLng = new kakao.maps.LatLng(p.latitude, p.longitude);
           const {
             defaultMarkerImg: defaultImg,
             hoverMarkerImg: hoverImg,
@@ -267,13 +274,15 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
             textColor
           } = markerMap[p.status];
 
-          let marker = markersRef.current[p.number];        
+          let marker = markersRef.current[p.vehicleNumber];        
 
-          if(marker) {                                                // 지도에 표시된 차량이 이미 존재
+          // 아래는 marker가 존재하면 setPosition이다. 
+          // 그런데 이를 "마커의 상태, gps가 변하면" 으로 수정 
+          if(marker) {                                            // 지도에 표시된 차량이 이미 존재
             marker.setPosition(latLng);
             marker.setImage(defaultImg);
-            if(overlayRef.current[p.number]) {
-              overlayRef.current[p.number].setPosition(latLng);
+            if(overlayRef.current[p.vehicleNumber]) {
+              overlayRef.current[p.vehicleNumber].setPosition(latLng);
             }
           }
           else {
@@ -283,14 +292,14 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
               image: defaultImg,
               map: mapInstance.current
             });
-            markersRef.current[p.number] = marker;
+            markersRef.current[p.vehicleNumber] = marker;
 
             const overlay = new kakao.maps.CustomOverlay({            // 오버레이 생성 (한 번만 실행)
               content: `
                 <div class="${styles["overlay-bubble"]}">
                   <div class="px-3 py-1 text-center">
-                    <div class="font-bold">${p.number}</div>
-                    <div class="font-bold my-1">${p.name}</div>
+                    <div class="font-bold">${p.vehicleNumber}</div>
+                    <div class="font-bold my-1">${p.vehicleNumber}</div>
                     <div class="${bgColor} ${textColor} p-1 font-bold rounded-sm text-center">
                       ${p.status}
                     </div>
@@ -302,9 +311,9 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
               zIndex: 99
             });
 
-            overlayRef.current[p.number] = overlay;
+            overlayRef.current[p.vehicleNumber] = overlay;
 
-            if(selectedCar?.number === p.number) {
+            if(selectedCar?.vehicleNumber === p.vehicleNumber) {
               marker.setImage(hoverImg);
               overlay.setMap(mapInstance.current);
               activeOverlayRef.current = overlay;
@@ -359,6 +368,7 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
       return createdMarkers;
     }
 
+    // 만약 api가 변경된 차량만 제공하게 되면 아래 코드는 필요 X
     Object.keys(markersRef.current).forEach(key => {
       if(!currentCars.includes(key)) {
         markersRef.current[key].setMap(null);
@@ -375,12 +385,24 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
       if(!runningClustererRef.current || !notRunningClustererRef.current || 
           !inspectedClustererRef.current) return;
 
-      const mapRef: Record<string, kakao.maps.MarkerClusterer> = {
-        "운행중": runningClustererRef.current,
-        "미운행": notRunningClustererRef.current,
-        "점검중": inspectedClustererRef.current
+      const mapRef: Record<string, {clusterRef: kakao.maps.MarkerClusterer, optionName: string}> = {
+        "운행중": {
+          clusterRef: runningClustererRef.current,
+          optionName: "ACTIVE"
+        },
+        "미운행": {
+          clusterRef: notRunningClustererRef.current,
+          optionName: "INACTIVE"
+        },
+        "점검중": {
+          clusterRef: inspectedClustererRef.current,
+          optionName: "INSPECTING"
+        }
       }
-      mapRef[carStatusOption].addMarkers(makeMarkers(carStatusOption));
+      const mapRefClusterRef = mapRef[carStatusOption].clusterRef;
+      const mapRefOptionName = mapRef[carStatusOption].optionName;
+
+      mapRefClusterRef.addMarkers(makeMarkers(mapRefOptionName));
     }
     
     return () => {

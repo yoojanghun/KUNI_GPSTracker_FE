@@ -8,11 +8,11 @@ export type Position = {
 }
 
 export type CarInfo = {
-	number: string;
-	name: string;
-	mileage: number;
+	latitude: number;
+	longitude: number;
 	status: string;
-	path?: Position[];
+	vehicleNumber: string;
+	type: string;
 }
 
 type SelectedCarStore = {
