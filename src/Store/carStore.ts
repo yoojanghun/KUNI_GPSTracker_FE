@@ -5,7 +5,7 @@ import type { getCarListRequest } from "@/Api/ManageApi/interfaces/getCarListReq
 
 interface CarStoreState {
   cars: carList[];
-  vehicleNumber: string;
+  vehicleName: string;
   status: getCarListRequest["status"];
   totalPage: number;
   totalElement: number;
@@ -17,7 +17,7 @@ interface CarStoreState {
   isAllSelected: () => boolean;
   toggleSelectAll: () => void;
   setSelected: (ids: string[]) => void;
-  setVehicleNumber: (vehicleNumber: string) => void;
+  setVehicleName: (vehicleName: string) => void;
   setStatus: (currentStatus: getCarListRequest["status"]) => void;
   clearSelected: () => void;
 
@@ -25,26 +25,26 @@ interface CarStoreState {
     page?: number;
     size?: number;
     sort?: getCarListRequest["sort"];
-    vehicleNumber?: string;
+    vehicleName?: string;
     status?: getCarListRequest["status"];
   }) => Promise<void>;
 }
 
 export const useCarStore = create<CarStoreState>((set, get) => ({
   cars: [],
-  vehicleNumber: "",
+  vehicleName: "",
   status: "" as getCarListRequest["status"],
   totalPage: 0,
   totalElement: 0,
   currentPage: 0,
   size: 10,
-  sort: "createDate,ASC" as getCarListRequest["sort"],
+  sort: "createDate,DESC" as getCarListRequest["sort"],
 
   selected: new Set(),
 
-  setVehicleNumber: (vehicleNumber) => {
-    console.log("vehicleNumber set: ", vehicleNumber);
-    set({ vehicleNumber: vehicleNumber });
+  setVehicleName: (vehicleName) => {
+    console.log("vehicleName set: ", vehicleName);
+    set({ vehicleName: vehicleName });
   },
 
   setStatus: (currentStatus: getCarListRequest["status"]) => {
@@ -74,11 +74,11 @@ export const useCarStore = create<CarStoreState>((set, get) => ({
     page = get().currentPage,
     size = get().size,
     sort = get().sort,
-    vehicleNumber = get().vehicleNumber,
+    vehicleName = get().vehicleName,
     status = get().status,
   }) => {
     try {
-      const res = await getCarList({ page, size, sort, vehicleNumber, status });
+      const res = await getCarList({ page, size, sort, vehicleName, status });
       console.log("total Pages: ", res.totalPages);
       console.log("total Elements: ", res.totalElements);
       set({

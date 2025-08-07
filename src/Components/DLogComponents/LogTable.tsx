@@ -23,7 +23,9 @@ export function LogTable() {
 
   const tableRef = useRef<HTMLDivElement>(null); // 테이블의 너비값을 전달하기 위한 wrapper
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10; // TODO: 사용자 기기의 크기에 따라 개수 조절
+  
+   const tableRowHeight = 70;
+   const itemsPerPage = Math.floor((window.innerHeight) / tableRowHeight);
 
   const [sortDirection, setSortDirection] = useState<"onTime,ASC" | "onTime,DESC">("onTime,ASC");
   const handleSort = () => {
@@ -50,7 +52,7 @@ export function LogTable() {
 
 
   return (
-    <div ref={tableRef} className="h-[470px] w-full flex flex-col gap-4 p-1">
+    <div ref={tableRef} className="w-full flex flex-col gap-4 p-1 overflow-auto">
       <Table className="table-fixed w-full">
         <TableHeader>
           <TableRow>

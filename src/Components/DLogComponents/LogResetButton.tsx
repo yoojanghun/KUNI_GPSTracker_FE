@@ -9,7 +9,7 @@ export function LogResetButton() {
   const setStartTime = useDLogStore((state) => state.setStartTime);
   const setEndTime = useDLogStore((state) => state.setEndTime);
 
-  const tableRowHeight = 60;
+  const tableRowHeight = 70;
   const itemsPerPage = Math.floor((window.innerHeight) / tableRowHeight);
 
   return (

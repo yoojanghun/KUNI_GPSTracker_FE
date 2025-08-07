@@ -16,12 +16,15 @@ import { CircleCheck, CircleX, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { carRegist } from "@/Api/ManageApi/carRegist";
+import { useCarStore } from "@/Store/carStore";
 
 export function AddCarButton() {
   const [inputDialog, setInputDialog] = useState(false);
   const [vehicleNumber, setVehicleNumber] = useState("");
   const [vehicleName, setVehicleName] = useState("");
   const [attemptedSubmit, setAttemptedSubmit] = useState(false);
+
+  const fetchCars = useCarStore((state) => state.fetchCars);
 
   // TODO: react-hook-form 도입 고려 (리펙토링 시)
   // 입력값 유효성 검사
@@ -123,6 +126,7 @@ export function AddCarButton() {
                       vehicleName === res.vehicleName &&
                       vehicleNumber === res.vehicleNumber
                     ) {
+                      fetchCars({sort:"createDate,DESC"});
                       toast(
                         <span>
                           <strong>{vehicleNumber}</strong> 차량이

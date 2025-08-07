@@ -60,6 +60,7 @@ export const useDLogStore = create<DLogStore>((set, get) => ({
       ? new Date(new Date(endTime).setHours(23, 59, 59, 999)).toISOString()
       : undefined;
     try {
+      console.log("logtable size: ", size)
       const res = await getLogList({
         page,
         size,
@@ -71,6 +72,7 @@ export const useDLogStore = create<DLogStore>((set, get) => ({
       console.log("totalPage: ", res.totalPages);
       console.log("totalElements: ", res.totalElements);
       console.log("currentPage: ", page);
+      console.log("Fetched Log Datas: ", res.content);
       set({
         DLogs: res.content,
         totalPage: res.totalPages,

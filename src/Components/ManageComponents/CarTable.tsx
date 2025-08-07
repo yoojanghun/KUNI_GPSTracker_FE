@@ -29,7 +29,7 @@ export default function CarTable() {
   const isAllSelected = useCarStore((state) => state.isAllSelected);
   const fetchCars = useCarStore((state) => state.fetchCars);
 
-  const tableRowHeight = 60;
+  const tableRowHeight = 70;
   const itemsPerPage = Math.floor((window.innerHeight) / tableRowHeight);
 
   // 정렬 키를 생성하기 위한 로직, getSortParam(sortKey, sortDirection) 를 통해 키값을 얻을 수 있음
@@ -52,7 +52,7 @@ export default function CarTable() {
     direction: string
   ): getCarListRequest["sort"] => {
     const dir = direction.toUpperCase() === "DESC" ? "DESC" : "ASC";
-    const defaultSort = `createDate,ASC` as getCarListRequest["sort"];
+    const defaultSort = `createDate,DESC` as getCarListRequest["sort"];
 
     if (!key || !isValidSortKey(key)) return defaultSort;
 
@@ -84,11 +84,11 @@ export default function CarTable() {
 
   return (
     <div ref={tableRef}>
-      <Table>
+      <Table className="my-4">
         <TableHeader>
           <TableRow>
             <TableHead
-              className="text-center cursor-pointer"
+              className="w-[35px] text-start cursor-pointer"
               onClick={() => handleSort("carNumber")}
             >
               <div className="flex items-center justify-center gap-1">

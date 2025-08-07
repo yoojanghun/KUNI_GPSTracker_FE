@@ -4,7 +4,7 @@ import { ManageTable } from "./ManageTable";
 
 export default function Management() {
     return (
-        <div className="flex flex-col gap-16 px-8 py-8 w-full max-w-7xl mx-auto">
+        <div className="flex flex-col gap-10 px-8 py-8 w-full max-w-7xl mx-auto">
             <ManageHeader />
             <ManageInputs />
             <ManageTable />
