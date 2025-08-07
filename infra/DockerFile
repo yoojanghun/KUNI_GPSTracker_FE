@@ -1,0 +1,18 @@
+# 1. Build stage
+FROM node:18-alpine as builder
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files and install dependencies
+# package-lock.json 또는 yarn.lock이 있다면 함께 복사하는 것이 좋습니다.
+COPY package*.json ./
+RUN npm install
+
+# Copy the rest of the application source code
+COPY . .
+
+# Build the project
+RUN npm run build
+
+# The 'dist' folder is now available in /app/dist
