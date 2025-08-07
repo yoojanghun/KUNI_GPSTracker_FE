@@ -1,69 +1,44 @@
-# React + TypeScript + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-Currently, two official plugins are available:
+# GPS Tracker
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 📖 개요
 
-## Expanding the ESLint configuration
+KUNI GPS Tracker는 차량의 운행 정보를 시각적으로 확인하고 관리할 수 있는 웹 애플리케이션입니다. React, TypeScript, Vite, Tailwind CSS를 기반으로 구축되었습니다.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+---
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## ✨ 주요 기능
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+### 🚗 운행 정보 대시보드 (메인 페이지)
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+* **차량 상태 요약:** 전체 차량, 미운행 차량, 운행 중인 차량의 수를 각각 아이콘과 함께 시각적으로 보여주는 카드를 통해 한눈에 파악할 수 있습니다.
+* **직관적인 아이콘:** 각 카드에는 상태를 나타내는 아이콘(전체, 미운행, 운행)이 있어 사용자가 빠르게 정보를 인지할 수 있도록 돕습니다.
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### 🗺️ 위치 조회
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+* 차량의 실시간 위치를 조회하여 지도 상에 표시하는 기능입니다.
+
+---
+
+### 🔧 차량 관리
+
+* 새로운 차량을 등록하거나 기존 차량 정보를 수정/삭제하는 등, 시스템에 등록된 모든 차량을 효율적으로 관리할 수 있는 페이지입니다.
+
+---
+
+### 📂 운행 일지
+
+* 각 차량의 과거 운행 기록을 날짜별, 차량별로 조회하고 관리할 수 있습니다.
+
+---
+
+## 🛠️ 기술 스택
+
+* **[React](https://react.dev/):** 사용자 인터페이스 구축
+* **[TypeScript](https://www.typescriptlang.org/):** 정적 타입 지원
+* **[Vite](https://vitejs.dev/):** 빠른 개발 서버 및 번들링
+* **[Tailwind CSS](https://tailwindcss.com/):** CSS 프레임워크
+* **[React Router](https://reactrouter.com/):** 클라이언트 사이드 라우팅
