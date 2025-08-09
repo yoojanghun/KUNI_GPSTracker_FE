@@ -8,16 +8,14 @@ import styles from "./Home.module.css";
 
 import CarsPerDayChart from "@/Components/CarsPerDayChart";
 import MapHome from "@/Components/Map/MapHome";
-import { useCarStatusBtnStore, useMapCarLocationStore } from "@/Store/carStatus";
+import { useCarStatusBtnStore } from "@/Store/carStatus";
 import { MapPin, Calendar } from "lucide-react";
 
 import { type CarStatusNum, fetchCarStatistics } from "@/Api/HomeApi/CarStatistics";
 import { useEffect, useState, useRef } from "react";
 
+// 아직 이 페이지에서 지도는 api를 받고 있지 않습니다(더미데이터 사용중)
 function Home() {
-  const carLocations = useMapCarLocationStore(state => state.carLocations);
-  const startPolling = useMapCarLocationStore(state => state.startPolling);
-
   const [carStat, setCarStat] = useState<CarStatusNum | null>(null);
   // carStat = {vehicles: 500, active: 0, inactive: 500, inspect: 0}
   const prevCarStat = useRef<CarStatusNum | null>(null);
@@ -40,19 +38,6 @@ function Home() {
 
     return () => clearInterval(intervalId);
   }, []);
-
-  useEffect(() => {
-    const timer = startPolling();
-    return () => {
-      if(timer != null) {
-        clearInterval(timer);
-      }
-    };
-  }, [startPolling]);
-
-  useEffect(() => {
-    console.log(carLocations);
-  }, [carLocations]);
  
   if(!carStat) return;
   const { 

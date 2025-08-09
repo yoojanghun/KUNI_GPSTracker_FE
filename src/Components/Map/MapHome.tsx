@@ -169,6 +169,7 @@ function MapHome ({ maxLevel }: MapTestProps) {
       map: mapInstance.current,
       averageCenter: true,
       minLevel: 7,
+      gridSize: 140,          // 한 개의 마커가 커버가능한 영역을 늘림
       styles: [{
                 width : '60px', 
                 height : '60px',
