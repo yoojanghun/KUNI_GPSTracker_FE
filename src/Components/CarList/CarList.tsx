@@ -16,29 +16,26 @@ import {
   SelectValue,
 } from "@/Components/ui/select";
 import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-  PaginationDoublePrevious,
-  PaginationDoubleNext,
-} from "@/Components/ui/pagination";
+  Table,
+  TableBody,
+  TableCell,
+  TableRow,
+} from "@/Components/ui/table";
+import { TablePagination } from "../TablePagination";
 import {
-  type CarInfo,
   useSelectCarStore,
   useCarStatusOptionStore,
   useTrackCarStore,
-  usePaginationStore,
   useSelectedCarLatLng,
   useCarListPageStore,
+  useMapCarLocationStore
 } from "@/Store/carStatus";
 import { useCarStore } from "@/Store/carStore";
+import { fetchTotalCarsList, useSearchedCar } from "@/Api/CarList/carListStore";
 import { useDLogStore } from "@/Store/dlogStore";
+import { StatusBadge } from "../StatusBadge";
 import { type SelectedCar, fetchSelectedCarStat } from "@/Api/CarList/SelectedCarInfo";
-import { fetchTotalCarsList } from "@/Api/CarList/TotalCars";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./CarList.module.css";
 
@@ -50,58 +47,62 @@ type CarList = {
 }
 
 function CarList() {
+  const { searchedCar, setSearchedCar} = useSearchedCar();
   const { selectedCar, setSelectedCar } = useSelectCarStore();
   const { carListPage, setCarListPage } = useCarListPageStore();
   const { setMapCenterCarList, setMapLevelCarList} = useTrackCarStore();
   const { carStatusOption, setCarStatusOption } = useCarStatusOptionStore();
 
+  const [logs, setLogs] = useState<CarList[]>([]);
+  const [totalPages, setTotalPages] = useState<number>(1)
   const setSelectedCarLatLng = useSelectedCarLatLng(
     (state) => state.setLatLng
   );
   const setSelectedCarNumber = useSelectedCarLatLng(
     (state) => state.setCarNumber
   );
-  const { page, setPage } = usePaginationStore();
-  const totalPages = 72; // 백엔드에서 제공 예정
 
-  const [inputVal, setInputVal] = useState<string>("");
-  const [currentCarList, setCurrentCarList] = useState<CarList[]>([]);
   const [isVisible, setIsVisible] = useState<boolean>(true);
   const [selectedCarInfo, setSelectedCarInfo] = useState<SelectedCar | null>(null);
-  // const selectedCarInfoRef = useRef<SelectedCar | null>
 
   const navigate = useNavigate();
   const setCarNumLog = useDLogStore((state) => state.setVehicleNumber);
   const setCarNumManage = useCarStore((state) => state.setVehicleNumber);
+  
+  const tableRef = useRef<HTMLDivElement>(null); // 테이블의 너비값을 전달하기 위한 wrapper
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const carLocations = useMapCarLocationStore((state) => state.carLocations);
 
   const hideBtnRef = useRef<HTMLButtonElement | null>(null);
 
-  const carStatusClass: Record<string, string> = {
-    ACTIVE: "bg-[#c1d8ff] text-[#5491f5]",
-    INACTIVE: "bg-[#ffcac6] text-[#e94b3e]",
-    INSPECTING: "bg-[#ffe4be] text-[#ffa62a]",
-  };
+  // 페이지네이션을 차량 리스트(carList.tsx)에 적용하기 위해 (/api/vehicle) 받음.
+  // 파라미터는 순서대로 "현재 페이지", "페이지당 차량리스트 수", "검색창에 입력된 차량이름", "차량 status"
+  // 전체 차량 리스트들을 logs에 저장, 전체 페이지 수를 totalPages에 저장
+  const totalCarLoc = useCallback(async () => {
+    try {
+      const result = await fetchTotalCarsList(
+        currentPage - 1,
+        9,
+        !searchedCar ? null : searchedCar,
+        carStatusOption,
+      )
+      setLogs(result.content);
+      setTotalPages(result.totalPages);
+    } catch(err) {
+      console.error("Error Fetching logs: ", err)
+    }
+  }, [currentPage, searchedCar, carStatusOption])
 
-  // 아래 코드는 api/vehicle (차량 목록 조회) 에서 가져온 정보라고 가정
-  // 현재는 currentCarList의 정보로 차량들의 리스트를 나타냄. 
-  // useEffect(() => {
-  //   fetch("/carListExample.json")
-  //     .then((res) => res.json())
-  //     .then((data) => setCurrentCarList(data));
-  // }, []);
-
-  // 실제 api/vehicle (차량 목록 조회)에서 가져온 정보.
-  // carList에서 paigination을 이용한 차량 목록들을 나타내기 위해 사용함.
-  // parameter로 carStatusOption 넘기기 ("" 부분)
   useEffect(() => {
-    fetchTotalCarsList(page - 1, 7, "")
-      .then(totalCars => setCurrentCarList(totalCars.content))
-      .catch(error => console.log(error));
-  }, [page])
+    totalCarLoc();
+  }, [totalCarLoc]);
 
-
-  // 초기엔 gpsRecordId값은 0
-  // 뒤로 가기 버튼 누르면 selectedCar가 null로 변해서 아예 처음부터 다시 시작해버림
+  // 리스트에서 클릭된 차량에 대한 정보를 받음. (/api/location/{vehicleNumber})
+  // 리스트에서 선택된 차량 객체(selectedCar)의 차량번호(selectedCar.vehicleNumber)과 
+  // gpsRecordId값(초기엔 0)을 파라미터로 보냄
+  // 그리고 받은 정보들(차량 gps값, status, vehicleNumber, 다음 gpsRecordId값)을 
+  // selectedCarInfo에 저장
   useEffect(() => {
     if (!selectedCar) {
       setSelectedCarInfo(null);
@@ -112,7 +113,10 @@ function CarList() {
       .catch(console.error);
   }, [selectedCar]);
 
-  // gpsRecordId가 생성된 후에 함수의 파라미터로 넘김
+  // 초기값 gpsRecordId가 0이 아닐 때(초기값을 받은 이후에) gpsRecordId가 바뀔 때마다(현재 3초 간격)
+  // api 요청해서 에뮬레이터의 다음 gps 값을 받음
+  // setSelectedCarNumber => 리스트에서 클릭된 차량 정보를 저장
+  // setSelectedCarLatLng => 그 차량의 gps 저장, gps 값이 바뀔 때마다 mapLocationSearch에서 마커를 다시 그림
   useEffect(() => {
     if (!selectedCar || selectedCarInfo?.gpsRecordId == null) return;
 
@@ -122,7 +126,6 @@ function CarList() {
           setSelectedCarInfo(car); 
           setSelectedCarLatLng(car.location);
           setSelectedCarNumber(car.vehicleNumber);
-          console.log(car.vehicleNumber,car.location);
         })
         .catch(console.error);
     }, 3000);
@@ -130,50 +133,8 @@ function CarList() {
     return () => clearInterval(intervalId);
   }, [selectedCar, selectedCarInfo?.gpsRecordId]);
 
-  // carList 목록에 보여지는 차량들
-  const filteredCarList = currentCarList.filter((car) => {
-    const keyword = inputVal.trim().toLowerCase();
-
-    const matchesKeyWord =
-      car["type"].trim().toLowerCase().includes(keyword) ||
-      car["carNumber"].trim().toLowerCase().includes(keyword);
-
-    const matchesStatus =
-      car["status"] === carStatusOption || carStatusOption === "전체";
-
-    return matchesKeyWord && matchesStatus;
-  });
-
-  function handleInput(event: React.ChangeEvent<HTMLInputElement>) {
-    setInputVal(event.target.value);
-
-    const keyword = event.target.value.trim().toLowerCase();
-    const isMatchingCar = filteredCarList.filter((car) => {
-      return (
-        car["type"].trim().toLowerCase().includes(keyword) ||
-        car["carNumber"].trim().toLowerCase().includes(keyword)
-      );
-    });
-    if (isMatchingCar.length > 0 && keyword !== "") {
-      setIsVisible(true);
-    }
-  }
-
-  // pagination 시 화면에 보이는 페이지 설정
-  const allPages = [...Array(totalPages)].map((_, i) => i + 1); // [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-
-  let visiblePages: number[] = [];
-
-  if (totalPages <= 5) {
-    visiblePages = allPages;
-  } else if (page <= 3) {
-    visiblePages = allPages.slice(0, 5); // 처음 5개 페이지
-  } else if (page >= totalPages - 2) {
-    visiblePages = allPages.slice(totalPages - 5); // 마지막 5개 페이지
-  } else {
-    visiblePages = allPages.slice(page - 3, page + 2);
-  }
-
+  // 만들어 주신 StatusBadge, tablePagination 컴포넌트를 적극 활용하였습니다
+  // 만약 selectedCar가 존재(차량 리스트에서 차량 선택) 그리고, carListPage라는 변수가 true라면 정보페이지를 보여줌
   if (selectedCar && carListPage) {
     return (
       <section
@@ -192,10 +153,18 @@ function CarList() {
               <SelectValue placeholder="전체" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="전체">전체</SelectItem>
-              <SelectItem value="운행중">운행중</SelectItem>
-              <SelectItem value="미운행">미운행</SelectItem>
-              <SelectItem value="점검중">점검중</SelectItem>
+              <SelectItem value="전체" className="cursor-pointer">
+                전체
+              </SelectItem>
+              <SelectItem value="ACTIVE" className="cursor-pointer">
+                <StatusBadge status={"ACTIVE"} />
+              </SelectItem>
+              <SelectItem value="INACTIVE" className="cursor-pointer">
+                <StatusBadge status={"INACTIVE"} />
+              </SelectItem>
+              <SelectItem value="INSPECTING" className="cursor-pointer">
+                <StatusBadge status={"INSPECTING"} />
+              </SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -205,42 +174,39 @@ function CarList() {
             <table className="my-5">
               <tbody>
                 <tr>
-                  <th className={styles["th"]}>차량번호</th>
+                  <th className={`${styles["th"]} w-30`}>차량번호</th>
                   <td className={styles["td"]}>{selectedCar.vehicleNumber}</td>
                 </tr>
                 <tr>
-                  <th className={styles["th"]}>차량명</th>
+                  <th className={`${styles["th"]} w-30`}>차량명</th>
                   <td className={styles["td"]}>{selectedCar.type}</td>
                 </tr>
                 <tr>
-                  <th className={styles["th"]}>상태</th>
+                  <th className={`${styles["th"]} w-30`}>상태</th>
                   <td className={styles["td"]}>
-                    <span
-                      className={`p-1 px-2 font-bold border text-sm rounded-sm 
-                      ${carStatusClass[selectedCar.status]} min-w-[55px]`}
-                    >
-                      {selectedCar.status}
+                    <span className={`p-1 px-2 font-bold text-sm rounded-sm`}>
+                      <StatusBadge status={selectedCar.status} />
                     </span>
                   </td>
                 </tr>
                 <tr>
-                  <th className={styles["th"]}>운행일자</th>
+                  <th className={`${styles["th"]} w-30`}>운행일자</th>
                   <td className={styles["td"]}>{selectedCarInfo?.drivingDate}</td>
                 </tr>
                 <tr>
-                  <th className={styles["th"]}>운행시간</th>
+                  <th className={`${styles["th"]} w-30`}>운행시간</th>
                   <td className={styles["td"]}>{selectedCarInfo?.drivingTime} 분</td>
                 </tr>
                 <tr>
-                  <th className={styles["th"]}>운행거리</th>
+                  <th className={`${styles["th"]} w-30`}>운행거리</th>
                   <td className={styles["td"]}>{selectedCarInfo?.drivingDistanceKm} m</td>
                 </tr>
               </tbody>
             </table>
             <button
               onClick={() => {
-                navigate("/management");
                 setCarNumManage(selectedCar.vehicleNumber);
+                navigate("/management");
               }}
               className="border cursor-pointer font-bold py-1 rounded-sm flex justify-center items-center mb-2"
             >
@@ -249,8 +215,8 @@ function CarList() {
             </button>
             <button
               onClick={() => {
-                navigate("/log");
                 setCarNumLog(selectedCar.vehicleNumber);
+                navigate("/log");
               }}
               className="border cursor-pointer font-bold py-1 rounded-sm flex justify-center items-center"
             >
@@ -259,6 +225,7 @@ function CarList() {
             </button>
           </>
         )}
+        {/* carList.tsx창 최소화(isVisible이 false), 최대화(isVisible이 true) 버튼 */}
         <button
           ref={hideBtnRef}
           onClick={() => {
@@ -274,6 +241,7 @@ function CarList() {
 
   return (
     <section
+      ref={tableRef}
       className={`${styles["car-list"]} border w-80 max-h-145 flex flex-col rounded-xl bg-white box-border p-3`}
     >
       <h3 className="flex justify-between items-center font-bold text-xl mb-2 pr-1">
@@ -289,131 +257,95 @@ function CarList() {
             <SelectItem value="전체" className="cursor-pointer">
               전체
             </SelectItem>
-            <SelectItem value="운행중" className="cursor-pointer">
-              운행중
+            <SelectItem value="ACTIVE" className="cursor-pointer">
+              <StatusBadge status={"ACTIVE"} />
             </SelectItem>
-            <SelectItem value="미운행" className="cursor-pointer">
-              미운행
+            <SelectItem value="INACTIVE" className="cursor-pointer">
+              <StatusBadge status={"INACTIVE"} />
             </SelectItem>
-            <SelectItem value="점검중" className="cursor-pointer">
-              점검중
+            <SelectItem value="INSPECTING" className="cursor-pointer">
+              <StatusBadge status={"INSPECTING"} />
             </SelectItem>
           </SelectContent>
         </Select>
       </h3>
 
-      <form action="#" onSubmit={(e) => e.preventDefault()} className="mb-3">
-        <label
-          className={`${styles["car-list__input"]} flex items-center border-none rounded px-2 py-1`}
-        >
-          <Search className="w-4 h-4 mr-2" />
-          <input
-            value={inputVal}
-            onChange={handleInput}
-            type="text"
-            placeholder="차량 검색"
-            className="w-full h-7 outline-none text-xl"
-          />
-          {inputVal && (
-            <button
-              onClick={() => setInputVal("")}
-              type="button"
-              className="text-sm cursor-pointer opacity-30 mr-[3px] hover:bg-gray-400 rounded-full"
-            >
-              <X />
-            </button>
-          )}
-        </label>
-      </form>
-
-{/* 하나의 차량을 filteredCarList에서 선택했으면, 그 차량과 같은 selectedInfo 가져옴.
- 거기에 위도 경도 좌표 있음 */}
       {/* car는 각 차량 객체 */}
       {isVisible && (
         <>
-          <ul className="flex-1 overflow-y-auto space-y-2 pr-2 min-h-105 pb-2">
-            {filteredCarList.map((car) => {
-              if (!car.latitude || !car.longitude) return null;
-              const iconSrc = carStatusClass[car.status];
-              return (
-                <li
-                  key={car.carNumber}
-                  onClick={() => {
-                    setMapCenterCarList({
-                      lat: car.latitude,
-                      lng: car.longitude,
-                    });
-                    setMapLevelCarList(2);
-                    setSelectedCar(car);
-                    setCarListPage(true);
-                  }}
-                  className={`${styles["car-list__item"]} flex items-center rounded-lg box-border px-2 py-1.5`}
-                >
-                  <span
-                    className={`p-1 px-2 font-bold mr-3 border text-sm rounded-sm ${iconSrc} min-w-[55px]`}
+          <form action="#" onSubmit={(e) => e.preventDefault()} className="mb-3">
+          <label
+            className={`${styles["car-list__input"]} flex items-center border-none rounded px-2 py-1`}
+          >
+            {/* 검색창에서 검색한 내용이 searchedCar로 들어감. 그걸로 다시 api 요청. */}
+            <Search className="w-4 h-4 mr-2" />
+            <input
+              value={!searchedCar ? "" : searchedCar}
+              onChange={(e) => setSearchedCar(e.target.value)}
+              type="text"
+              placeholder="차량 번호 검색"
+              className="w-full h-7 outline-none text-xl"
+            />
+            {/* 뭔가 검색을 했는데 X 버튼 누르면 검색한 거 사라짐 */}
+            {searchedCar && (
+              <button
+                onClick={() => setSearchedCar("")}
+                type="button"
+                className="text-sm cursor-pointer opacity-30 mr-[3px] hover:bg-gray-400 rounded-full"
+              >
+                <X />
+              </button>
+            )}
+          </label>
+          </form>
+          <div ref={tableRef} className="h-100 flex flex-col justify-between gap-4 p-1">
+            <Table>
+              <TableBody>
+                {logs.map((car) => (
+                  <TableRow 
+                    key={car.carNumber} 
+                    className="cursor-pointer flex justify-between"
+                    onClick={() => {
+                      // carLocations에서 carNumber 찾기
+                      // carLocations 배열은 지도의 차량 gps가 담긴 배열 (/api/dashboard/map의 반환값)
+                      const carLocObj = carLocations.find((carObj) => carObj.vehicleNumber === car.carNumber )
+                      if(!carLocObj) {
+                        window.alert("차량이 리스트엔 있는데, 지도엔 없어요")
+                        return
+                      };
+
+                      // zustand에 클릭된 차량의 gps값을 저장하여 그 차량의 위치를 중심으로 지도 이동
+                      setMapCenterCarList({
+                        lat: carLocObj.latitude,
+                        lng: carLocObj.longitude,
+                      });
+                      // 지도를 "2" 크기만큼 확대
+                      setMapLevelCarList(2);
+                      setSelectedCar(carLocObj);
+                      setCarListPage(true);
+                    }}
                   >
-                    {car.status}
-                  </span>
-                  <div>
-                    <div className="font-bold h-5">{car.carNumber}</div>
-                    <div className="opacity-50 h-5">{car.type}</div>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-          <Pagination className="mt-1">
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationDoublePrevious
-                  href="#"
-                  onClick={() => page > 5 && setPage(page - 5)}
-                  className="w-6 h-8 flex items-center justify-center cursor-pointer"
-                ></PaginationDoublePrevious>
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationPrevious
-                  href="#"
-                  onClick={() => page > 1 && setPage(page - 1)}
-                  aria-disabled={page === 1}
-                  className="w-6 h-8 flex items-center justify-center"
-                />
-              </PaginationItem>
-              {visiblePages.map((p) => (
-                <PaginationItem key={p}>
-                  <PaginationLink
-                    href="#"
-                    onClick={() => setPage(p)}
-                    isActive={page === p}
-                    className="w-8 h-8"
-                  >
-                    {p}
-                  </PaginationLink>
-                </PaginationItem>
-              ))}
-              <PaginationItem>
-                <PaginationNext
-                  href="#"
-                  onClick={() => page < totalPages && setPage(page + 1)}
-                  aria-disabled={page === totalPages}
-                  className="w-6 h-8 flex items-center justify-center"
-                />
-              </PaginationItem>
-              <PaginationDoubleNext
-                href="#"
-                onClick={() => page < totalPages - 5 && setPage(page + 5)}
-                className="w-6 h-8 flex items-center justify-center cursor-pointer"
-              ></PaginationDoubleNext>
-            </PaginationContent>
-          </Pagination>
+                    <TableCell className="font-medium">{car.carNumber}</TableCell>
+                    <TableCell>{car.type}</TableCell>
+                    <TableCell>
+                      <StatusBadge status={car.status}/>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+            <TablePagination
+              tableRef={tableRef}
+              total={totalPages}
+              current={currentPage}
+              setCurrent={setCurrentPage}
+            />
+          </div>
         </>
       )}
-
       <button
         ref={hideBtnRef}
-        onClick={() => {
-          setIsVisible(!isVisible);
-        }}
+        onClick={() => {setIsVisible(!isVisible);}}
         className={`${styles["hide-btn"]} rounded-br-xl rounded-bl-xl h-6 border flex justify-center`}
       >
         {isVisible ? <ChevronUp /> : <ChevronDown />}

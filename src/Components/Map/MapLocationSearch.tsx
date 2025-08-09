@@ -16,10 +16,11 @@ type MapTestProps = {
 }
 
 type CustomOverlayStyle = {
-  defaultMarkerImg: kakao.maps.MarkerImage, 
-  hoverMarkerImg: kakao.maps.MarkerImage,
-  bgColor: string,
-  textColor: string,
+  defaultMarkerImg: kakao.maps.MarkerImage;
+  hoverMarkerImg: kakao.maps.MarkerImage;
+  bgColor: string;
+  textColor: string;
+  statusName: string;
 }
 
 function MapLocationSearch ({ maxLevel }: MapTestProps) {
@@ -36,8 +37,6 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
   const { mapCenterCarList, mapLevelCarList } = useTrackCarStore();
   const selectedCarLatLng = useSelectedCarLatLng(state => state.latLng);
   const selectedCarNumber = useSelectedCarLatLng(state => state.carNumber);
-
-  // const [positions, setPositions] = useState<CarWithPath[]>([]);      // positions에는 차량들의 리스트 객체들이 들어감
 
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<kakao.maps.Map | null>(null);
@@ -78,7 +77,8 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
         { offset: new kakao.maps.Point(18, 37) }
       ),
       bgColor: "bg-[#c1d8ff]", 
-      textColor: "text-[#5491f5]"
+      textColor: "text-[#5491f5]",
+      statusName: "운행중"
     },
     "INACTIVE": {
       defaultMarkerImg: new kakao.maps.MarkerImage(
@@ -92,7 +92,8 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
         { offset: new kakao.maps.Point(18, 37) }
       ),
       bgColor: "bg-[#ffcac6]", 
-      textColor: "text-[#e94b3e]"
+      textColor: "text-[#e94b3e]",
+      statusName: "미운행"
     },
     "INSPECTING": {
       defaultMarkerImg: new kakao.maps.MarkerImage(
@@ -106,7 +107,8 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
         { offset: new kakao.maps.Point(18, 37) }
       ),
       bgColor: "bg-[#ffe4be]", 
-      textColor: "text-[#ffa62a]"
+      textColor: "text-[#ffa62a]",
+      statusName: "점검중"
     }
   }), []);
 
@@ -192,6 +194,7 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
       map: mapInstance.current,
       averageCenter: true,
       minLevel: 7,
+      gridSize: 140,
       styles: [{
                 width : '60px', 
                 height : '60px',
@@ -263,7 +266,8 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
             defaultMarkerImg: defaultImg,
             hoverMarkerImg: hoverImg,
             bgColor,
-            textColor
+            textColor,
+            statusName
           } = markerMap[p.status];
 
           let marker = markersRef.current[p.vehicleNumber];        
@@ -289,11 +293,11 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
             const overlay = new kakao.maps.CustomOverlay({            // 오버레이 생성 (한 번만 실행)
               content: `
                 <div class="${styles["overlay-bubble"]}">
-                  <div class="px-3 py-1 text-center">
+                  <div class="px-3 py-1 text-center flex flex-col items-center">
                     <div class="font-bold">${p.vehicleNumber}</div>
                     <div class="font-bold my-1">${p.type}</div>
-                    <div class="${bgColor} ${textColor} p-1 font-bold rounded-sm text-center">
-                      ${p.status}
+                    <div class="${bgColor} ${textColor} w-15 p-1 font-bold rounded-sm text-center">
+                      ${statusName}
                     </div>
                   </div>
                 </div>`,
@@ -378,15 +382,15 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
           !inspectedClustererRef.current) return;
 
       const mapRef: Record<string, {clusterRef: kakao.maps.MarkerClusterer, optionName: string}> = {
-        "운행중": {
+        "ACTIVE": {
           clusterRef: runningClustererRef.current,
           optionName: "ACTIVE"
         },
-        "미운행": {
+        "INACTIVE": {
           clusterRef: notRunningClustererRef.current,
           optionName: "INACTIVE"
         },
-        "점검중": {
+        "INSPECTING": {
           clusterRef: inspectedClustererRef.current,
           optionName: "INSPECTING"
         }

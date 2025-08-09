@@ -1,4 +1,4 @@
-import { type MapCarLocation, fetchMapCarLocation } from "@/Api/Map/MapCarLocation";
+import { fetchMapCarLocation } from "@/Api/Map/MapCarLocation";
 import { create } from "zustand";
 
 export type Position = {
@@ -64,7 +64,7 @@ type MapStateStoreCarList = {
 }
 
 type CarLocations = {
-	carLocations: MapCarLocation;
+	carLocations: CarInfo[];
 	startPolling: (status?: string) => void;
 }
 
