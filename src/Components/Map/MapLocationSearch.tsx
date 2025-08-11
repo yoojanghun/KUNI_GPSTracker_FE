@@ -1,7 +1,7 @@
 import { useEffect, useRef, useMemo } from 'react';
 import { 
   useMapCarLocationStore
-} from '@/Store/Map/totalCarsLoc';
+} from '@/Store/Map/locationSearchTotalCarsLoc';
 import { 
   useSelectCarStore, 
   useCarListPageStore,

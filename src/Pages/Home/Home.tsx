@@ -25,16 +25,16 @@ function Home() {
   useEffect(() => {
     const getStat = () => {
       fetchCarStatistics()
-      .then((carStat) => {
-        if(JSON.stringify(prevCarStat.current) !== JSON.stringify(carStat)){
-          prevCarStat.current = carStat;
-          setCarStat(carStat);
-        }
-      })
-      .catch((error) => console.error(error));
+        .then((carStat) => {
+          if(JSON.stringify(prevCarStat.current) !== JSON.stringify(carStat)){
+            prevCarStat.current = carStat;
+            setCarStat(carStat);
+          }
+        })
+        .catch((error) => console.error(error));
     }
     getStat();      // 처음에 함수를 바로 호출하여 화면에 나타내기
-    const intervalId = setInterval(getStat, 5000);
+    const intervalId = setInterval(getStat, 15_000);
 
     return () => clearInterval(intervalId);
   }, []);
@@ -208,7 +208,7 @@ function Home() {
             </div>
           </div>
           <div className="w-[100%] h-[91%]">
-            <MapHome maxLevel={13} />
+            <MapHome maxLevel={13} minLevel={10} />
           </div>
         </div>
       </div>
