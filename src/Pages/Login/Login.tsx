@@ -1,0 +1,107 @@
+import { Link } from "react-router-dom";
+import { Input } from "@/Components/ui/input";
+import { Button } from "@/Components/ui/button";
+import { Card, CardContent } from "@/Components/ui/card";
+import { Label } from "@/Components/ui/label";
+import { UserRound, Lock } from "lucide-react";
+import Illustrator from "../../assets/illustrator.png";
+import logo from "../../assets/logo.svg";
+import { useState } from "react";
+
+export function Login() {
+  const [username, setUsername] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+
+  const isValid = username.trim() !== "" && password.trim() !== "";
+
+  const onSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!isValid) return;
+    // TODO: 로그인 API 호출
+  };
+  return (
+    <div className="min-h-screen w-full bg-white grid grid-cols-1 md:grid-cols-[1fr_520px]">
+      {/* 좌측 이미지 패널 영역 */}
+      <div className="hidden md:block relative overflow-hidden">
+        <div className="absolute inset-6 rounded-2xl bg-[#377CFB]" />
+        <img
+          src={Illustrator}
+          alt="앱 소개 일러스트"
+          className="absolute inset-0 m-auto max-w-[70%] h-auto drop-shadow-xl"
+        />
+        <div className="absolute bottom-10 left-16 text-white">
+          <p className="text-2xl font-bold">차량 관리</p>
+          <p className="text-2xl font-bold">실시간 추적</p>
+          <p className="text-2xl font-bold mb-3">운행 관리</p>
+          <p className="opacity-90">— 모두 한 번에</p>
+          <p className="opacity-90">복합 인프라 시스템 <span className="font-semibold">GPS Tracker</span></p>
+        </div>
+      </div>
+
+      {/* 우측 로그인 폼 패널 영역 */}
+      <div className="relative flex flex-col px-6 md:px-10">
+        {/* 우측 최상단 로고 */}
+        <div className="flex justify-end pt-6 pb-4">
+          <img src={logo} alt="GPS Tracker" className="h-20" />
+        </div>
+
+        {/* Shadcn Card 컴포넌트를 이용해 요소 배치 */}
+        <div className="flex-1 flex items-start justify-center py-16">
+          <Card className="w-full max-w-[460px] shadow-none border-0">
+            <CardContent className="p-0">
+              <div className="mb-8">
+                <h1 className="text-3xl md:text-[32px] font-extrabold tracking-tight">GPS Tracker에 로그인</h1>
+                <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
+                  <span>회원이 아니신가요?</span>
+                  {/* <span className="font-semibold underline underline-offset-4">회원가입 하기</span> */}
+                  <Link to="/signup" className="font-semibold underline underline-offset-4">회원가입 하기</Link>
+                </div>
+              </div>
+
+              <form className="space-y-4" onSubmit={onSubmit}>
+                {/* 아이디 */}
+                <div className="space-y-2">
+                  <div className="relative">
+                    <UserRound className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                    <Input
+                      id="username"
+                      placeholder="아이디 입력"
+                      autoComplete="username"
+                      className="pl-10 h-12"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                {/* 패스워드 */}
+                <div className="space-y-2">
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                    <Input
+                      id="password"
+                      type="password"
+                      placeholder="패스워드 입력"
+                      autoComplete="current-password"
+                      className="pl-10 h-12"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <Button
+                  type="submit"
+                  className="w-full h-12 bg-[#6F9AFF] text-black hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={!isValid}
+                >
+                  로그인
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -14,6 +14,7 @@ const navItems: NavItem[] = [
   { to: "/location",    icon: <MapPin />, label: "위치 조회" },
   { to: "/management",  icon: <Wrench />,     label: "차량 관리" },
   { to: "/log",         icon: <Folder />,   label: "운행 일지" },
+  { to: "/login",         icon: <Folder />,   label: "로그인" },
 ];
 
 const Navbar = () => {
