@@ -52,8 +52,8 @@ export function LogTable() {
 
 
   return (
-    <div ref={tableRef} className="w-full flex flex-col gap-4 p-1 overflow-auto">
-      <Table className="table-fixed w-full">
+    <div ref={tableRef}>
+      <Table className="my-4">
         <TableHeader>
           <TableRow>
             <TableHead className="w-[35px] text-start cursor-pointer">
@@ -65,7 +65,7 @@ export function LogTable() {
                 )}
               </div>
             </TableHead>
-            <TableHead className="w-[100px] text-start">
+            <TableHead className="text-start">
               <div className="flex items-center justify-center gap-1">
                 <span>차량 번호</span>
               </div>
@@ -95,7 +95,7 @@ export function LogTable() {
         </TableHeader>
         <TableBody>
           {logs.map((dlog) => (
-            <TableRow key={dlog.vehicleNumber} className="text-center">
+            <TableRow key={dlog.id} className="text-center">
               <TableCell></TableCell>
               <TableCell className="font-medium">{dlog.vehicleNumber}</TableCell>
               <TableCell>{dlog.vehicleName}</TableCell>
