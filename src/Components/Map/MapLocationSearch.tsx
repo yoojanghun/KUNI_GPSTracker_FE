@@ -1,7 +1,7 @@
 import { useEffect, useRef, useMemo } from 'react';
 import { 
   useMapCarLocationStore
-} from '@/Store/Map/locationSearchTotalCarsLoc';
+} from '@/Store/Map/LocationSearchTotalCarsLoc';
 import { 
   useSelectCarStore, 
   useCarListPageStore,
@@ -57,6 +57,7 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
   const overlayRef = useRef<Record<string, kakao.maps.CustomOverlay>>({});
 
   const startPolling = useMapCarLocationStore(state => state.startPolling);
+  const stopPolling = useMapCarLocationStore(state => state.startPolling);
   const carLocations = useMapCarLocationStore(state => state.carLocations);
 
   // 실제로는 zustand에서 정의한 useMapCarLocationStore의 
@@ -64,6 +65,7 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
   // 또한 파라미터를 하나 더 추가해서 그게 false이면, 프로그램에서 삭제된 차량 => 마커 완전히 제거
   useEffect(() => {
     startPolling();
+    return () => stopPolling();
   }, []);
 
   const markerMap = useMemo<Record<string, CustomOverlayStyle>>(() => ({

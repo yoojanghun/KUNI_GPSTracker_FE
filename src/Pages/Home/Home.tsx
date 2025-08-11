@@ -1,3 +1,4 @@
+import { MapPin, Calendar } from "lucide-react";
 import total from "../../assets/car-status-icons/total.svg";
 import working from "../../assets/car-status-icons/working.svg";
 import notWorking from "../../assets/car-status-icons/not-working.svg";
@@ -8,13 +9,13 @@ import styles from "./Home.module.css";
 
 import CarsPerDayChart from "@/Components/CarsPerDayChart";
 import MapHome from "@/Components/Map/MapHome";
+
 import { useCarStatusBtnStore } from "@/Store/Home/mapState";
-import { MapPin, Calendar } from "lucide-react";
 
 import { type CarStatusNum, fetchCarStatistics } from "@/Api/Home/CarStatistics";
 import { useEffect, useState, useRef } from "react";
+import { prcInterval } from 'precision-timeout-interval';
 
-// 아직 이 페이지에서 지도는 api를 받고 있지 않습니다(더미데이터 사용중)
 function Home() {
   const [carStat, setCarStat] = useState<CarStatusNum | null>(null);
   // carStat = {vehicles: 500, active: 0, inactive: 500, inspect: 0}
@@ -23,6 +24,8 @@ function Home() {
   const { carStatusBtn, setCarStatusBtn } = useCarStatusBtnStore();
 
   useEffect(() => {
+    let mounted = true;
+
     const getStat = () => {
       fetchCarStatistics()
         .then((carStat) => {
@@ -32,12 +35,19 @@ function Home() {
           }
         })
         .catch((error) => console.error(error));
-    }
+    };
     getStat();      // 처음에 함수를 바로 호출하여 화면에 나타내기
-    const intervalId = setInterval(getStat, 15_000);
 
-    return () => clearInterval(intervalId);
-  }, []);
+    const intervalId = prcInterval(15_000, () => {
+      if(!mounted) return;
+      getStat();
+    });
+
+    return () => {
+      mounted = false;
+      intervalId.cancel();
+    };
+  }, [])
  
   if(!carStat) return;
   const { 
