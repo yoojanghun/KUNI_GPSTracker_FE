@@ -173,11 +173,11 @@ export function DLogDetails() {
   }
 
   return (
-    <div className="flex flex-col gap-6 py-8 w-full mx-auto">
-      <div className="w-full px-12 flex justify-between items-center">
+    <div className="flex flex-col gap-6 py-6 md:py-8 w-full max-w-screen-xl mx-auto">
+      <div className="w-full px-4 md:px-12 flex flex-wrap gap-3 justify-between items-center">
         <div className="flex items-center gap-3">
           <DLogHeader />
-          <span className="whitespace-nowrap text-xl font-medium text-[#969696]">
+          <span className="whitespace-nowrap text-lg md:text-xl font-medium text-[#969696]">
             {log.vehicleNumber}, {log.vehicleName}
           </span>
         </div>
@@ -189,65 +189,76 @@ export function DLogDetails() {
           목록으로
         </div>
       </div>
-      <div className="m-5 mx-20">
-        <div className="flex flex-row gap-5 mb-6 justify-start w-full">
-          <div className="border rounded-[12px] border-[#000000]/10 shadow-md px-8 py-6 justify-between gap-4 flex flex-col shrink-0">
-            <div className="flex items-center gap-3 font-bold text-xl">
-              <Clock size={22} />
-              시작 시간
+      <div className="px-4 md:px-8 xl:px-20">
+        <div className="flex flex-col gap-4 md:gap-5 w-full">
+          {/* Row 1: all info cards in a single line */}
+          <div className="flex flex-nowrap gap-4 md:gap-5 w-full items-stretch">
+            {/* 시작 시간 */}
+            <div className="flex-1 min-w-0 border rounded-[12px] border-[#000000]/10 shadow-md px-3 sm:px-4 md:px-6 py-3 sm:py-4 md:py-6 justify-between gap-2 sm:gap-3 md:gap-4 flex flex-col shrink">
+              <div className="flex items-center gap-2 sm:gap-3 font-bold text-sm sm:text-base md:text-lg">
+                <Clock size={20} />
+                시작 시간
+              </div>
+              <div className="text-[#969696] text-xs sm:text-sm md:text-base break-words whitespace-normal">
+                {log.onTime.replace("T", " ")}
+              </div>
             </div>
-            <div className="text-[#969696] text-lg">
-              {log.onTime.replace("T", " ")}
+            {/* 종료 시간 */}
+            <div className="flex-1 min-w-0 border rounded-[12px] border-[#000000]/10 shadow-md px-3 sm:px-4 md:px-6 py-3 sm:py-4 md:py-6 justify-between gap-2 sm:gap-3 md:gap-4 flex flex-col shrink">
+              <div className="flex items-center gap-2 sm:gap-3 font-bold text-sm sm:text-base md:text-lg">
+                <ClockFading size={20} />
+                종료 시간
+              </div>
+              <div className="text-[#969696] text-xs sm:text-sm md:text-base break-words whitespace-normal">
+                {log.offTime.replace("T", " ")}
+              </div>
+            </div>
+            {/* 총 운행거리 */}
+            <div className="flex-1 min-w-0 border rounded-[12px] border-[#000000]/10 shadow-md px-3 sm:px-4 md:px-6 py-3 sm:py-4 md:py-6 justify-between gap-2 sm:gap-3 md:gap-4 flex flex-col shrink">
+              <div className="flex items-center gap-2 sm:gap-3 font-bold text-sm sm:text-base md:text-lg">
+                <Clipboard size={20} />
+                총 운행거리
+              </div>
+              <div className="text-[#969696] text-xs sm:text-sm md:text-base truncate">
+                {(Number(log.sumDist) / 1000).toFixed(1).toLocaleString()} km
+              </div>
+            </div>
+            {/* 시작/종료 주소 */}
+            <div className="flex-[1.6] min-w-0 border rounded-[12px] border-[#000000]/10 shadow-md px-3 sm:px-5 md:px-8 py-3 sm:py-4 md:py-6 justify-between gap-3 md:gap-4 flex flex-col">
+              <div className="flex gap-2 sm:gap-3 min-w-0">
+                <div className="flex items-center gap-2 sm:gap-3 font-bold text-sm sm:text-base md:text-lg">
+                  <Play size={20} />
+                </div>
+                <div className="text-[#969696] text-[11px] sm:text-xs md:text-sm break-words whitespace-normal">
+                  {!startAddr ? "주소 불러오는 중.." : startAddr}
+                </div>
+              </div>
+              <Separator orientation="vertical" className="hidden" />
+              <Separator orientation="horizontal" className="" />
+              <div className="flex gap-2 sm:gap-3 min-w-0">
+                <div className="flex items-center gap-2 sm:gap-3 font-bold text-sm sm:text-base md:text-lg">
+                  <CircleSlash size={20} />
+                </div>
+                <div className="text-[#969696] text-[11px] sm:text-xs md:text-sm break-words whitespace-normal">
+                  {!endAddr ? "주소 불러오는 중.." : endAddr}
+                </div>
+              </div>
             </div>
           </div>
-          <div className="border rounded-[12px] border-[#000000]/10 shadow-md px-8 py-6 justify-between gap-4 flex flex-col shrink-0">
-            <div className="flex items-center gap-3 font-bold text-xl">
-              <ClockFading size={22} />
-              종료 시간
+          {/* Row 2: map full width */}
+          <div className="border rounded-[12px] border-[#000000]/10 shadow-md px-4 sm:px-6 md:px-8 py-4 sm:py-5 md:py-6 justify-start gap-3 sm:gap-4 flex flex-col w-full">
+            <div className="flex items-center gap-2 sm:gap-3 font-bold text-base sm:text-lg md:text-xl">
+              <Map size={22} />
+              운행 경로
             </div>
-            <div className="text-[#969696] text-lg">
-              {log.offTime.replace("T", " ")}
-            </div>
-          </div>
-          <div className="border rounded-[12px] border-[#000000]/10 shadow-md px-6 py-6 justify-between gap-4 flex flex-col shrink-0">
-            <div className="flex items-center gap-3 font-bold text-xl">
-              <Clipboard size={22} />총 운행거리
-            </div>
-            <div className="text-[#969696] text-lg">{(Number(log.sumDist) / 1000).toFixed(1).toLocaleString()} km</div>
-          </div>
-          <div className="border rounded-[12px] border-[#000000]/10 shadow-md px-10 py-6 justify-between gap-8 flex w-full">
-            <div className="flex flex-col gap-6">
-              <div className="flex items-center gap-3 font-bold text-xl">
-                <Play size={22} />
-                시작 주소
-              </div>
-              <div className="text-[#969696] text-sm">
-                {!startAddr ? "주소 불러오는 중.." : startAddr}
-              </div>
-            </div>
-            <Separator orientation="vertical" />
-            <div className="flex flex-col gap-6">
-              <div className="flex items-center gap-3 font-bold text-xl">
-                <CircleSlash size={22} />
-                종료 주소
-              </div>
-              <div className="text-[#969696] text-sm">
-                {!endAddr ? "주소 불러오는 중.." : endAddr}
-              </div>
-            </div>
+            <div
+              ref={containerRef}
+              id="map"
+              className="w-full h-[260px] sm:h-[320px] md:h-[420px] lg:h-[520px] rounded-[6px]"
+            ></div>
           </div>
         </div>
-        <div className="border rounded-[12px] border-[#000000]/10 shadow-md px-8 py-5 justify-start gap-4 flex flex-col">
-          <div className="flex items-center gap-3 font-bold text-xl">
-            <Map size={22} />
-            운행 경로
-          </div>
-          <div
-            ref={containerRef}
-            id="map"
-            className="w-full h-[450px] rounded-[6px]"
-          ></div>
-        </div>
+        <div className="mt-6" />
       </div>
       <div className="mt-6"></div>
     </div>
