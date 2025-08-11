@@ -23,13 +23,15 @@ import {
 } from "@/Components/ui/table";
 import { TablePagination } from "../TablePagination";
 import {
-  useSelectCarStore,
-  useCarStatusOptionStore,
-  useTrackCarStore,
-  useSelectedCarLatLng,
-  useCarListPageStore,
   useMapCarLocationStore
-} from "@/Store/carStatus";
+} from "@/Store/Map/totalCarsLoc";
+import { 
+  useSelectCarStore, 
+  useCarListPageStore,
+  useTrackCarStore,
+  useCarStatusOptionStore,
+  useSelectedCarLatLng,
+} from "@/Store/LocationSearch/carList";
 import { useCarStore } from "@/Store/carStore";
 import { fetchTotalCarsList, useSearchedCar } from "@/Api/CarList/carListStore";
 import { useDLogStore } from "@/Store/dlogStore";

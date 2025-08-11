@@ -8,7 +8,7 @@ import {
 	Tooltip,
 	ResponsiveContainer,
 } from "recharts";
-import { type ActiveCarStat, fetchActiveCarStat } from "@/Api/HomeApi/ActiveCarStat";
+import { type ActiveCarStat, fetchActiveCarStat } from "@/Api/Home/ActiveCarStat";
 
 type ChartData = {
 	name: string;

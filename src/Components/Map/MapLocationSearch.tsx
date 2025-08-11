@@ -1,13 +1,15 @@
 import { useEffect, useRef, useMemo } from 'react';
 import { 
-  useCarListPageStore, 
-  useCarStatusOptionStore, 
-  useLocationSearchMapStore, 
-  useSelectCarStore, 
-  useSelectedCarLatLng, 
-  useTrackCarStore,
   useMapCarLocationStore
-} from '@/Store/carStatus';
+} from '@/Store/Map/totalCarsLoc';
+import { 
+  useSelectCarStore, 
+  useCarListPageStore,
+  useTrackCarStore,
+  useCarStatusOptionStore, 
+  useSelectedCarLatLng, 
+} from '@/Store/LocationSearch/carList';
+import { useLocationSearchMapStore } from '@/Store/LocationSearch/mapState';
 import styles from "./MapCustomOverlay.module.css";
 import {} from 'react-kakao-maps-sdk';
 

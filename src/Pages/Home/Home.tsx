@@ -8,10 +8,10 @@ import styles from "./Home.module.css";
 
 import CarsPerDayChart from "@/Components/CarsPerDayChart";
 import MapHome from "@/Components/Map/MapHome";
-import { useCarStatusBtnStore } from "@/Store/carStatus";
+import { useCarStatusBtnStore } from "@/Store/Home/mapState";
 import { MapPin, Calendar } from "lucide-react";
 
-import { type CarStatusNum, fetchCarStatistics } from "@/Api/HomeApi/CarStatistics";
+import { type CarStatusNum, fetchCarStatistics } from "@/Api/Home/CarStatistics";
 import { useEffect, useState, useRef } from "react";
 
 // 아직 이 페이지에서 지도는 api를 받고 있지 않습니다(더미데이터 사용중)

@@ -1,13 +1,23 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { 
-  type CarInfo,
-  type Position,
-  useCarStatusBtnStore, 
-  useHomeMapStore 
-} from '@/Store/carStatus';
+import { useHomeMapStore } from '@/Store/Home/mapState';
+import { useCarStatusBtnStore } from '@/Store/Home/mapState';
 import styles from "./MapCustomOverlay.module.css";
 
 type CarWithPath = Omit<CarInfo, "path"> & { path: Position[]; };
+
+type Position = {
+	lat: number;
+	lng: number;
+	time: number;
+}
+
+type CarInfo = {
+	latitude: number;
+	longitude: number;
+	status: string;
+	vehicleNumber: string;
+	type: string;
+}
 
 type MapTestProps = {
   maxLevel: number;
