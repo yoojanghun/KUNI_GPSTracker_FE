@@ -41,7 +41,8 @@ export const useMapCarLocationStore = create<CarLocations>((set) => ({
                 .catch(error => console.error(error))
         }
         getStat();
-        intervalCtrl = prcInterval(60_000, getStat);
+        intervalCtrl = prcInterval(10_000, getStat);
+        console.log("전체 차량 gps 값");
     },
     stopPolling: () => {
         intervalCtrl?.cancel();

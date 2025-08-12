@@ -23,7 +23,7 @@ import {
 } from "@/Components/ui/table";
 import { TablePagination } from "../TablePagination";
 import { StatusBadge } from "../StatusBadge";
-import { useMapCarLocationStore } from "@/Store/Map/LocationSearchTotalCarsLoc"
+import { useMapCarLocationStore } from "@/Store/Map/locationSearchTotalCarsLoc"
 import { 
   useSelectCarStore, 
   useCarListPageStore,
@@ -97,6 +97,7 @@ function CarList() {
 
   useEffect(() => {
     totalCarLoc();
+    console.log("페이지네이션");
   }, [totalCarLoc]);
 
   // 리스트에서 클릭된 차량에 대한 정보를 받음. (/api/location/{vehicleNumber})
@@ -110,7 +111,7 @@ function CarList() {
       return;
     }
     fetchSelectedCarStat(selectedCar.vehicleNumber, 0)
-      .then(car => setSelectedCarInfo(car))
+      .then(car => {setSelectedCarInfo(car); console.log("첫 번째 gpsRecordId");})
       .catch(console.error);
   }, [selectedCar]);
 
@@ -127,6 +128,7 @@ function CarList() {
           setSelectedCarInfo(car); 
           setSelectedCarLatLng(car.location);   
           setSelectedCarNumber(car.vehicleNumber);
+          console.log("gpsRecordId");
         })
         .catch(console.error);
     });

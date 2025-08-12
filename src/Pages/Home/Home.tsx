@@ -39,7 +39,7 @@ function Home() {
     getStat();      // 처음에 함수를 바로 호출하여 화면에 나타내기
 
     const intervalId = prcInterval(15_000, () => {
-      if(!mounted) return;
+      if(!mounted) return;        // 컴포넌트가 마운트 안되면 return 하기
       getStat();
     });
 
