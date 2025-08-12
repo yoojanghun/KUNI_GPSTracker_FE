@@ -8,10 +8,10 @@ import styles from "./Home.module.css";
 
 import CarsPerDayChart from "@/Components/CarsPerDayChart";
 import MapHome from "@/Components/Map/MapHome";
-import { useCarStatusBtnStore } from "@/Store/carStatus";
+import { useCarStatusBtnStore } from "@/Store/Home/mapState";
 import { MapPin, Calendar } from "lucide-react";
 
-import { type CarStatusNum, fetchCarStatistics } from "@/Api/HomeApi/CarStatistics";
+import { type CarStatusNum, fetchCarStatistics } from "@/Api/Home/CarStatistics";
 import { useEffect, useState, useRef } from "react";
 
 // 아직 이 페이지에서 지도는 api를 받고 있지 않습니다(더미데이터 사용중)
@@ -25,16 +25,16 @@ function Home() {
   useEffect(() => {
     const getStat = () => {
       fetchCarStatistics()
-      .then((carStat) => {
-        if(JSON.stringify(prevCarStat.current) !== JSON.stringify(carStat)){
-          prevCarStat.current = carStat;
-          setCarStat(carStat);
-        }
-      })
-      .catch((error) => console.error(error));
+        .then((carStat) => {
+          if(JSON.stringify(prevCarStat.current) !== JSON.stringify(carStat)){
+            prevCarStat.current = carStat;
+            setCarStat(carStat);
+          }
+        })
+        .catch((error) => console.error(error));
     }
     getStat();      // 처음에 함수를 바로 호출하여 화면에 나타내기
-    const intervalId = setInterval(getStat, 5000);
+    const intervalId = setInterval(getStat, 15_000);
 
     return () => clearInterval(intervalId);
   }, []);
@@ -208,7 +208,7 @@ function Home() {
             </div>
           </div>
           <div className="w-[100%] h-[91%]">
-            <MapHome maxLevel={13} />
+            <MapHome maxLevel={13} minLevel={10} />
           </div>
         </div>
       </div>

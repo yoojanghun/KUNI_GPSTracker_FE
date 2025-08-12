@@ -22,14 +22,14 @@ import {
   TableRow,
 } from "@/Components/ui/table";
 import { TablePagination } from "../TablePagination";
-import {
-  useSelectCarStore,
-  useCarStatusOptionStore,
-  useTrackCarStore,
-  useSelectedCarLatLng,
+import { useMapCarLocationStore } from "@/Store/Map/locationSearchTotalCarsLoc";
+import { 
+  useSelectCarStore, 
   useCarListPageStore,
-  useMapCarLocationStore
-} from "@/Store/carStatus";
+  useTrackCarStore,
+  useCarStatusOptionStore,
+  useSelectedCarLatLng,
+} from "@/Store/LocationSearch/carList";
 import { useCarStore } from "@/Store/carStore";
 import { fetchTotalCarsList, useSearchedCar } from "@/Api/CarList/carListStore";
 import { useDLogStore } from "@/Store/dlogStore";
@@ -281,7 +281,7 @@ function CarList() {
             <Search className="w-4 h-4 mr-2" />
             <input
               value={!searchedCar ? "" : searchedCar}
-              onChange={(e) => setSearchedCar(e.target.value)}
+              onChange={(e) => {setSearchedCar(e.target.value); setCurrentPage(1);}}
               type="text"
               placeholder="차량 번호 검색"
               className="w-full h-7 outline-none text-xl"
