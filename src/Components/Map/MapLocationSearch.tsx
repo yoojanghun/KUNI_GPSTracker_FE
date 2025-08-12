@@ -54,9 +54,11 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
   const activeMarkerImgRef = useRef<kakao.maps.MarkerImage | null>(null);
 
   const markersRef = useRef<Record<string, kakao.maps.Marker>>({});
+  const selectedMarkerNumRef = useRef<string | null>(null);
   const overlayRef = useRef<Record<string, kakao.maps.CustomOverlay>>({});
 
   const startPolling = useMapCarLocationStore(state => state.startPolling);
+  const stopPolling = useMapCarLocationStore(state => state.stopPolling);
   const carLocations = useMapCarLocationStore(state => state.carLocations);
 
   // 실제로는 zustand에서 정의한 useMapCarLocationStore의 
@@ -64,6 +66,7 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
   // 또한 파라미터를 하나 더 추가해서 그게 false이면, 프로그램에서 삭제된 차량 => 마커 완전히 제거
   useEffect(() => {
     startPolling();
+    return () => stopPolling();
   }, []);
 
   const markerMap = useMemo<Record<string, CustomOverlayStyle>>(() => ({
@@ -234,6 +237,8 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
       activeOverlayRef.current = null;
       activeMarkerRef.current = null;
       activeMarkerImgRef.current = null;
+      selectedMarkerNumRef.current = null;
+      setSelectedCar(null);
     }
     kakao.maps.event.addListener(mapInstance.current, "click", removeOverlayMap)
 
@@ -246,18 +251,16 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
   // 마커와 클러스터링 생성, 만들어진 마커로 지도 클러스터링
   useEffect(() => {
     // const currentCars = positions.map(p => p.vehicleNumber);
-
     totalClustererRef.current?.clear();
     runningClustererRef.current?.clear();
     notRunningClustererRef.current?.clear();
     inspectedClustererRef.current?.clear();
     
-    activeOverlayRef.current?.setMap(null);
+    // activeOverlayRef.current?.setMap(null);
     activeMarkerRef.current = null;
     activeMarkerImgRef.current = null;
     
-    const offHandlers: Array<() => void> = [];
-
+    // const offHandlers: Array<() => void> = [];
     const makeMarkers = (status?: string) => {
       const createdMarkers: kakao.maps.Marker[] = [];
       carLocations
@@ -272,18 +275,19 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
             statusName
           } = markerMap[p.status];
 
-          let marker = markersRef.current[p.vehicleNumber];        
+          let selectedMarkerNum = selectedMarkerNumRef.current;
+          let marker = markersRef.current[p.vehicleNumber];   
 
-          // 아래는 marker가 존재하면 setPosition이다. 
-          // 그런데 이를 "마커의 상태, gps가 변하면" 으로 수정 
-          if(marker) {                                            // 지도에 표시된 차량이 이미 존재
+          // 이를 "마커의 상태, gps가 변하면" 으로 수정 
+          // marker(지도에 이미 표시된 차량)가 존재하고, selectedMarkersRef에 없으면 
+          if(marker && p.vehicleNumber !== selectedMarkerNum) {
             marker.setPosition(latLng);
             marker.setImage(defaultImg);
             if(overlayRef.current[p.vehicleNumber]) {
               overlayRef.current[p.vehicleNumber].setPosition(latLng);
             }
           }
-          else {
+          else if(!marker) {
             if(!mapInstance.current) return;
             marker = new kakao.maps.Marker({                          // 마커 생성 (한 번만 실행)
               position: latLng,
@@ -317,6 +321,7 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
               activeOverlayRef.current = overlay;
               activeMarkerRef.current = marker;
               activeMarkerImgRef.current = defaultImg;
+              selectedMarkerNumRef.current = p.vehicleNumber;
             }
 
             const setOverlay = () => {
@@ -348,18 +353,19 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
                 activeOverlayRef.current = overlay;
                 activeMarkerRef.current = marker;
                 activeMarkerImgRef.current = defaultImg;
+                selectedMarkerNumRef.current = p.vehicleNumber;
                 setSelectedCar(p);
                 setCarListPage(true);
               }
             }
             kakao.maps.event.addListener(marker, "mouseover", setOverlay);
-            offHandlers.push(() => kakao.maps.event.removeListener(marker, "mouseover", setOverlay));   
+            // offHandlers.push(() => kakao.maps.event.removeListener(marker, "mouseover", setOverlay));   
 
             kakao.maps.event.addListener(marker, "mouseout", deleteOverlay);
-            offHandlers.push(() => kakao.maps.event.removeListener(marker, "mouseout", deleteOverlay));
+            // offHandlers.push(() => kakao.maps.event.removeListener(marker, "mouseout", deleteOverlay));
 
             kakao.maps.event.addListener(marker, "click", controlClickOverlay);
-            offHandlers.push(() => kakao.maps.event.removeListener(marker, "click", controlClickOverlay));
+            // offHandlers.push(() => kakao.maps.event.removeListener(marker, "click", controlClickOverlay));
           }
           createdMarkers.push(marker);
         })
@@ -403,13 +409,14 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
       mapRefClusterRef.addMarkers(makeMarkers(mapRefOptionName));
     }
     
-    return () => {
-      offHandlers.forEach(removeFunc => removeFunc());
-      Object.values(markersRef.current).forEach(marker => marker.setMap(null));
-      Object.values(overlayRef.current).forEach(overlay => overlay.setMap(null));
-      markersRef.current = {};
-      overlayRef.current = {};
-    }
+    // useEffect가 다시 실행되기 이전에, 컴포넌트 unmount될 때 cleanup 실행됨.
+    // return () => {
+      // offHandlers.forEach(removeFunc => removeFunc());
+      // Object.values(markersRef.current).forEach(marker => marker.setMap(null));
+      // Object.values(overlayRef.current).forEach(overlay => overlay.setMap(null));
+      // markersRef.current = {};
+      // overlayRef.current = {};
+    // }
   }, [carStatusOption, carLocations, selectedCar]);
 
   useEffect(() => {
@@ -417,8 +424,9 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
     if (!selectedCarNumber || latitude == null || longitude == null) return;
 
     const marker = markersRef.current[selectedCarNumber];
-    const overlay = overlayRef.current[selectedCarNumber];
+    selectedMarkerNumRef.current = selectedCarNumber;
 
+    const overlay = overlayRef.current[selectedCarNumber];
     const newPos = new kakao.maps.LatLng(latitude, longitude);
 
     if (marker) marker.setPosition(newPos);

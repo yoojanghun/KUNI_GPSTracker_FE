@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { prcInterval } from "precision-timeout-interval";
 import {
 	LineChart,
 	Line,
@@ -33,10 +34,10 @@ function CarsPerDayChart() {
 				.catch((error) => console.error(error));
 		}
 		getStat();
-		const intervalId = setInterval(getStat, 5000);
+		const intervalCtrl = prcInterval(15_000, getStat);
 
 		return () => {
-			clearInterval(intervalId);
+			intervalCtrl.cancel();
 		}
 	}, [])
 
