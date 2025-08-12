@@ -10,10 +10,15 @@ interface DLogStore {
   vehicleNumber: string;
   startTime: string;
   endTime: string;
+  appliedVehicleNumber: string;
+  appliedStartTime: string;
+  appliedEndTime: string;
   currentPage: number;
   size: number;
   sort: "onTime,ASC" | "onTime,DESC";
   isDateValid: boolean;
+  hasSearched: boolean;
+  searchNonce: number;
 
   // 함수
   fetchDLogs: (params: {
@@ -31,6 +36,9 @@ interface DLogStore {
   setStartTime: (startTime: string) => void;
   setEndTime: (endTime: string) => void;
   setIsDateValid: (isValid: boolean) => void;
+  setHasSearched: (hasSearched: boolean) => void;
+  setSearchNonce: (searchNonce: number) => void;
+  applySearch: () => void;
 }
 
 export const useDLogStore = create<DLogStore>((set, get) => ({
@@ -40,25 +48,34 @@ export const useDLogStore = create<DLogStore>((set, get) => ({
   vehicleNumber: "",
   startTime: "",
   endTime: "",
+  appliedVehicleNumber: "",
+  appliedStartTime: "",
+  appliedEndTime: "",
   currentPage: 0,
   size: 10,
   sort: "onTime,ASC",
   isDateValid: true,
+  hasSearched: true,
+  searchNonce: 0,
 
   fetchDLogs: async ({
     page = get().currentPage,
     size = get().size,
-    vehicleNumber = get().vehicleNumber,
-    startTime = get().startTime,
-    endTime = get().endTime,
+    vehicleNumber = get().appliedVehicleNumber || get().vehicleNumber,
+    startTime = get().appliedStartTime || get().startTime,
+    endTime = get().appliedEndTime || get().endTime,
     sort = get().sort,
   }) => {
     const adjustedStartTime = startTime
-      ? new Date(new Date(startTime).setHours(0, 0, 0, 0)).toISOString()
+      ? new Date(`${startTime}T00:00:00+09:00`).toISOString()
       : undefined;
     const adjustedEndTime = endTime
-      ? new Date(new Date(endTime).setHours(23, 59, 59, 999)).toISOString()
+      ? new Date(`${endTime}T23:59:59.999+09:00`).toISOString()
       : undefined;
+
+    console.log("adjusted startTime: ", adjustedStartTime);
+    console.log("adjusted endTime: ", adjustedEndTime);
+
     try {
       console.log("logtable size: ", size)
       const res = await getLogList({
@@ -82,6 +99,9 @@ export const useDLogStore = create<DLogStore>((set, get) => ({
         vehicleNumber: vehicleNumber,
         startTime: startTime,
         endTime: endTime,
+        appliedStartTime: startTime,
+        appliedEndTime: endTime,
+        appliedVehicleNumber: vehicleNumber,
         sort: sort,
       });
     } catch (err) {
@@ -91,17 +111,15 @@ export const useDLogStore = create<DLogStore>((set, get) => ({
 
   dateValidation: () => {
     const { startTime, endTime, setIsDateValid } = get();
-    const start = new Date(startTime);
-    const end = new Date(endTime);
-
-    if (
-      start.getTime() > end.getTime() ||
-      (startTime === "" && endTime === "")
-    ) {
+    if (startTime === "" && endTime === "") {
       setIsDateValid(false);
-    } else {
-      setIsDateValid(true);
+      return;
     }
+    if (startTime && endTime) {
+      setIsDateValid(startTime <= endTime);
+      return;
+    }
+    setIsDateValid(true);
   },
 
   setVehicleNumber: (vehicleNumber: string) => set({ vehicleNumber }),
@@ -111,4 +129,18 @@ export const useDLogStore = create<DLogStore>((set, get) => ({
   setEndTime: (endTime: string) => set({ endTime }),
 
   setIsDateValid: (isValid: boolean) => set({ isDateValid: isValid }),
+
+  setHasSearched: (hasSearched: boolean) => set({ hasSearched: hasSearched}),
+
+  setSearchNonce: (searchNonce: number) => set({ searchNonce: searchNonce}),
+
+  applySearch: () => {
+    const { vehicleNumber, startTime, endTime } = get();
+    set({
+      appliedVehicleNumber: vehicleNumber,
+      appliedStartTime: startTime,
+      appliedEndTime: endTime,
+      searchNonce: Date.now(),
+    });
+  },
 }));

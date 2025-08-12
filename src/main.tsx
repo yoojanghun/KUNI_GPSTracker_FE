@@ -3,6 +3,8 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
 import { worker } from './mocks/browser';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { queryClient } from './lib/queryClient.ts';
 
 if (import.meta.env.MODE === "development") {
   worker.start();
@@ -10,6 +12,8 @@ if (import.meta.env.MODE === "development") {
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <App />
+    <QueryClientProvider client={queryClient}>
+        <App />
+    </QueryClientProvider>
   </StrictMode>
 );
