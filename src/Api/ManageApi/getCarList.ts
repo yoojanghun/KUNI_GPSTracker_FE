@@ -24,6 +24,8 @@ export const getCarList = async (
     params.append("vehicleName", request.vehicleName);
   }
 
+  console.log("carList params: ", params.toString());
+
   const data = await api
     .get(`api/vehicle?${params.toString()}`)
     .json<getCarListResponse>();
