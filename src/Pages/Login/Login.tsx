@@ -2,10 +2,6 @@ import { Link } from "react-router-dom";
 import { Input } from "@/Components/ui/input";
 import { Button } from "@/Components/ui/button";
 import { Card, CardContent } from "@/Components/ui/card";
-<<<<<<< Updated upstream
-import { Label } from "@/Components/ui/label";
-=======
->>>>>>> Stashed changes
 import { UserRound, Lock } from "lucide-react";
 import Illustrator from "../../assets/illustrator.png";
 import logo from "../../assets/logo.svg";
@@ -15,11 +11,8 @@ export function Login() {
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
 
-<<<<<<< Updated upstream
-=======
 
 
->>>>>>> Stashed changes
   const isValid = username.trim() !== "" && password.trim() !== "";
 
   const onSubmit = (e: React.FormEvent) => {
@@ -61,10 +54,6 @@ export function Login() {
                 <h1 className="text-3xl md:text-[32px] font-extrabold tracking-tight">GPS Tracker에 로그인</h1>
                 <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
                   <span>회원이 아니신가요?</span>
-<<<<<<< Updated upstream
-                  {/* <span className="font-semibold underline underline-offset-4">회원가입 하기</span> */}
-=======
->>>>>>> Stashed changes
                   <Link to="/signup" className="font-semibold underline underline-offset-4">회원가입 하기</Link>
                 </div>
               </div>
@@ -74,11 +63,7 @@ export function Login() {
                 <div className="space-y-2">
                   <div className="relative">
                     <UserRound className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-<<<<<<< Updated upstream
-                    <Input
-=======
                       <Input
->>>>>>> Stashed changes
                       id="username"
                       placeholder="아이디 입력"
                       autoComplete="username"
@@ -86,10 +71,7 @@ export function Login() {
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
                     />
-<<<<<<< Updated upstream
-=======
       
->>>>>>> Stashed changes
                   </div>
                 </div>
 

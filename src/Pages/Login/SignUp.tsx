@@ -14,18 +14,12 @@ export function SignUp() {
   const [password, setPassword] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [role, setRole] = useState<string>("");
-<<<<<<< Updated upstream
-=======
   const [isValidName, setIsValidName] = useState<boolean>(false);
->>>>>>> Stashed changes
 
   const isValid =
     username.trim() !== "" &&
     password.trim() !== "" &&
     email.trim() !== "" &&
-<<<<<<< Updated upstream
-    role.trim() !== "";
-=======
     role.trim() !== "" &&
     isValidName;
 
@@ -33,7 +27,6 @@ export function SignUp() {
     // TODO: 중복 확인 로직 삽입
     setIsValidName(true) 
   };
->>>>>>> Stashed changes
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -94,12 +87,8 @@ export function SignUp() {
                 <div className="space-y-2">
                   <div className="relative">
                     <UserRound className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-<<<<<<< Updated upstream
-                    <Input
-=======
                     <div className="flex gap-3">
                       <Input
->>>>>>> Stashed changes
                       id="username"
                       placeholder="아이디 입력"
                       autoComplete="username"
@@ -107,15 +96,12 @@ export function SignUp() {
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
                     />
-<<<<<<< Updated upstream
-=======
                       <Button
                      variant={"outline"}
                      onClick={() => checkDuplicated()}
                     className="h-12 text-black hover:opacity-90">중복 확인</Button>
                     </div>
                     
->>>>>>> Stashed changes
                   </div>
                 </div>
 
