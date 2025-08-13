@@ -6,19 +6,39 @@ import { UserRound, Lock } from "lucide-react";
 import Illustrator from "../../assets/illustrator.png";
 import logo from "../../assets/logo.svg";
 import { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useAuthStore } from "@/Store/Authorization";
 
 export function Login() {
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
 
+  // 전역 인증 스토어 상태와 액션
+  const { isAuthLoading, authError, login } = useAuthStore();
 
+  // 라우팅 이동 훅
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const isValid = username.trim() !== "" && password.trim() !== "";
 
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isValid) return;
-    // TODO: 로그인 API 호출
+    if (!isValid || isAuthLoading) return;
+
+    try {
+      // 전역 스토어가 API 호출과 토큰 저장을 처리
+      await login(username, password);
+
+      // 원래 가려던 경로(from)가 있으면 그쪽으로, 없으면 /home
+      const params = new URLSearchParams(location.search);
+      const from = params.get("from") ?? "/";
+      navigate(from, { replace: true });
+    } catch {
+      // 실패 시 authError 상태가 설정되어 있음
+      // 필요한 경우 토스트나 인라인 에러 표시로 연결
+      // alert(authError ?? "로그인 실패");
+    }
   };
   return (
     <div className="min-h-screen w-full bg-white grid grid-cols-1 md:grid-cols-[1fr_520px]">
@@ -58,7 +78,7 @@ export function Login() {
                 </div>
               </div>
 
-              <form className="space-y-4" onSubmit={onSubmit}>
+              <form className="space-y-4">
                 {/* 아이디 */}
                 <div className="space-y-2">
                   <div className="relative">
@@ -71,7 +91,6 @@ export function Login() {
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
                     />
-      
                   </div>
                 </div>
 
@@ -91,12 +110,17 @@ export function Login() {
                   </div>
                 </div>
 
+                {authError && (
+                  <p className="text-sm text-red-600">{authError}</p>
+                )}
+
                 <Button
                   type="submit"
                   className="w-full h-12 bg-[#6F9AFF] text-black hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
-                  disabled={!isValid}
+                  disabled={!isValid || isAuthLoading}
+                  onClick={onSubmit}
                 >
-                  로그인
+                  {isAuthLoading ? "로그인 중..." : "로그인"}
                 </Button>
               </form>
             </CardContent>

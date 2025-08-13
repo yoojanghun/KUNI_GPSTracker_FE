@@ -5,33 +5,71 @@ import { Label } from "@/Components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/Components/ui/radio-group";
 import { Button } from "@/Components/ui/button";
 import { Card, CardContent } from "@/Components/ui/card";
-import { UserRound, Lock, Mail } from "lucide-react";
+import { UserRound, Lock, Mail, TriangleAlert, CircleCheckBig } from "lucide-react";
 import Illustrator from "../../assets/illustrator.png";
 import logo from "../../assets/logo.svg";
+import { useAuthStore } from "@/Store/Authorization";
+import { useNavigate } from "react-router-dom";
+import { duplicate } from "@/Api/AuthApi/duplicate";
+import { toast } from "sonner";
 
 export function SignUp() {
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [email, setEmail] = useState<string>("");
-  const [role, setRole] = useState<string>("");
+  const [role, setRole] = useState<"ADMIN" | "USER">("USER");
   const [isValidName, setIsValidName] = useState<boolean>(false);
+
+  // 전역 인증 스토어 상태와 액션
+  const { isAuthLoading, authError, signUp } = useAuthStore();
 
   const isValid =
     username.trim() !== "" &&
     password.trim() !== "" &&
     email.trim() !== "" &&
-    role.trim() !== "" &&
-    isValidName;
+    role !== null &&
+    isValidName &&
+    !isAuthLoading;
 
-  const checkDuplicated = () => { 
-    // TODO: 중복 확인 로직 삽입
-    setIsValidName(true) 
+  const checkDuplicated = async () => {
+    // TODO: 실제 중복 확인 API 연동 필요 시 store에 위임
+    try{
+      const duplicated = await duplicate({id: username});
+      console.log("Duplicated: ",duplicated);
+      if(!duplicated.ok){
+        setIsValidName(false);
+      } else {
+        setIsValidName(true);
+        toast("사용 가능한 아이디입니다.", {
+      icon: <CircleCheckBig/>
+    })
+    }
+  }
+  catch{
+    toast("중복 검증에 실패하였습니다. 다시 시도해 주세요", {
+      icon: <TriangleAlert/>
+    })
+  }
   };
 
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isValid) return;
-    // TODO: 회원가입 API 호출 로직 연결
+    if (!isValid || isAuthLoading) return;
+    try {
+      const res = await signUp({ username, password, email, role });
+      toast("회원가입에 성공하였습니다", {
+      icon: <CircleCheckBig/>
+    });
+    setUsername("");
+    setPassword("");
+    setEmail("");
+    setRole("USER");
+    setIsValidName(false);
+    } catch {
+      toast("회원가입에 실패하였습니다. 다시 시도해 주세요", {
+      icon: <TriangleAlert/>
+    })
+    }
   };
 
   return (
@@ -69,12 +107,12 @@ export function SignUp() {
             <CardContent className="p-0">
               <div className="mb-8">
                 <h1 className="text-3xl md:text-[32px] font-extrabold tracking-tight">
-                  GPS Tracker에 로그인
+                  GPS Tracker 회원가입
                 </h1>
                 <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
                   <span>이미 회원이신가요?</span>
                   <Link
-                    to="/"
+                    to="/login"
                     className="font-semibold underline underline-offset-4"
                   >
                     로그인 하기
@@ -82,26 +120,30 @@ export function SignUp() {
                 </div>
               </div>
 
-              <form className="space-y-4" onSubmit={onSubmit}>
+              <form className="space-y-4">
                 {/* 아이디 */}
                 <div className="space-y-2">
                   <div className="relative">
                     <UserRound className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                     <div className="flex gap-3">
                       <Input
-                      id="username"
-                      placeholder="아이디 입력"
-                      autoComplete="username"
-                      className="pl-10 h-12"
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
-                    />
+                        id="username"
+                        placeholder="아이디 입력"
+                        autoComplete="username"
+                        className="pl-10 h-12"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                      />
                       <Button
-                     variant={"outline"}
-                     onClick={() => checkDuplicated()}
-                    className="h-12 text-black hover:opacity-90">중복 확인</Button>
+                      type="button"
+                        variant={"outline"}
+                        onClick={checkDuplicated}
+                        className="h-12 text-black hover:opacity-90"
+                        disabled={isValid}
+                      >
+                        {isValid ? "확인 완료" : "중복 확인"}
+                      </Button>
                     </div>
-                    
                   </div>
                 </div>
 
@@ -138,24 +180,33 @@ export function SignUp() {
                 </div>
 
                 <div className="space-y-2">
-                  <RadioGroup value={role} onValueChange={setRole} className="flex justify-center gap-16">
+                  <RadioGroup
+                    value={role}
+                    onValueChange={(value) => setRole(value as "ADMIN" | "USER")}
+                    className="flex justify-center gap-16"
+                  >
                     <div className="flex items-center gap-3">
-                      <RadioGroupItem value="default" id="r1" />
+                      <RadioGroupItem value="USER" id="r1" />
                       <Label htmlFor="r1">일반 사용자</Label>
                     </div>
                     <div className="flex items-center gap-3">
-                      <RadioGroupItem value="admin" id="r2" />
+                      <RadioGroupItem value="ADMIN" id="r2" />
                       <Label htmlFor="r2">관리자</Label>
                     </div>
                   </RadioGroup>
                 </div>
 
+                {authError && (
+                  <p className="text-sm text-red-600">{authError}</p>
+                )}
+
                 <Button
                   type="submit"
-                  disabled={!isValid}
+                  disabled={!isValid || isAuthLoading}
                   className="w-full h-12 bg-[#6F9AFF] text-black hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+                  onClick={onSubmit}
                 >
-                  회원가입
+                  {isAuthLoading ? "처리 중..." : "회원가입"}
                 </Button>
               </form>
             </CardContent>
