@@ -20,8 +20,8 @@ export const getCarList = async (
     params.append("status", request.status);
   }
 
-  if (request.vehicleName) {
-    params.append("vehicleName", request.vehicleName);
+  if (request.vehicleNumber) {
+    params.append("vehicleNumber", request.vehicleNumber);
   }
 
   console.log("carList params: ", params.toString());

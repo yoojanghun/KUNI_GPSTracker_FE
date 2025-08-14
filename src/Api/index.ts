@@ -1,8 +1,8 @@
 import ky from 'ky';
 import { handleResponse } from './hooks/handleResponse';
-export const instance = ky.create({
 
-  prefixUrl: "https://api.gps-tracker.store/", // baseURL 설정
+export const instance = ky.create({
+  prefixUrl: "https://api.gps-tracker.store/", // baseURL 설정, TODO: env로 안전하게 관리
   headers: {
     Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0NSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc1NTEzNzUyMywiZXhwIjoxNzU1MjIzOTIzfQ.WRJtPnFgspO2qj4hC4FT1jAcKXIQ-rgnBBav0hMRcgg',
     // 이후 헤더 항목 추가
@@ -29,7 +29,7 @@ export const api = instance.extend({
   // 재시도 요청
   retry: {
     limit: 5, // 재시도 횟수
-    statusCodes: [401, 400, 500], // 재시도 진행할 응답코드
+    statusCodes: [400, 500], // 재시도 진행할 응답코드
     methods: ['get', 'post', 'delete'], // 재시도 진행할 http 메서드
     backoffLimit: 3 * 1000 // 재시도 간격 최대값
   }

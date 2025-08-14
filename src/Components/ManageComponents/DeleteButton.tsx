@@ -55,7 +55,7 @@ export function DeleteButton() {
           <Button
             className="bg-[#8D99FF] gap-3 hover:bg-[#8D99FF]/80"
             onClick={() => {
-              // Take a snapshot of the current selection for accurate toast
+              // 삭제완료 토스트 창에 띄울 정보
               const toDelete = Array.from(selected);
               const toDeleteShow = toDelete.slice(0, 2);
               const toDeleteHidden = toDelete.length - toDeleteShow.length;
@@ -73,18 +73,29 @@ export function DeleteButton() {
                 },
               });
 
+              
               deleteTimerRef.current = setTimeout(() => {
                 delMany.mutate(toDelete, {
                   onSuccess: () => {
                     toast(
                       toDeleteHidden > 0 ? (
                         <span>
-                          <strong>{toDelete[0]}</strong> 외
+                          {toDeleteShow.map((item, idx) => (
+                            <strong key={idx}>
+                              {item}
+                              {idx < toDeleteShow.length - 1 ? ", " : ""}
+                            </strong>
+                          ))} 외
                           <strong> {toDeleteHidden}</strong>대 삭제 완료
                         </span>
                       ) : (
                         <span>
-                          <strong>{toDelete[0]}</strong> 삭제 완료
+                          {toDeleteShow.map((item, idx) => (
+                            <strong key={idx}>
+                              {item}
+                              {idx < toDeleteShow.length - 1 ? ", " : ""}
+                            </strong>
+                          ))} 삭제 완료
                         </span>
                       ),
                       { icon: <FileX2 /> }

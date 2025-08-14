@@ -12,6 +12,6 @@ export interface getCarListRequest {
     | "totalDist,DESC"
     | "status,ASC"
     | "status,DESC";
-  vehicleName?: string;
+  vehicleNumber?: string;
   status?: "" | "ACTIVE" | "INACTIVE" | "INSPECTING";
 }

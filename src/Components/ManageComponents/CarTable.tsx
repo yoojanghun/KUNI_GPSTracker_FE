@@ -10,14 +10,14 @@ import {
 import { Checkbox } from "@/Components/ui/checkbox";
 import { StatusBadge } from "@/Components/StatusBadge";
 import { TablePagination } from "@/Components/TablePagination";
-import type { carList } from "@/Api/ManageApi/interfaces/getCarListResponse";
 import { ArrowDownUp } from "lucide-react";
 import type { getCarListRequest } from "@/Api/ManageApi/interfaces/getCarListRequest";
 import { useCarStore } from "@/Store/carStore";
 import { useManageQuery } from "@/Queries/useManageQuery";
 
 export default function CarTable() {
-  const [sortKey, setSortKey] = useState<"createDate" | "carNumber" | "type" | "totalDist" | "status">();
+
+  const [sortKey, setSortKey] = useState<"createDate" | "vehicleNumber" | "type" | "totalDist" | "status">();
   // 정렬 방향은 API 스펙(ASC/DESC)에 맞춰 대문자로 관리
   const [sortDirection, setSortDirection] = useState<"ASC" | "DESC">("ASC");
   const [currentPage, setCurrentPage] = useState(1);
@@ -31,6 +31,10 @@ export default function CarTable() {
   const vehicleName = useCarStore((state) => state.appliedVehicleName);
   const status = useCarStore((state) => state.appliedStatus);
   const searchNonce = useCarStore(s => s.searchNonce);
+  const cars = useCarStore((state) => state.cars);
+  const setCars = useCarStore((state) => state.setCars);
+  const totalPages = useCarStore((state) => state.totalPage);
+  const setTotalPage = useCarStore((state) => state.setTotalPage);
 
   const tableRowHeight = 70;
   const itemsPerPage = Math.floor((window.innerHeight) / tableRowHeight);
@@ -38,7 +42,7 @@ export default function CarTable() {
   // 정렬 키를 생성하기 위한 로직, getSortParam(sortKey, sortDirection) 를 통해 키값을 얻을 수 있음
   const VALID_SORT_KEYS = [
     "createDate",
-    "carNumber",
+    "vehicleNumber",
     "type",
     "totalDist",
     "status",
@@ -52,7 +56,7 @@ export default function CarTable() {
 
   const getSortParam = (
     direction: string,
-    key?: "createDate" | "carNumber" | "type" | "totalDist" | "status",
+    key?: "createDate" | "vehicleNumber" | "type" | "totalDist" | "status",
     
   ): getCarListRequest["sort"] => {
     const dir = direction.toUpperCase() === "DESC" ? "DESC" : "ASC";
@@ -77,13 +81,23 @@ export default function CarTable() {
     searchNonce: searchNonce, // searchNonce -> 같은 조건으로 검색 시 강제 refetch
   });
 
+  useEffect(() => {
+    if (!data) {
+      setCars([]);
+      setTotalPage(0);
+      return;
+    }
+    setCars(data.content ?? []);
+    setTotalPage(data.totalPages ?? 0);
+  }, [data, setCars, setTotalPage]);
+
   // 응답 데이터 매핑 (API 스펙에 맞춰 조정)
-  const cars = data?.content ?? [];
-  const totalPages = data?.totalPages ?? 0;
+  // const cars = data?.content ?? [];
+  // const totalPages = data?.totalPages ?? 0;
 
   console.log(cars.map(c => c.carNumber));
 
-  const handleSort = (key: "createDate" | "carNumber" | "type" | "totalDist" | "status") => {
+  const handleSort = (key: "createDate" | "vehicleNumber" | "type" | "totalDist" | "status") => {
     if (sortKey === key) {
       setSortDirection(sortDirection === "ASC" ? "DESC" : "ASC");
     } else {
@@ -104,7 +118,7 @@ export default function CarTable() {
           <TableRow>
             <TableHead
               className="w-[35px] text-start cursor-pointer"
-              onClick={() => handleSort("carNumber")}
+              onClick={() => handleSort("vehicleNumber")}
             >
               <div className="flex items-center justify-center gap-1">
                 <ArrowDownUp size={14} />

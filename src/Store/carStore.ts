@@ -28,6 +28,10 @@ interface CarStoreState {
   setStatus: (currentStatus: getCarListRequest["status"]) => void;
   clearSelected: () => void;
 
+  setCars: (cars: carList[]) => void;
+  setTotalPage: (n: number) => void;
+  setTotalElement: (n: number) => void;
+
   // 현재 입력된 값들을 확정(search 적용)
   applySearch: () => void;
 }
@@ -51,6 +55,10 @@ export const useCarStore = create<CarStoreState>((set, get) => ({
   sort: "createDate,DESC" as getCarListRequest["sort"],
 
   selected: new Set(),
+
+  setCars: (cars) => set({ cars }),
+  setTotalPage: (n) => set({ totalPage: n }),
+  setTotalElement: (n) => set({ totalElement: n }),
 
   setVehicleName: (vehicleName) => {
     console.log("vehicleName set: ", vehicleName);
@@ -76,7 +84,10 @@ export const useCarStore = create<CarStoreState>((set, get) => ({
     }
   },
 
-  setSelected: (ids) => set({ selected: new Set(ids) }),
+  setSelected: (ids) => {
+    console.log('[store] setSelected', { len: ids.length });
+    set({ selected: new Set(ids) })
+  },
 
   clearSelected: () => set({ selected: new Set() }),
 
