@@ -38,5 +38,6 @@ export function useDlogsQuery(p: UseDlogsParams) {
     },
     enabled: p.enabled ?? true,
     placeholderData: (prev) => prev,
+    staleTime: 30000
   });
 }

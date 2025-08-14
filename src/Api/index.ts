@@ -3,10 +3,10 @@ import { handleResponse } from './hooks/handleResponse';
 export const instance = ky.create({
 
   prefixUrl: "https://api.gps-tracker.store/", // baseURL 설정
-  // headers: {
-  //   Authorization: '',
-  //   // 이후 헤더 항목 추가
-  // },
+  headers: {
+    Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0NSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc1NTEzNzUyMywiZXhwIjoxNzU1MjIzOTIzfQ.WRJtPnFgspO2qj4hC4FT1jAcKXIQ-rgnBBav0hMRcgg',
+    // 이후 헤더 항목 추가
+  },
   hooks: {
     beforeRequest: [
       async (request) => {

@@ -44,5 +44,6 @@ export function useManageQuery(p: UseManageParams) {
     },
     enabled: true,
     placeholderData: (prev) => prev,
+    staleTime: 1000 * 60 * 60,
   });
 }
