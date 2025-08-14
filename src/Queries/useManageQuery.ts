@@ -58,7 +58,7 @@ export function useManageQuery(p: UseManageParams) {
         vehicleName: p.vehicleName, status: p.status, searchNonce: p.searchNonce,
       });
       const res = await getCarList({
-        page: p.page - 1,
+        page: p.page-1,
         size: p.size,
         sort: p.sort,
         vehicleName: p.vehicleName,
@@ -69,6 +69,7 @@ export function useManageQuery(p: UseManageParams) {
     },
     enabled: true,
     placeholderData: (prev) => prev,
+    staleTime: 1000 * 60 * 60,
     // 필요시 임시로 포커스/마운트 리패치 방지
     // refetchOnWindowFocus: false,
     // refetchOnMount: false,
