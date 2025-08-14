@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { carDelete, carDeleteMany } from "@/Api/ManageApi/carDelete";
 import { useCarStore } from "@/Store/carStore";
-import type { carList } from "@/Api/ManageApi/interfaces/getCarListResponse";
+import type { carList, getCarListResponse } from "@/Api/ManageApi/interfaces/getCarListResponse";
 
 // 단건 삭제
 export function useDeleteCarMutation() {
@@ -9,16 +9,16 @@ export function useDeleteCarMutation() {
   const { appliedVehicleName, appliedStatus, appliedSort, appliedPage, size, searchNonce, selected, setSelected } =
     useCarStore();
 
-  // 현재 화면의 쿼리키를 직접 구성
+  // 현재 화면의 쿼리키 (useManageQuery와 완전히 동일한 구성)
   const queryKey = [
-    "cars",
-    appliedVehicleName,
-    appliedStatus,
-    appliedSort,
+    "manageCars",
     appliedPage,
     size,
+    appliedSort,
+    appliedVehicleName,
+    appliedStatus,
     searchNonce,
-  ];
+  ] as const;
 
   return useMutation({
     mutationFn: async (carNumber: string) => {
@@ -28,11 +28,16 @@ export function useDeleteCarMutation() {
     onMutate: async (carNumber) => {
       await queryClient.cancelQueries({ queryKey });
 
-      const previous = queryClient.getQueryData<carList[]>(queryKey);
+      const previous = queryClient.getQueryData<getCarListResponse>(queryKey);
 
-      // 낙관적 업데이트
+      // 낙관적 업데이트 (페이지 응답 형태 유지)
       if (previous) {
-        const next = previous.filter((c) => c.carNumber !== carNumber);
+        const nextContent = previous.content.filter((c: carList) => c.carNumber !== carNumber);
+        const next: getCarListResponse = {
+          ...previous,
+          content: nextContent,
+          totalElements: Math.max(0, previous.totalElements - 1),
+        };
         queryClient.setQueryData(queryKey, next);
       }
 
@@ -41,6 +46,7 @@ export function useDeleteCarMutation() {
       nextSelected.delete(carNumber);
       setSelected(Array.from(nextSelected));
 
+      // 롤백용으로 이전 데이터 반환
       return { previous, key: queryKey as readonly unknown[] };
     },
     onError: (_err, _vars, ctx) => {
@@ -48,9 +54,15 @@ export function useDeleteCarMutation() {
       if (ctx?.previous && ctx?.key) {
         queryClient.setQueryData(ctx.key, ctx.previous);
       }
+      // 선택 상태 복구
+      const restored = new Set(selected);
+      if (typeof _vars === 'string') {
+        restored.add(_vars);
+      }
+      setSelected(Array.from(restored));
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["cars"], exact: false });
+      queryClient.invalidateQueries({ queryKey: ["manageCars"], exact: false });
     },
   });
 }
@@ -62,14 +74,14 @@ export function useDeleteManyCarsMutation() {
     useCarStore();
 
   const queryKey = [
-    "cars",
-    appliedVehicleName,
-    appliedStatus,
-    appliedSort,
+    "manageCars",
     appliedPage,
     size,
+    appliedSort,
+    appliedVehicleName,
+    appliedStatus,
     searchNonce,
-  ];
+  ] as const;
 
   return useMutation({
     mutationFn: async (carNumbers: string[]) => {
@@ -79,12 +91,18 @@ export function useDeleteManyCarsMutation() {
     onMutate: async (carNumbers) => {
       await queryClient.cancelQueries({ queryKey });
 
-      const previous = queryClient.getQueryData<carList[]>(queryKey);
+      const previous = queryClient.getQueryData<getCarListResponse>(queryKey);
 
-      // 낙관적 업데이트
+      // 낙관적 업데이트 (페이지 응답 형태 유지)
       if (previous) {
         const removeSet = new Set(carNumbers);
-        const next = previous.filter((c) => !removeSet.has(c.carNumber));
+        const nextContent = previous.content.filter((c: carList) => !removeSet.has(c.carNumber));
+        const removedCount = previous.content.length - nextContent.length;
+        const next: getCarListResponse = {
+          ...previous,
+          content: nextContent,
+          totalElements: Math.max(0, previous.totalElements - removedCount),
+        };
         queryClient.setQueryData(queryKey, next);
       }
 
@@ -103,7 +121,7 @@ export function useDeleteManyCarsMutation() {
       setSelected(Array.from(nextSelected));
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["cars"], exact: false });
+      queryClient.invalidateQueries({ queryKey: ["manageCars"], exact: false });
     },
   });
 }
