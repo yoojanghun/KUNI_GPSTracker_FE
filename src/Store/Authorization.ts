@@ -18,6 +18,7 @@ interface AuthState {
   logout: () => void;
   bootstrapFromStorage: () => Promise<void>;
   signUp: (params: { username: string; password: string; email: string; role: "ADMIN" | "USER" }) => Promise<boolean>;
+  setAuthError: (err: string) => void;
 }
 
 // Zustand 스토어 생성
@@ -111,7 +112,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       set({ isBootstrapping: false });
     }
   },
+
+  setAuthError: (err) => set({ authError: err }),
 }));
+
 
 
 

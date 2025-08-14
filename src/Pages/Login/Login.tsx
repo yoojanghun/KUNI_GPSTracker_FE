@@ -14,7 +14,7 @@ export function Login() {
   const [password, setPassword] = useState<string>("");
 
   // 전역 인증 스토어 상태와 액션
-  const { isAuthLoading, authError, login } = useAuthStore();
+  const { isAuthLoading, authError, login, setAuthError } = useAuthStore();
 
   // 라우팅 이동 훅
   const navigate = useNavigate();
@@ -74,7 +74,11 @@ export function Login() {
                 <h1 className="text-3xl md:text-[32px] font-extrabold tracking-tight">GPS Tracker에 로그인</h1>
                 <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
                   <span>회원이 아니신가요?</span>
-                  <Link to="/signup" className="font-semibold underline underline-offset-4">회원가입 하기</Link>
+                  <Link 
+                  to="/signup" 
+                  className="font-semibold underline underline-offset-4"
+                  onClick={() => setAuthError('')}
+                  >회원가입 하기</Link>
                 </div>
               </div>
 
@@ -111,12 +115,12 @@ export function Login() {
                 </div>
 
                 {authError && (
-                  <p className="text-sm text-red-600">{authError}</p>
+                  <p className="text-sm text-red-600">올바르지 않은 회원 정보입니다. 아이디 또는 비밀번호를 확인해 주세요</p>
                 )}
 
                 <Button
                   type="submit"
-                  className="w-full h-12 bg-[#6F9AFF] text-black hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full h-12 bg-[#6F9AFF] text-black hover:bg-[#6F9AFF]/80 disabled:opacity-50 disabled:cursor-not-allowed"
                   disabled={!isValid || isAuthLoading}
                   onClick={onSubmit}
                 >

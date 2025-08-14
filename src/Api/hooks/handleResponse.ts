@@ -31,7 +31,7 @@ export const handleResponse: AfterResponseHook = async (
       const message = errorData?.message || "Unknown error";
 
       console.log(
-        `requset: ${request.body}, options: ${options.body}, response: ${response.body}, message: ${message}`
+        `request: ${request.body}, options: ${options.body}, response: ${response.body}, message: ${message}`
       );
       throw new Error(message);
     }

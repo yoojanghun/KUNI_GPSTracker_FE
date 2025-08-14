@@ -43,7 +43,7 @@ const Navbar = () => {
     </nav>
     <div className="p-4 mt-auto">
       <Button 
-      className="w-full"
+      className="w-full cursor-pointer hover:bg-[#8D99FF]/80 bg-[#8D99FF]"
       onClick={() => useAuthStore.getState().logout()}
       >로그아웃</Button>
     </div>

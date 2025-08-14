@@ -9,7 +9,6 @@ import { UserRound, Lock, Mail, TriangleAlert, CircleCheckBig } from "lucide-rea
 import Illustrator from "../../assets/illustrator.png";
 import logo from "../../assets/logo.svg";
 import { useAuthStore } from "@/Store/Authorization";
-import { useNavigate } from "react-router-dom";
 import { duplicate } from "@/Api/AuthApi/duplicate";
 import { toast } from "sonner";
 
@@ -21,7 +20,7 @@ export function SignUp() {
   const [isValidName, setIsValidName] = useState<boolean>(false);
 
   // 전역 인증 스토어 상태와 액션
-  const { isAuthLoading, authError, signUp } = useAuthStore();
+  const { isAuthLoading, setAuthError, signUp } = useAuthStore();
 
   const isValid =
     username.trim() !== "" &&
@@ -114,6 +113,7 @@ export function SignUp() {
                   <Link
                     to="/login"
                     className="font-semibold underline underline-offset-4"
+                    onClick={() => setAuthError('')}
                   >
                     로그인 하기
                   </Link>
@@ -196,14 +196,11 @@ export function SignUp() {
                   </RadioGroup>
                 </div>
 
-                {authError && (
-                  <p className="text-sm text-red-600">{authError}</p>
-                )}
 
                 <Button
                   type="submit"
                   disabled={!isValid || isAuthLoading}
-                  className="w-full h-12 bg-[#6F9AFF] text-black hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full h-12 bg-[#6F9AFF] text-black hover:bg-[#6F9AFF]/80 disabled:opacity-50 disabled:cursor-not-allowed"
                   onClick={onSubmit}
                 >
                   {isAuthLoading ? "처리 중..." : "회원가입"}
