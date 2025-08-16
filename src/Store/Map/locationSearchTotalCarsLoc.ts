@@ -1,6 +1,5 @@
 import { create } from "zustand";
 import { fetchMapCarLocation } from "@/Api/Map/MapCarLocation";
-import { prcInterval } from "precision-timeout-interval";
 
 export type Position = {
 	lat: number;
@@ -16,39 +15,50 @@ export type CarInfo = {
 	type: string;
 }
 
-type CarLocations = {
-	carLocations: CarInfo[];
-	startPolling: (status?: string) => void;
-    stopPolling: () => void;
+type AllCarLocations = {
+	allCarLocations: CarInfo[];
+	allCarsPolling: (status?: string) => void;
+}
+
+type visibleCarLocations = {
+    visibleCarLocations: CarInfo[];
+    visibleCarsPolling: (status?: string) => void;
 }
 
 // 아래는 차량이름, 번호, gps값을 담은 객체들의 배열
 // carLocations안에 챠량들의 이름, 번호, gps, status값의 객체들이 들어간다.
 // api/dashboard/map의 정보
 
-let intervalCtrl: ReturnType<typeof prcInterval> | null = null;
-let pollingStarted = false;             // strict mode 중복 실행 방지
 
-export const useMapCarLocationStore = create<CarLocations>((set) => ({
-    carLocations: [],
+// 전체 차량들 gps들
+export const useAllCarLocationStore = create<AllCarLocations>((set) => ({
+    allCarLocations: [],       // 여기엔 약 10초마다 전체 차량들의 gps 넣음
     
-    startPolling: (status) => {
-        if(pollingStarted) return;
-        pollingStarted = true;			// true일 때는 pollingStarted 못하도록
+    // 아래에 status 대신 빈 문자열
+    allCarsPolling: (status) => {
         const getStat = () => {
             fetchMapCarLocation(status)
-                .then(carLoc => set({carLocations: carLoc}))
-                .catch(error => console.error(error))
+                .then(carLoc => set({allCarLocations: carLoc}))
+                .catch(error => console.error(error));
         }
         getStat();
-        intervalCtrl = prcInterval(10_000, getStat);
-        console.log("전체 차량 gps 값");
     },
-    stopPolling: () => {
-        intervalCtrl?.cancel();
-        intervalCtrl = null;
-        pollingStarted = false;
-    }
-}))
+}));
 // React StrictMode에선 타이밍 체크용으로 두번 마운트(언마운트)했다 다시 마운트함. 
 // 여러 페이지에서 각각 마운트될 때마다 useEffect 실행되면 startPolling() 여러번 실행됨.
+
+
+// 화면에 보이는 차량들 gps들
+export const useVisibleCarLocationStore = create<visibleCarLocations>((set) => ({
+    visibleCarLocations: [],       // 여기엔 화면에 보이는 차량들의 gps 값 들어감
+    
+    // 아래에 status 대신 차량들 number로 수정
+    visibleCarsPolling: (status) => {
+        const getStat = () => {
+            fetchMapCarLocation(status)
+                .then(carLoc => set({visibleCarLocations: carLoc}))
+                .catch(error => console.error(error));
+        }
+        getStat();
+    },
+}));

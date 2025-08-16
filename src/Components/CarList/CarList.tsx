@@ -23,7 +23,7 @@ import {
 } from "@/Components/ui/table";
 import { TablePagination } from "../TablePagination";
 import { StatusBadge } from "../StatusBadge";
-import { useMapCarLocationStore } from "@/Store/Map/locationSearchTotalCarsLoc"
+import { useAllCarLocationStore } from "@/Store/Map/locationSearchTotalCarsLoc"
 import { 
   useSelectCarStore, 
   useCarListPageStore,
@@ -59,9 +59,6 @@ function CarList() {
   const setSelectedCarLatLng = useSelectedCarLatLng(
     (state) => state.setLatLng
   );
-  const setSelectedCarNumber = useSelectedCarLatLng(
-    (state) => state.setCarNumber
-  );
 
   const [isVisible, setIsVisible] = useState<boolean>(true);
   const [selectedCarInfo, setSelectedCarInfo] = useState<SelectedCar | null>(null);
@@ -73,7 +70,7 @@ function CarList() {
   const tableRef = useRef<HTMLDivElement>(null); // 테이블의 너비값을 전달하기 위한 wrapper
   const [currentPage, setCurrentPage] = useState(1);
 
-  const carLocations = useMapCarLocationStore((state) => state.carLocations);
+  const allCarLocations = useAllCarLocationStore((state) => state.allCarLocations);
 
   const hideBtnRef = useRef<HTMLButtonElement | null>(null);
 
@@ -100,25 +97,20 @@ function CarList() {
     console.log("페이지네이션");
   }, [totalCarLoc]);
 
-  // 리스트에서 클릭된 차량에 대한 정보를 받음. (/api/location/{vehicleNumber})
-  // 리스트에서 선택된 차량 객체(selectedCar)의 차량번호(selectedCar.vehicleNumber)과 
-  // gpsRecordId값(초기엔 0)을 파라미터로 보냄
-  // 그리고 받은 정보들(차량 gps값, status, vehicleNumber, 다음 gpsRecordId값)을 
-  // selectedCarInfo에 저장
+  // 아래는 하나의 차량을 선택했을 때, 해당 차량 gps, 정보 가져오는 api(수정 필요)
   useEffect(() => {
     if (!selectedCar) {
       setSelectedCarInfo(null);
       return;
     }
     fetchSelectedCarStat(selectedCar.vehicleNumber, 0)
-      .then(car => {setSelectedCarInfo(car); console.log("첫 번째 gpsRecordId");})
+      .then(car => {
+        setSelectedCarInfo(car);
+        setSelectedCarLatLng(car.location); 
+        console.log("첫 번째 gpsRecordId");})
       .catch(console.error);
-  }, [selectedCar]);
+  }, [selectedCar?.vehicleNumber]);
 
-  // 초기값 gpsRecordId가 0이 아닐 때(초기값을 받은 이후에) gpsRecordId가 바뀔 때마다(현재 3초 간격)
-  // api 요청해서 에뮬레이터의 다음 gps 값을 받음
-  // setSelectedCarNumber => 리스트에서 클릭된 차량 정보를 저장
-  // setSelectedCarLatLng => 그 차량의 gps 저장, gps 값이 바뀔 때마다 mapLocationSearch에서 마커를 다시 그림
   useEffect(() => {
     if (!selectedCar || selectedCarInfo?.gpsRecordId == null) return;
 
@@ -127,7 +119,6 @@ function CarList() {
         .then(car => {
           setSelectedCarInfo(car); 
           setSelectedCarLatLng(car.location);   
-          setSelectedCarNumber(car.vehicleNumber);
           console.log("gpsRecordId");
         })
         .catch(console.error);
@@ -136,7 +127,6 @@ function CarList() {
     return () => intervalCtrl.cancel();
   }, [selectedCar, selectedCarInfo?.gpsRecordId]);
 
-  // 만들어 주신 StatusBadge, tablePagination 컴포넌트를 적극 활용하였습니다
   // 만약 selectedCar가 존재(차량 리스트에서 차량 선택) 그리고, carListPage라는 변수가 true라면 정보페이지를 보여줌
   if (selectedCar && carListPage) {
     return (
@@ -309,9 +299,9 @@ function CarList() {
                     key={car.carNumber} 
                     className="cursor-pointer flex justify-between"
                     onClick={() => {
-                      // carLocations에서 carNumber 찾기
-                      // carLocations 배열은 지도의 차량 gps가 담긴 배열 (/api/dashboard/map의 반환값)
-                      const carLocObj = carLocations.find((carObj) => carObj.vehicleNumber === car.carNumber )
+                      // allCarLocations에서 carNumber 찾기
+                      // allCarLocations 배열은 지도의 모든 차량 gps(500대)가 담긴 배열 (/api/dashboard/map의 반환값)
+                      const carLocObj = allCarLocations.find((carObj) => carObj.vehicleNumber === car.carNumber )
                       if(!carLocObj) {
                         window.alert("차량이 리스트엔 있는데, 지도엔 없어요")
                         return
