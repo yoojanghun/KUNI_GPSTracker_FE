@@ -1,4 +1,3 @@
-import { fetchActiveCarStat } from "@/Api/HomeApi/ActiveCarStat";
 import { create } from "zustand";
 import { logIn } from "@/Api/AuthApi/logIn";
 import { SignUpApi } from "@/Api/AuthApi/signUp";

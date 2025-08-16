@@ -125,6 +125,7 @@ export function DLogDetails() {
         });
         mapRef.current = map;
 
+  
         const path = log.record.map((k) => new kakao.maps.LatLng(k.lat, k.lng));
         const polyline = new kakao.maps.Polyline({
           path: path,
