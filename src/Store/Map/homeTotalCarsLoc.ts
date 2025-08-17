@@ -29,9 +29,9 @@ export const useAllCarLocationStore = create<AllCarLocations>((set) => ({
     allCarLocations: [],       // 여기엔 약 10초마다 전체 차량들의 gps 넣음
     
     // 아래에 status 대신 빈 문자열
-    allCarsPolling: (status) => {
+    allCarsPolling: () => {
         const getStat = () => {
-            fetchMapCarLocation(status)
+            fetchMapCarLocation()
                 .then(carLoc => set({allCarLocations: carLoc}))
                 .catch(error => console.error(error));
         }

@@ -4,7 +4,7 @@ export const instance = ky.create({
 
   prefixUrl: "https://api.gps-tracker.store/", // baseURL 설정
   headers: {
-    Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ5b29qYW5naHVuIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzU1MzIwOTIyLCJleHAiOjE3NTU0MDczMjJ9.Rrj8Yc3mFWsC3um8kuj3gbhb5841eZFH20fzlANdsJY',
+    Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ5b29qYW5naHVuIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzU1NDIwODYxLCJleHAiOjE3NTU1MDcyNjF9.EPrNVxcFCgdwkGkVkxtLFgLW1ysJjEukPb2eGWGGDKI',
     // 이후 헤더 항목 추가
   },
   hooks: {

@@ -15,9 +15,9 @@ export interface CarLocation {
 export type MapCarLocation = CarLocation[];
 
 // searchParams에 차량 number를 집어넣을 예정
-export async function fetchMapCarLocation(status: string = ""): Promise<MapCarLocation> {
+export async function fetchMapCarLocation(cars: string = ""): Promise<MapCarLocation> {
 	const stats = await api.get("api/dashboard/map",
-		{searchParams: {status}}
+		{searchParams: {cars}}
 	).json<MapCarLocation>();
 
 	return stats;

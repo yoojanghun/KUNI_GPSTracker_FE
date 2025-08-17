@@ -71,6 +71,7 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
   const isBusy = useRef<boolean>(false);
   const allCarsRef = useRef<CarInfo[]>([]);
   const targetedCars = useRef<string[]>([]);
+  const removeHandlers = useRef<Record<string, Array<() => void>>>({});
 
   // 아래 코드에서 그냥 allCarsRef.current대신 allCarLocations로 쓰면 최신 allCarLocations를 
   // 반영하지 못할 수 있다. 따라서 useRef로 관리.
@@ -79,8 +80,6 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
   }, [allCarLocations]);
 
   useEffect(() => {
-    const map = mapInstance.current;
-    if(!map) return;
     const firstFetch = async () => {
       isBusy.current = true;
       try {
@@ -101,19 +100,25 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
     }
 
     intervalCtrl.current = prcInterval(3000, async () => {
+      if(!mapInstance.current) return;
+      const level = mapInstance.current.getLevel();
+      const step = stepRef.current;
+      console.log('[tick]', { step, level });
       if(isBusy.current) return;
       isBusy.current = true;      // true => 나 지금 바쁘다
       try {
-        if(!map) return;
+        if(!mapInstance.current) return;
         if(stepRef.current === 0) {
           await allCarsPolling();
           stepRef.current += 1;
           console.log("전체 차량 gps");
         }
-        else if(stepRef.current > 0 && stepRef.current < 3 && map.getLevel() <= 8) {
-          await visibleCarsPolling();
+        else if(stepRef.current > 0 && stepRef.current < 3) {
+          if(mapInstance.current.getLevel() <= 8) {
+            await visibleCarsPolling();
+            console.log("보이는 차량 gps");
+          }
           stepRef.current += 1;
-          console.log("보이는 차량 gps");
           if(stepRef.current === 3) {
             stepRef.current = 0;
           }
@@ -127,22 +132,14 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
       }
     });
 
-    const mapCornerGpsEvent = () => {
-      if(!map) return;
-      if(map.getLevel() > 8) return;
-      const bounds = map.getBounds();
-      targetedCars.current = allCarsRef.current
-        .filter(carObj => bounds.contain(new kakao.maps.LatLng(carObj.latitude, carObj.longitude)))
-        .map(carObj => carObj.vehicleNumber);
-    }
-    kakao.maps.event.addListener(map, "idle", mapCornerGpsEvent);
-
     return () => {
       intervalCtrl.current?.cancel();
-      if(!map) return;
-      kakao.maps.event.removeListener(map, "idle", mapCornerGpsEvent);
     };
   }, []);
+
+  useEffect(() => {
+    console.log(targetedCars.current);
+  }, [visibleCarLocations])
 
   const markerMap = useMemo<Record<string, CustomOverlayStyle>>(() => ({
     "ACTIVE": {
@@ -223,6 +220,27 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
     }
     kakao.maps.event.addListener(mapInstance.current, "idle", mapCenterLevelEvent);
 
+    const mapCornerGpsEvent = () => {
+      if(!mapInstance.current) return;
+      if(mapInstance.current.getLevel() > 8) return;
+      const bounds = mapInstance.current.getBounds();
+      const southWest = bounds.getSouthWest();
+      const northEast = bounds.getNorthEast();
+      const minLat = southWest.getLat();
+      const minLng = southWest.getLng();
+      const maxLat = northEast.getLat();
+      const maxLng = northEast.getLng();
+      targetedCars.current = allCarsRef.current
+        .filter(
+          carObj => 
+            carObj.latitude >= minLat && 
+            carObj.latitude <= maxLat && 
+            carObj.longitude >= minLng && 
+            carObj.longitude <= maxLng)
+        .map(carObj => carObj.vehicleNumber);
+    }
+    kakao.maps.event.addListener(mapInstance.current, "idle", mapCornerGpsEvent);
+
     // 화면에서 드래그 범위를 벗어나면 지도의 중심으로 다시 위치
     const bounds = new kakao.maps.LatLngBounds(
       new kakao.maps.LatLng(33.0, 124.0),     // SouthWest
@@ -254,6 +272,7 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
     return () => {
       if(!mapInstance.current || !zoomControlRef.current) return;
       kakao.maps.event.removeListener(mapInstance.current, 'idle', mapCenterLevelEvent);
+      kakao.maps.event.removeListener(mapInstance.current, "idle", mapCornerGpsEvent);
       kakao.maps.event.removeListener(mapInstance.current, "dragend", preventDrag);
       mapInstance.current.removeControl(zoomControlRef.current);
     };
@@ -333,11 +352,6 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
     notRunningClustererRef.current?.clear();
     inspectedClustererRef.current?.clear();
     
-    // activeOverlayRef.current?.setMap(null);
-    activeMarkerRef.current = null;
-    activeMarkerImgRef.current = null;
-    
-    // const offHandlers: Array<() => void> = [];
     const makeMarkers = (status?: string) => {
       const createdMarkers: kakao.maps.Marker[] = [];
       allCarLocations
@@ -356,20 +370,9 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
 
           // 저장된 마커가 존재할 때
           if(marker) {
-            if(car.vehicleNumber === selectedCar?.vehicleNumber) {
-              const overlay = overlayRef.current[car.vehicleNumber];
-              marker.setImage(hoverImg);
-              overlay.setMap(mapInstance.current);
-              activeOverlayRef.current = overlay;
-              activeMarkerRef.current = marker;
-              activeMarkerImgRef.current = defaultImg;
-            }
-            else {  // marker(지도에 이미 표시된 차량)가 존재하고, selectedMarkersRef에 없으면
-              marker.setPosition(latLng);
-              marker.setImage(defaultImg);
-              if(overlayRef.current[car.vehicleNumber]) {
-                overlayRef.current[car.vehicleNumber].setPosition(latLng);
-              }
+            marker.setPosition(latLng);
+            if(overlayRef.current[car.vehicleNumber]) {
+              overlayRef.current[car.vehicleNumber].setPosition(latLng);
             }
           }
           else {
@@ -399,15 +402,6 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
             });
 
             overlayRef.current[car.vehicleNumber] = overlay;
-
-            // if(selectedCar?.vehicleNumber === p.vehicleNumber) {
-            //   marker.setImage(hoverImg);
-            //   overlay.setMap(mapInstance.current);
-            //   activeOverlayRef.current = overlay;
-            //   activeMarkerRef.current = marker;
-            //   activeMarkerImgRef.current = defaultImg;
-            //   selectedMarkerNumRef.current = p.vehicleNumber;
-            // }
 
             const setOverlay = () => {
               marker.setImage(hoverImg);
@@ -443,13 +437,14 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
               }
             }
             kakao.maps.event.addListener(marker, "mouseover", setOverlay);
-            // offHandlers.push(() => kakao.maps.event.removeListener(marker, "mouseover", setOverlay));   
-
             kakao.maps.event.addListener(marker, "mouseout", deleteOverlay);
-            // offHandlers.push(() => kakao.maps.event.removeListener(marker, "mouseout", deleteOverlay));
-
             kakao.maps.event.addListener(marker, "click", controlClickOverlay);
-            // offHandlers.push(() => kakao.maps.event.removeListener(marker, "click", controlClickOverlay));
+
+            removeHandlers.current[car.vehicleNumber] = [
+              () => kakao.maps.event.removeListener(marker, "mouseover", setOverlay),
+              () => kakao.maps.event.removeListener(marker, "mouseout", deleteOverlay),
+              () => kakao.maps.event.removeListener(marker, "click", controlClickOverlay)
+            ]
           }
           createdMarkers.push(marker);
         })
@@ -459,6 +454,8 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
     // database에서 삭제된 차량들 찾아서 없애기
     Object.keys(markersRef.current).forEach(key => {
       if(!currentCars.includes(key)) {
+        removeHandlers.current[key].forEach(fn => fn());
+        delete removeHandlers.current[key];
         markersRef.current[key].setMap(null);
         overlayRef.current[key].setMap(null);
         delete markersRef.current[key];
@@ -492,16 +489,43 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
 
       mapRefClusterRef.addMarkers(makeMarkers(mapRefOptionName));
     }
-    
-    // useEffect가 다시 실행되기 이전에, 컴포넌트 unmount될 때 cleanup 실행됨.
-    // return () => {
-      // offHandlers.forEach(removeFunc => removeFunc());
-      // Object.values(markersRef.current).forEach(marker => marker.setMap(null));
-      // Object.values(overlayRef.current).forEach(overlay => overlay.setMap(null));
-      // markersRef.current = {};
-      // overlayRef.current = {};
-    // }
-  }, [allCarLocations, visibleCarLocations, selectedCar]);
+
+    return () => {
+      
+    }
+  }, [allCarLocations, carStatusOption]);
+
+  useEffect(() => {
+    if(activeMarkerRef.current && activeMarkerImgRef.current) {
+      activeMarkerRef.current.setImage(activeMarkerImgRef.current);
+    }
+    if(activeOverlayRef.current) {
+      activeOverlayRef.current.setMap(null);
+    }
+    activeMarkerRef.current = null;
+    activeMarkerImgRef.current = null;
+
+    if(!selectedCar?.vehicleNumber) return;
+    const selectedMarker = markersRef.current[selectedCar.vehicleNumber];
+    const selectedMarkerOverlay = overlayRef.current[selectedCar.vehicleNumber];
+
+    const {
+      defaultMarkerImg: defaultImg,
+      hoverMarkerImg: hoverImg,
+    } = markerMap[selectedCar.status];
+
+    if(selectedMarker && selectedMarkerOverlay) {
+      selectedMarkerOverlay.setMap(mapInstance.current);
+      selectedMarker.setImage(hoverImg);
+      activeOverlayRef.current = selectedMarkerOverlay;
+      activeMarkerRef.current = selectedMarker;
+      activeMarkerImgRef.current = defaultImg;
+    }
+  }, [selectedCar])
+
+  useEffect(() => {
+
+  }, [visibleCarLocations])
 
   return (
     <div ref={mapContainerRef} style={{ width: '100%', height: '100%'}}/>
