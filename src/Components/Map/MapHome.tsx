@@ -21,7 +21,6 @@ function MapHome ({ maxLevel, minLevel }: MapTestProps) {
   const carStatusBtn = useCarStatusBtnStore(state => state.carStatusBtn);
   const { homeMapCenter, setHomeMapCenter, homeMapLevel, setHomeMapLevel } = useHomeMapStore();
 
-
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<kakao.maps.Map | null>(null);
   const zoomControlRef = useRef<kakao.maps.ZoomControl | null>(null);
@@ -39,11 +38,13 @@ function MapHome ({ maxLevel, minLevel }: MapTestProps) {
   const overlayRef = useRef<Record<string, kakao.maps.CustomOverlay>>({});
 
   const startPolling = useMapCarLocationStore(state => state.startPolling);
+  const stopPolling = useMapCarLocationStore(state => state.stopPolling);
   const carLocations = useMapCarLocationStore(state => state.carLocations);
   
-  // 차량의 현재 위치 (예시 데이터)
+  // 컴포넌트가 unmount될 때 clean up 함수가 실행됨.
   useEffect(() => {
     startPolling();
+    return () => stopPolling();
   }, []);
 
   // 단순 계산(입력과 출력만 있는 것)

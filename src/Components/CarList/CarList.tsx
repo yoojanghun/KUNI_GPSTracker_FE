@@ -22,7 +22,8 @@ import {
   TableRow,
 } from "@/Components/ui/table";
 import { TablePagination } from "../TablePagination";
-import { useMapCarLocationStore } from "@/Store/Map/locationSearchTotalCarsLoc";
+import { StatusBadge } from "../StatusBadge";
+import { useMapCarLocationStore } from "@/Store/Map/locationSearchTotalCarsLoc"
 import { 
   useSelectCarStore, 
   useCarListPageStore,
@@ -31,13 +32,13 @@ import {
   useSelectedCarLatLng,
 } from "@/Store/LocationSearch/carList";
 import { useCarStore } from "@/Store/carStore";
-import { fetchTotalCarsList, useSearchedCar } from "@/Api/CarList/carListStore";
 import { useDLogStore } from "@/Store/dlogStore";
-import { StatusBadge } from "../StatusBadge";
+import { fetchTotalCarsList, useSearchedCar } from "@/Api/CarList/carListStore";
 import { type SelectedCar, fetchSelectedCarStat } from "@/Api/CarList/SelectedCarInfo";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./CarList.module.css";
+import { prcInterval } from "precision-timeout-interval";
 
 type CarList = {
   carNumber: string;
@@ -67,7 +68,7 @@ function CarList() {
 
   const navigate = useNavigate();
   const setCarNumLog = useDLogStore((state) => state.setVehicleNumber);
-  const setCarNumManage = useCarStore((state) => state.setVehicleNumber);
+  const setCarNumManage = useCarStore((state) => state.setVehicleName);
   
   const tableRef = useRef<HTMLDivElement>(null); // 테이블의 너비값을 전달하기 위한 wrapper
   const [currentPage, setCurrentPage] = useState(1);
@@ -96,6 +97,7 @@ function CarList() {
 
   useEffect(() => {
     totalCarLoc();
+    console.log("페이지네이션");
   }, [totalCarLoc]);
 
   // 리스트에서 클릭된 차량에 대한 정보를 받음. (/api/location/{vehicleNumber})
@@ -109,7 +111,7 @@ function CarList() {
       return;
     }
     fetchSelectedCarStat(selectedCar.vehicleNumber, 0)
-      .then(car => setSelectedCarInfo(car))
+      .then(car => {setSelectedCarInfo(car); console.log("첫 번째 gpsRecordId");})
       .catch(console.error);
   }, [selectedCar]);
 
@@ -120,17 +122,18 @@ function CarList() {
   useEffect(() => {
     if (!selectedCar || selectedCarInfo?.gpsRecordId == null) return;
 
-    const intervalId = setInterval(() => {
+    const intervalCtrl = prcInterval(3000, () => {
       fetchSelectedCarStat(selectedCar.vehicleNumber, selectedCarInfo.gpsRecordId)
         .then(car => {
           setSelectedCarInfo(car); 
-          setSelectedCarLatLng(car.location);
+          setSelectedCarLatLng(car.location);   
           setSelectedCarNumber(car.vehicleNumber);
+          console.log("gpsRecordId");
         })
         .catch(console.error);
-    }, 3000);
+    });
 
-    return () => clearInterval(intervalId);
+    return () => intervalCtrl.cancel();
   }, [selectedCar, selectedCarInfo?.gpsRecordId]);
 
   // 만들어 주신 StatusBadge, tablePagination 컴포넌트를 적극 활용하였습니다

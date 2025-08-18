@@ -47,6 +47,16 @@ export const useSelectCarStore = create<SelectedCarStore>((set) => ({
     setSelectedCar: (car) => set({ selectedCar: car})
 }));
 
+// CarList.tsx에서 하나의 차량을 선택 => carList.tsx에서 api를 통해 해당 차량 정보 획득
+// 그 정보 내엔 lat, lng값이 존재하는데, 그 값을 zustand에 저장하여 다른 파일에도 사용할 수 있도록
+export const useSelectedCarLatLng = create<SelectedCarLatLng>((set) => ({
+    carNumber: null,
+    latLng: {latitude: null, longitude: null},
+    setCarNumber: (carNum) => set({carNumber: carNum}),
+    setLatLng: (pos) => set({latLng: {latitude: pos.latitude, longitude: pos.longitude}}),
+    clearSetLatLng: () => set({latLng: {latitude: null, longitude: null}})
+}))
+
 // carList.tsx에서 차량 리스트를 보여줄 지, 한 차량의 정보를 보여줄 지 결정할 때 사용
 // false => 차량 리스트, true => 한 차량 정보
 export const useCarListPageStore = create<CarListPageStore>((set) => ({
@@ -68,13 +78,3 @@ export const useCarStatusOptionStore = create<CarStatusOptionStore>((set) => ({
     carStatusOption: "전체",
     setCarStatusOption: (selectedCarStatusOption) => set({ carStatusOption: selectedCarStatusOption })
 }));
-
-// CarList.tsx에서 하나의 차량을 선택 => carList.tsx에서 api를 통해 해당 차량 정보 획득
-// 그 정보 내엔 lat, lng값이 존재하는데, 그 값을 zustand에 저장하여 다른 파일에도 사용할 수 있도록
-export const useSelectedCarLatLng = create<SelectedCarLatLng>((set) => ({
-    carNumber: null,
-    latLng: {latitude: null, longitude: null},
-    setCarNumber: (carNum) => set({carNumber: carNum}),
-    setLatLng: (pos) => set({latLng: {latitude: pos.latitude, longitude: pos.longitude}}),
-    clearSetLatLng: () => set({latLng: {latitude: null, longitude: null}})
-}))
