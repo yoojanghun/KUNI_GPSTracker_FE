@@ -6,14 +6,15 @@ import {
   TableHeader,
   TableHead,
   TableRow,
-} from "@/Components/ui/table";
-import { Checkbox } from "@/Components/ui/checkbox";
-import { StatusBadge } from "@/Components/StatusBadge";
-import { TablePagination } from "@/Components/TablePagination";
-import { ArrowDownUp } from "lucide-react";
+} from "@/components/ui/table";
+import { Checkbox } from "@/components/ui/checkbox";
+import { StatusBadge } from "@/components/StatusBadge";
+import { TablePagination } from "@/components/TablePagination";
+import { ArrowDownUp, CircleQuestionMark } from "lucide-react";
 import type { getCarListRequest } from "@/Api/ManageApi/interfaces/getCarListRequest";
 import { useCarStore } from "@/Store/carStore";
 import { useManageQuery } from "@/Queries/useManageQuery";
+import { toast } from "sonner";
 
 export default function CarTable() {
 
@@ -81,15 +82,19 @@ export default function CarTable() {
     searchNonce: searchNonce, // searchNonce -> 같은 조건으로 검색 시 강제 refetch
   });
 
-  useEffect(() => {
-    if (!data) {
-      setCars([]);
-      setTotalPage(0);
-      return;
-    }
-    setCars(data.content ?? []);
-    setTotalPage(data.totalPages ?? 0);
-  }, [data, setCars, setTotalPage]);
+
+useEffect(() => {
+  if (data && (data.content?.length ?? 0) === 0) {
+    setCars([]);
+    setTotalPage(0);
+    toast("검색된 차량이 없습니다.", {
+      icon: <CircleQuestionMark />
+    });
+    return;
+  }
+  setCars(data?.content ?? []);
+  setTotalPage(data?.totalPages ?? 0);
+}, [data, setCars, setTotalPage]);
 
   // 응답 데이터 매핑 (API 스펙에 맞춰 조정)
   // const cars = data?.content ?? [];

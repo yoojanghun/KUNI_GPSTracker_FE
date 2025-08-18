@@ -7,14 +7,15 @@ import notWorkingIndicator from "../../assets/car-status-icons/not-working-indic
 import workingIndicator from "../../assets/car-status-icons/working-indicator.svg";
 import styles from "./Home.module.css";
 
-import CarsPerDayChart from "@/Components/CarsPerDayChart";
-import MapHome from "@/Components/Map/MapHome";
+import CarsPerDayChart from "@/components/CarsPerDayChart";
+import MapHome from "@/components/Map/MapHome";
 
 import { useCarStatusBtnStore } from "@/Store/Home/mapState";
 
 import { type CarStatusNum, fetchCarStatistics } from "@/Api/Home/CarStatistics";
 import { useEffect, useState, useRef } from "react";
 import { prcInterval } from 'precision-timeout-interval';
+import { Separator } from "@/components/ui/separator";
 
 type CarStatus = "전체" | "ACTIVE" | "INACTIVE" | "INSPECTING";
 
@@ -62,95 +63,65 @@ function Home() {
   const percentage = Math.round((activeCarsNum / totalCarsNum) * 100);
 
   return (
-    <main className="flex-1 box-border p-5">
+    <main className={`flex-col box-border p-5 w-full min-h-[calc(100vh*0.75)]`}>
       <div className="flex gap-5 mb-5">
         <div
-          className={`${styles["icon"]} flex flex-1 justify-center items-center border rounded-xl p-[23px] min-w-[202px] min-h-[110px]`}
+          className="flex w-full justify-evenly items-center border p-[23px] min-h-[110px]"
         >
-          <img className="w-13 h-13 mr-3" src={total} alt="전체 차량 아이콘" />
-          <div>
-            <div>
-              <span className="text-3xl font-bold mr-2">{totalCarsNum}</span>
-              <span className="text-sm opacity-60">전체 차량</span>
+          <div className="flex flex-col gap-4 min-w-[280px]">
+            <div className="flex items-center gap-2">
+              <img className="w-10 h-10 mr-2" src={total} alt="전체 차량 아이콘" />
+              <div>
+                <span className="text-2xl font-bold mr-2">{totalCarsNum}</span>
+                <span className="text-sm opacity-60">전체 차량</span>
+              </div>
             </div>
-            {/* <div>progress bar 여긴 없음</div> */}
+            <div className="flex items-center gap-2">
+              <img className="w-10 h-10 mr-2" src={working} alt="운행 차량 아이콘" />
+              <div>
+                <span className="text-2xl font-bold mr-2">{percentage}%</span>
+                <span className="text-sm opacity-60">운행중 차량 ({activeCarsNum})</span>
+                <div className="w-50 h-2 mt-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div className="h-full bg-blue-500" style={{ width: `${percentage}%` }} />
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-        <div
-          className={`${styles["icon"]} flex flex-2 justify-evenly items-center border rounded-xl p-[23px] min-h-[110px]`}
-        >
-          <div className="flex items-center min-w-[280px]">
-            <img
-              className="w-13 h-13 mr-3"
-              src={notWorking}
-              alt="미운행 차량 아이콘"
-            />
-            <div>
-              <div className="mr-6 min-w-[200px]">
-                <span className="text-3xl font-bold mr-3">{100 - percentage}%</span>
+          <Separator orientation="vertical" className="h-20 mx-6" />
+          <div className="flex gap-4 min-w-[280px]">
+            <div className="flex items-center gap-2">
+              <img className="w-15 h-15 mr-3" src={notWorking} alt="미운행 차량 아이콘" />
+              <div>
+                <span className="text-4xl font-bold mr-3">{100 - percentage}%</span>
                 <span className="text-sm opacity-60">미운행 차량 ({inactiveCarsNum})</span>
-              </div>
-              <div className="w-50 h-2 mt-2 bg-gray-200 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-red-500"
-                  style={{ width: `${100 - percentage}%` }}
-                />
+                <div className="w-50 h-2 mt-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div className="h-full bg-red-500" style={{ width: `${100 - percentage}%` }} />
+                </div>
               </div>
             </div>
-          </div>
-          <div className="min-w-[180px] mr-3">
-            <div className="flex items-center mb-2">
-              <img
-                className="w-8 h-8 mr-1"
-                src={checkingIndicator}
-                alt="점검중 차량 아이콘"
-              />
-              <div>
-                <span className="font-bold mr-1">점검중인 차량</span>
-                <span className="text-[14px] opacity-60">{inspectedCarsNum}대</span>
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center">
+                <img className="w-8 h-8 mr-1" src={checkingIndicator} alt="점검중 차량 아이콘" />
+                <div>
+                  <span className="font-bold mr-1">점검중인 차량</span>
+                  <span className="text-[14px] opacity-60">{inspectedCarsNum}대</span>
+                </div>
               </div>
-            </div>
-            <div className="flex items-center">
-              <img
-                className="w-8 h-8 mr-1"
-                src={notWorkingIndicator}
-                alt="미운행 차량 아이콘"
-              />
-              <div>
-                <span className="font-bold mr-1">미운행 차량</span>
-                <span className="text-[14px] opacity-60">{inactiveCarsNum}대</span>
+              <div className="flex items-center">
+                <img className="w-8 h-8 mr-1" src={notWorkingIndicator} alt="미운행 차량 아이콘" />
+                <div>
+                  <span className="font-bold mr-1">미운행 차량</span>
+                  <span className="text-[14px] opacity-60">{inactiveCarsNum}대</span>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <div className="flex gap-4 h-[80%]">
+      <div className="flex gap-4 h-[100%]">
         <div className="flex flex-col flex-2 gap-5">
           <div
-            className={`${styles["icon"]} flex justify-center items-center border rounded-xl p-[23px] min-h-[110px]`}
-          >
-            <img
-              className="w-13 h-13 mr-3"
-              src={working}
-              alt="운행 차량 아이콘"
-            />
-            <div>
-              <div>
-                <span className="text-3xl font-bold mr-2">
-                  {percentage}%
-                </span>
-                <span className="text-sm opacity-60">운행중 차량 ({activeCarsNum})</span>
-              </div>
-              <div className="w-50 h-2 mt-2 bg-gray-200 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-blue-500"
-                  style={{ width: `${percentage}%` }}
-                />
-              </div>
-            </div>
-          </div>
-          <div
-            className={`${styles["icon"]} border box-border pr-4 pt-4 pb-4 h-[100%] rounded-xl`}
+            className={`border box-border pr-4 pt-4 pb-4 h-[100%]`}
           >
             <div className="flex items-center ml-4 mb-5 font-bold">
               <Calendar className="w-6 h-6 mr-2" />
@@ -162,7 +133,7 @@ function Home() {
           </div>
         </div>
         <div
-          className={`${styles["icon"]} flex-3 border box-border p-4 pt-2 h-[100%] rounded-3xl`}
+          className={`flex-3 border box-border p-4 pt-2 h-[100%]`}
         >
           <div className="w-[100%] h-[9%] flex items-center justify-between">
             <div className="flex items-center">

@@ -1,4 +1,4 @@
-import { Input } from "@/Components/ui/input";
+import { Input } from "@/components/ui/input";
 import { useCarStore } from "../../Store/carStore";
 
 export function SearchInput() {

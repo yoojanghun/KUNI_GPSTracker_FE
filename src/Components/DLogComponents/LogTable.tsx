@@ -1,11 +1,13 @@
 // src/Components/DLogComponents/LogTable.tsx
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/Components/ui/table";
+import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ChevronRight, ClockArrowDown, ClockArrowUp } from "lucide-react";
-import { TablePagination } from "@/Components/TablePagination";
+import { TablePagination } from "@/components/TablePagination";
 import { useDlogsQuery } from "@/Queries/useDlogsQuery";
 import { useDLogStore } from "@/Store/dlogStore";
+import { toast } from "sonner";
+import { CircleQuestionMark } from "lucide-react";
 
 export function LogTable() {
   const navigate = useNavigate();
@@ -29,6 +31,16 @@ const { data, isLoading, isFetching } = useDlogsQuery({
   enabled: true,
   searchNonce, // searchNonce -> 같은 조건으로 검색 시 강제 refetch
 });
+
+useEffect(() => {
+  if (data && (data.content?.length ?? 0) === 0) {
+    toast("검색된 차량이 없습니다.", {
+      icon: <CircleQuestionMark />
+    });
+    return;
+  }
+
+}, [data]);
 
   // 로딩/페칭 처리(필요 최소치만)
   useEffect(() => {
@@ -69,7 +81,7 @@ const { data, isLoading, isFetching } = useDlogsQuery({
           )}
 
           {!isLoading && logs.map((dlog) => (
-            <TableRow key={dlog.id} className="text-center" onClick={() => navigate(`/log/${dlog.id}`, { state: { id: dlog.id } })}>
+            <TableRow key={dlog.id} className="text-center cursor-pointer" onClick={() => navigate(`/log/${dlog.id}`, { state: { id: dlog.id } })}>
               <TableCell></TableCell>
               <TableCell className="font-medium">{dlog.vehicleNumber}</TableCell>
               <TableCell>{dlog.vehicleName}</TableCell>
@@ -78,7 +90,7 @@ const { data, isLoading, isFetching } = useDlogsQuery({
               <TableCell>{(Number(dlog.sumDist) / 1000).toFixed(1)} km</TableCell>
               <TableCell className="text-right">
                 <ChevronRight
-                  className="inline-block pr-2 cursor-pointer"
+                  className="inline-block pr-2"
                   
                 />
               </TableCell>

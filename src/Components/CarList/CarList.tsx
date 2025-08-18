@@ -14,7 +14,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/Components/ui/select";
+} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -29,6 +29,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/Components/ui/pagination"
+
 import { StatusBadge } from "../StatusBadge";
 import { useAllCarLocationStore } from "@/Store/Map/locationSearchTotalCarsLoc"
 import { 

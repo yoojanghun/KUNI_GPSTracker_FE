@@ -6,7 +6,7 @@ import {
   PaginationNext,
   PaginationPrevious,
   PaginationEllipsis,
-} from "@/Components/ui/pagination";
+} from "@/components/ui/pagination";
 import { useEffect, useState } from "react";
 
 function getPages(current: number, total: number, tableWidth: number): (number | "...")[] {

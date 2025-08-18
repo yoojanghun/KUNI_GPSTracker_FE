@@ -1,10 +1,10 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
-import { Input } from "@/Components/ui/input";
-import { Label } from "@/Components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/Components/ui/radio-group";
-import { Button } from "@/Components/ui/button";
-import { Card, CardContent } from "@/Components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { UserRound, Lock, Mail, TriangleAlert, CircleCheckBig } from "lucide-react";
 import Illustrator from "../../assets/illustrator.png";
 import logo from "../../assets/logo.svg";
@@ -16,7 +16,6 @@ export function SignUp() {
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [email, setEmail] = useState<string>("");
-  const [role, setRole] = useState<"ADMIN" | "USER">("USER");
   const [isValidName, setIsValidName] = useState<boolean>(false);
 
   // 전역 인증 스토어 상태와 액션
@@ -26,7 +25,6 @@ export function SignUp() {
     username.trim() !== "" &&
     password.trim() !== "" &&
     email.trim() !== "" &&
-    role !== null &&
     isValidName &&
     !isAuthLoading;
 
@@ -37,6 +35,9 @@ export function SignUp() {
       console.log("Duplicated: ",duplicated);
       if(!duplicated.ok){
         setIsValidName(false);
+        toast("중복이거나 올바르지 않은 아이디입니다.", {
+      icon: <TriangleAlert/>
+    });
       } else {
         setIsValidName(true);
         toast("사용 가능한 아이디입니다.", {
@@ -55,14 +56,13 @@ export function SignUp() {
     e.preventDefault();
     if (!isValid || isAuthLoading) return;
     try {
-      const res = await signUp({ username, password, email, role });
+      const res = await signUp({ username, password, email });
       toast("회원가입에 성공하였습니다", {
       icon: <CircleCheckBig/>
     });
     setUsername("");
     setPassword("");
     setEmail("");
-    setRole("USER");
     setIsValidName(false);
     } catch {
       toast("회원가입에 실패하였습니다. 다시 시도해 주세요", {
@@ -177,23 +177,6 @@ export function SignUp() {
                       onChange={(e) => setEmail(e.target.value)}
                     />
                   </div>
-                </div>
-
-                <div className="space-y-2">
-                  <RadioGroup
-                    value={role}
-                    onValueChange={(value) => setRole(value as "ADMIN" | "USER")}
-                    className="flex justify-center gap-16"
-                  >
-                    <div className="flex items-center gap-3">
-                      <RadioGroupItem value="USER" id="r1" />
-                      <Label htmlFor="r1">일반 사용자</Label>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <RadioGroupItem value="ADMIN" id="r2" />
-                      <Label htmlFor="r2">관리자</Label>
-                    </div>
-                  </RadioGroup>
                 </div>
 
 
