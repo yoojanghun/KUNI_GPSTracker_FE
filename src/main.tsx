@@ -27,7 +27,9 @@ queryClient.getQueryCache().subscribe((event) => {
 });
 
 createRoot(document.getElementById("root")!).render(
-           
-    <App />
+      <QueryClientProvider client={queryClient}>
+           <App />
+      </QueryClientProvider>     
+ 
 
 );
