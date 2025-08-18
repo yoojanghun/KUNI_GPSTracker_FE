@@ -111,13 +111,13 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
           stepRef.current += 1;
           console.log("전체 차량 gps");
         }
-        else if(stepRef.current > 0 && stepRef.current < 3) {
+        else if(stepRef.current > 0 && stepRef.current < 5) {
           if(mapInstance.current.getLevel() <= 8) {
             await visibleCarsPolling(targetedCars.current);
             console.log("보이는 차량 gps");
           }
           stepRef.current += 1;
-          if(stepRef.current === 3) {
+          if(stepRef.current === 5) {
             stepRef.current = 0;
           }
         }
@@ -379,7 +379,7 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
             });
             markersRef.current[car.vehicleNumber] = marker;
 
-            const overlay = new kakao.maps.CustomOverlay({            // 오버레이 생성 (한 번만 실행)
+            overlay = new kakao.maps.CustomOverlay({            // 오버레이 생성 (한 번만 실행)
               content: `
                 <div class="${styles["overlay-bubble"]}">
                   <div class="px-3 py-1 text-center flex flex-col items-center">
@@ -395,7 +395,6 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
               yAnchor: 1.5,
               zIndex: 99
             });
-
             overlayRef.current[car.vehicleNumber] = overlay;
 
             const setOverlay = () => {
@@ -516,7 +515,7 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
 
   useEffect(() => {
     visibleCarLocations
-      .filter(car => car.status === carStatusOption || car.status === "전체")
+      .filter(car => car.status === carStatusOption || carStatusOption === "전체")
       .map(car => {
         const latLng = new kakao.maps.LatLng(car.latitude, car.longitude);
         let marker = markersRef.current[car.vehicleNumber];
