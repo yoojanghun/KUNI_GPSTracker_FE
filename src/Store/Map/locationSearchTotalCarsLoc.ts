@@ -1,12 +1,6 @@
 import { create } from "zustand";
 import { fetchMapCarLocation } from "@/Api/Map/MapCarLocation";
 
-export type Position = {
-	lat: number;
-	lng: number;
-	time: number;
-}
-
 export type CarInfo = {
 	latitude: number;
 	longitude: number;
@@ -17,12 +11,12 @@ export type CarInfo = {
 
 type AllCarLocations = {
 	allCarLocations: CarInfo[];
-	allCarsPolling: (status?: string) => void;
+	allCarsPolling: (cars?: string) => void;
 }
 
 type visibleCarLocations = {
     visibleCarLocations: CarInfo[];
-    visibleCarsPolling: (status?: string) => void;
+    visibleCarsPolling: (cars?: string[]) => void;
 }
 
 // 아래는 차량이름, 번호, gps값을 담은 객체들의 배열
@@ -34,10 +28,10 @@ type visibleCarLocations = {
 export const useAllCarLocationStore = create<AllCarLocations>((set) => ({
     allCarLocations: [],       // 여기엔 약 10초마다 전체 차량들의 gps 넣음
     
-    // 아래에 status 대신 빈 문자열
-    allCarsPolling: (status) => {
+    // 아래에 cars 대신 빈 문자열
+    allCarsPolling: () => {
         const getStat = () => {
-            fetchMapCarLocation(status)
+            fetchMapCarLocation()
                 .then(carLoc => set({allCarLocations: carLoc}))
                 .catch(error => console.error(error));
         }
@@ -50,13 +44,13 @@ export const useAllCarLocationStore = create<AllCarLocations>((set) => ({
 
 // 화면에 보이는 차량들 gps들
 export const useVisibleCarLocationStore = create<visibleCarLocations>((set) => ({
-    visibleCarLocations: [],       // 여기엔 화면에 보이는 차량들의 gps 값 들어감
+    visibleCarLocations: [],       // 여기엔 api 요청 후 화면에 보이는 차량들의 gps 값 들어감
     
-    // 아래에 status 대신 차량들 number로 수정
-    visibleCarsPolling: (status) => {
+    // vehicleNumbers라는 차량 번호들의 배열이 들어감
+    visibleCarsPolling: (vehicleNumbers) => {
         const getStat = () => {
-            fetchMapCarLocation(status)
-                .then(carLoc => set({visibleCarLocations: carLoc}))
+            fetchMapCarLocation(vehicleNumbers)
+                .then(carLoc => {console.log(carLoc); set({visibleCarLocations: carLoc});})
                 .catch(error => console.error(error));
         }
         getStat();

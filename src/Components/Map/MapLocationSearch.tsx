@@ -8,7 +8,6 @@ import {
   useCarListPageStore,
   useTrackCarStore,
   useCarStatusOptionStore, 
-  useSelectedCarLatLng, 
 } from '@/Store/LocationSearch/carList';
 import { 
   useLocationSearchMapStore,
@@ -42,7 +41,6 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
   const setLocationSearchMapLevel = useLocationSearchMapStore(state => state.setLocationSearchMapLevel);
   const mapCenterCarList = useTrackCarStore(state => state.mapCenterCarList);
   const mapLevelCarList = useTrackCarStore(state => state.mapLevelCarList);
-  const selectedCarLatLng = useSelectedCarLatLng(state => state.latLng);
 
   const allCarLocations = useAllCarLocationStore(state => state.allCarLocations);
   const allCarsPolling = useAllCarLocationStore(state => state.allCarsPolling);
@@ -115,7 +113,7 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
         }
         else if(stepRef.current > 0 && stepRef.current < 3) {
           if(mapInstance.current.getLevel() <= 8) {
-            await visibleCarsPolling();
+            await visibleCarsPolling(targetedCars.current);
             console.log("보이는 차량 gps");
           }
           stepRef.current += 1;
@@ -136,10 +134,6 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
       intervalCtrl.current?.cancel();
     };
   }, []);
-
-  useEffect(() => {
-    console.log(targetedCars.current);
-  }, [visibleCarLocations])
 
   const markerMap = useMemo<Record<string, CustomOverlayStyle>>(() => ({
     "ACTIVE": {
@@ -352,7 +346,7 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
     notRunningClustererRef.current?.clear();
     inspectedClustererRef.current?.clear();
     
-    const makeMarkers = (status?: string) => {
+    const setMarkers = (status?: string) => {
       const createdMarkers: kakao.maps.Marker[] = [];
       allCarLocations
         .filter(car => car.status === status || !status)
@@ -367,12 +361,13 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
           } = markerMap[car.status];
 
           let marker = markersRef.current[car.vehicleNumber];   
+          let overlay = overlayRef.current[car.vehicleNumber];
 
           // 저장된 마커가 존재할 때
           if(marker) {
             marker.setPosition(latLng);
-            if(overlayRef.current[car.vehicleNumber]) {
-              overlayRef.current[car.vehicleNumber].setPosition(latLng);
+            if(overlay) {
+              overlay.setPosition(latLng);
             }
           }
           else {
@@ -452,19 +447,19 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
     }
 
     // database에서 삭제된 차량들 찾아서 없애기
-    Object.keys(markersRef.current).forEach(key => {
-      if(!currentCars.includes(key)) {
-        removeHandlers.current[key].forEach(fn => fn());
-        delete removeHandlers.current[key];
-        markersRef.current[key].setMap(null);
-        overlayRef.current[key].setMap(null);
-        delete markersRef.current[key];
-        delete overlayRef.current[key];
+    Object.keys(markersRef.current).forEach(carNumber => {
+      if(!currentCars.includes(carNumber)) {
+        removeHandlers.current[carNumber].forEach(fn => fn());
+        delete removeHandlers.current[carNumber];
+        markersRef.current[carNumber].setMap(null);
+        overlayRef.current[carNumber].setMap(null);
+        delete markersRef.current[carNumber];
+        delete overlayRef.current[carNumber];
       }
     })
 
     if (carStatusOption === "전체") {
-        totalClustererRef.current?.addMarkers(makeMarkers());
+      totalClustererRef.current?.addMarkers(setMarkers());
     }
     else{
       if(!runningClustererRef.current || !notRunningClustererRef.current || 
@@ -487,11 +482,7 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
       const mapRefClusterRef = mapRef[carStatusOption].clusterRef;
       const mapRefOptionName = mapRef[carStatusOption].optionName;
 
-      mapRefClusterRef.addMarkers(makeMarkers(mapRefOptionName));
-    }
-
-    return () => {
-      
+      mapRefClusterRef.addMarkers(setMarkers(mapRefOptionName));
     }
   }, [allCarLocations, carStatusOption]);
 
@@ -524,8 +515,20 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
   }, [selectedCar])
 
   useEffect(() => {
-
-  }, [visibleCarLocations])
+    visibleCarLocations
+      .filter(car => car.status === carStatusOption || car.status === "전체")
+      .map(car => {
+        const latLng = new kakao.maps.LatLng(car.latitude, car.longitude);
+        let marker = markersRef.current[car.vehicleNumber];
+        let overlay = overlayRef.current[car.vehicleNumber];
+        if(marker) {
+          marker.setPosition(latLng);
+          if(overlay) {
+            overlay.setPosition(latLng);
+          }
+        }
+      })
+  }, [visibleCarLocations, carStatusOption])
 
   return (
     <div ref={mapContainerRef} style={{ width: '100%', height: '100%'}}/>

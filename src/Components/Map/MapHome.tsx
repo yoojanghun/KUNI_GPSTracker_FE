@@ -20,7 +20,10 @@ type CustomOverlayStyle = {
 function MapHome ({ maxLevel, minLevel }: MapTestProps) {
 
   const carStatusBtn = useCarStatusBtnStore(state => state.carStatusBtn);
-  const { homeMapCenter, setHomeMapCenter, homeMapLevel, setHomeMapLevel } = useHomeMapStore();
+  const homeMapCenter = useHomeMapStore(state => state.homeMapCenter);
+  const setHomeMapCenter = useHomeMapStore(state => state.setHomeMapCenter);
+  const homeMapLevel = useHomeMapStore(state => state.homeMapLevel);
+  const setHomeMapLevel = useHomeMapStore(state => state.setHomeMapLevel)
 
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<kakao.maps.Map | null>(null);
@@ -43,6 +46,8 @@ function MapHome ({ maxLevel, minLevel }: MapTestProps) {
   
   const intervalCtrl = useRef<ReturnType<typeof prcInterval> | null>(null);
   const isBusy = useRef<boolean>(false);
+
+  const removeHandlers = useRef<Record<string, Array<() => void>>>({});
 
   // 컴포넌트가 unmount될 때, useEffect가 다시 실행될 때 clean up 함수가 실행됨.
   useEffect(() => {
@@ -242,12 +247,6 @@ function MapHome ({ maxLevel, minLevel }: MapTestProps) {
     notRunningClustererRef.current?.clear();
     inspectedClustererRef.current?.clear();
 
-    activeOverlayRef.current?.setMap(null);
-    activeMarkerRef.current = null;
-    activeMarkerImgRef.current = null;
-
-    const offHandlers: Array<() => void> = [];                // removeListener는 undefined를 반환
-
     const makeMarkers = (status?: string): kakao.maps.Marker[] => {
       const createdMarkers:kakao.maps.Marker[] = [];            // 생성된 마커의 배열을 반환하기 위해 사용
       allCarLocations
@@ -329,15 +328,14 @@ function MapHome ({ maxLevel, minLevel }: MapTestProps) {
               }
             }
             kakao.maps.event.addListener(marker, "mouseover", setOverlay);
-            offHandlers.push(() => kakao.maps.event.removeListener(marker, "mouseover", setOverlay));
-
             kakao.maps.event.addListener(marker, "mouseout", deleteOverlay);
-            offHandlers.push(() => kakao.maps.event.removeListener(marker, "mouseout", deleteOverlay));
-
             kakao.maps.event.addListener(marker, "click", controlClickOverlay);
-            offHandlers.push(() => kakao.maps.event.removeListener(marker, "click", controlClickOverlay));
 
-            markersRef.current[car.vehicleNumber] = marker;
+            removeHandlers.current[car.vehicleNumber] = [
+              () => kakao.maps.event.removeListener(marker, "mouseover", setOverlay),
+              () => kakao.maps.event.removeListener(marker, "mouseout", deleteOverlay),
+              () => kakao.maps.event.removeListener(marker, "click", controlClickOverlay)
+            ]
           }
           createdMarkers.push(marker);        // createdMarkers에 마커의 배열이 들어감
         });
@@ -345,12 +343,13 @@ function MapHome ({ maxLevel, minLevel }: MapTestProps) {
       return createdMarkers;
     }
 
-    Object.keys(markersRef.current).forEach(key => {      // markersRef의 number 배열에 현재 차량(currentCars) number가 포함이 안되었을 때 삭제
-      if(!currentCars.includes(key)) {
-        markersRef.current[key].setMap(null);
-        overlayRef.current[key].setMap(null);
-        delete markersRef.current[key];
-        delete overlayRef.current[key];
+    Object.keys(markersRef.current).forEach(carNumber => {      // markersRef의 number 배열에 현재 차량(currentCars) number가 포함이 안되었을 때 삭제
+      if(!currentCars.includes(carNumber)) {
+        removeHandlers.current[carNumber].forEach(fn => fn());
+        markersRef.current[carNumber].setMap(null);
+        overlayRef.current[carNumber].setMap(null);
+        delete markersRef.current[carNumber];
+        delete overlayRef.current[carNumber];
       }
     })
 
@@ -360,15 +359,15 @@ function MapHome ({ maxLevel, minLevel }: MapTestProps) {
     else {
       if(!runningClustererRef.current || !notRunningClustererRef.current || !inspectedClustererRef.current) return;
       const mapRef: Record<string, {clusterRef: kakao.maps.MarkerClusterer, statusName: string}> = {
-        "운행중": {
+        "ACTIVE": {
           clusterRef: runningClustererRef.current,
           statusName: "ACTIVE"
         },
-        "미운행": {
+        "INACTIVE": {
           clusterRef:notRunningClustererRef.current,
           statusName: "INACTIVE"
         },
-        "점검중": {
+        "INSPECTING": {
           clusterRef: inspectedClustererRef.current,
           statusName: "INSPECTING"
         }
@@ -378,7 +377,7 @@ function MapHome ({ maxLevel, minLevel }: MapTestProps) {
 
       mapRefClusterRef.addMarkers(makeMarkers(mapRefStatusName));
     }
-  }, [allCarLocations])
+  }, [allCarLocations, carStatusBtn])
 
   return (
     <div ref={mapContainerRef} style={{ width: '100%', height: '100%'}}/>

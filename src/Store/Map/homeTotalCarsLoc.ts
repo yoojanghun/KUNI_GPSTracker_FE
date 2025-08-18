@@ -1,12 +1,6 @@
 import { create } from "zustand";
 import { fetchMapCarLocation } from "@/Api/Map/MapCarLocation";
 
-export type Position = {
-    lat: number;
-    lng: number;
-    time: number;
-}
-
 export type CarInfo = {
     latitude: number;
     longitude: number;

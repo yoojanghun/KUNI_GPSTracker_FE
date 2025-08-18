@@ -2,6 +2,8 @@ import { create } from "zustand";
 
 const DEFAULT_CENTER = { lat: 36.0, lng: 128.0 };
 
+type CarStatus = "전체" | "ACTIVE" | "INACTIVE" | "INSPECTING";
+
 export type CarInfo = {
 	latitude: number;
 	longitude: number;
@@ -28,8 +30,8 @@ type MapStateStoreCarList = {
 }
 
 type CarStatusOptionStore = {
-	carStatusOption: string;
-	setCarStatusOption: (selectedCarStatusOption: string) => void;
+	carStatusOption: CarStatus;
+	setCarStatusOption: (selectedCarStatusOption: CarStatus) => void;
 }
 
 type SelectedCarLatLng = {
