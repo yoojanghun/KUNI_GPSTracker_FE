@@ -1,5 +1,5 @@
-import { AppSidebar } from "./components/app-sidebar";
-import { SidebarProvider } from "./components/ui/sidebar";
+import { AppSidebar } from "@/components/app-sidebar.tsx";
+import { SidebarProvider } from "@/components/ui/sidebar.tsx";
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   return (
