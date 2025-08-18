@@ -1,6 +1,5 @@
 import { create } from "zustand";
 import type { dlog } from "@/Api/LogApi/interfaces/getLogListResponse";
-import { getLogList } from "@/Api/LogApi/getLogList";
 
 interface DLogStore {
   // 속성
@@ -10,27 +9,26 @@ interface DLogStore {
   vehicleNumber: string;
   startTime: string;
   endTime: string;
+  appliedVehicleNumber: string;
+  appliedStartTime: string;
+  appliedEndTime: string;
   currentPage: number;
   size: number;
   sort: "onTime,ASC" | "onTime,DESC";
   isDateValid: boolean;
+  hasSearched: boolean;
+  searchNonce: number;
 
   // 함수
-  fetchDLogs: (params: {
-    vehicleNumber?: string;
-    startTime?: string;
-    endTime?: string;
-    sort?: "onTime,ASC" | "onTime,DESC";
-    page?: number;
-    size?: number;
-  }) => Promise<void>;
-
   dateValidation: () => void;
 
   setVehicleNumber: (vehicleNumber: string) => void;
   setStartTime: (startTime: string) => void;
   setEndTime: (endTime: string) => void;
   setIsDateValid: (isValid: boolean) => void;
+  setHasSearched: (hasSearched: boolean) => void;
+  setSearchNonce: (searchNonce: number) => void;
+  applySearch: () => void;
 }
 
 export const useDLogStore = create<DLogStore>((set, get) => ({
@@ -40,68 +38,27 @@ export const useDLogStore = create<DLogStore>((set, get) => ({
   vehicleNumber: "",
   startTime: "",
   endTime: "",
+  appliedVehicleNumber: "",
+  appliedStartTime: "",
+  appliedEndTime: "",
   currentPage: 0,
   size: 10,
   sort: "onTime,ASC",
   isDateValid: true,
-
-  fetchDLogs: async ({
-    page = get().currentPage,
-    size = get().size,
-    vehicleNumber = get().vehicleNumber,
-    startTime = get().startTime,
-    endTime = get().endTime,
-    sort = get().sort,
-  }) => {
-    const adjustedStartTime = startTime
-      ? new Date(new Date(startTime).setHours(0, 0, 0, 0)).toISOString()
-      : undefined;
-    const adjustedEndTime = endTime
-      ? new Date(new Date(endTime).setHours(23, 59, 59, 999)).toISOString()
-      : undefined;
-    try {
-      console.log("logtable size: ", size)
-      const res = await getLogList({
-        page,
-        size,
-        vehicleNumber,
-        startTime: adjustedStartTime,
-        endTime: adjustedEndTime,
-        sort,
-      });
-      console.log("totalPage: ", res.totalPages);
-      console.log("totalElements: ", res.totalElements);
-      console.log("currentPage: ", page);
-      console.log("Fetched Log Datas: ", res.content);
-      set({
-        DLogs: res.content,
-        totalPage: res.totalPages,
-        totalElement: res.totalElements,
-        currentPage: page,
-        size: size,
-        vehicleNumber: vehicleNumber,
-        startTime: startTime,
-        endTime: endTime,
-        sort: sort,
-      });
-    } catch (err) {
-      console.error("운행일지 데이터 불러오기에 실패했습니다", err);
-    }
-  },
+  hasSearched: true,
+  searchNonce: 0,
 
   dateValidation: () => {
     const { startTime, endTime, setIsDateValid } = get();
-    const start = new Date(startTime);
-    const end = new Date(endTime);
-
-    if (
-      start.getTime() > end.getTime() ||
-      (startTime === "" && endTime === "")
-    ) {
+    if (startTime === "" && endTime === "") {
       setIsDateValid(false);
-    } else {
-      setIsDateValid(true);
+      return;
     }
+    if (startTime && endTime) {
+      setIsDateValid(startTime <= endTime);
+      return;
+    }
+    setIsDateValid(true);
   },
 
   setVehicleNumber: (vehicleNumber: string) => set({ vehicleNumber }),
@@ -111,4 +68,18 @@ export const useDLogStore = create<DLogStore>((set, get) => ({
   setEndTime: (endTime: string) => set({ endTime }),
 
   setIsDateValid: (isValid: boolean) => set({ isDateValid: isValid }),
+
+  setHasSearched: (hasSearched: boolean) => set({ hasSearched: hasSearched}),
+
+  setSearchNonce: (searchNonce: number) => set({ searchNonce: searchNonce}),
+
+  applySearch: () => {
+    const { vehicleNumber, startTime, endTime } = get();
+    set({
+      appliedVehicleNumber: vehicleNumber,
+      appliedStartTime: startTime,
+      appliedEndTime: endTime,
+      searchNonce: Date.now(),
+    });
+  },
 }));

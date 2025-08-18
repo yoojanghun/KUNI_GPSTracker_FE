@@ -4,13 +4,10 @@ import { useDLogStore } from "@/Store/dlogStore";
 import { toast } from "sonner";
 
 export function LogSearchButton() {
-  const fetchDLogs = useDLogStore((state) => state.fetchDLogs);
   const vehicleNumber = useDLogStore((state) => state.vehicleNumber);
   const dateValidation = useDLogStore((state) => state.dateValidation);
   const isDateValid = useDLogStore((state) => state.isDateValid);
-
-  const tableRowHeight = 60;
-  const itemsPerPage = Math.floor((window.innerHeight) / tableRowHeight);
+  const { applySearch } = useDLogStore.getState();
 
   return (
     <div className="flex flex-col">
@@ -23,15 +20,13 @@ export function LogSearchButton() {
               icon: <CircleAlert />,
             });
           } else {
-            await fetchDLogs({
-              size: itemsPerPage
-            })
-            const updatedLogs = useDLogStore.getState().DLogs;
-            if (updatedLogs.length <= 0) {
-              toast("일치하는 기록이 없습니다", {
-                icon: <CircleAlert />,
-              });
-            }
+            applySearch();
+            // const updatedLogs = useDLogStore.getState().DLogs;
+            // if (updatedLogs.length <= 0) {
+            //   toast("일치하는 기록이 없습니다", {
+            //     icon: <CircleAlert />,
+            //   });
+            // }
           
           }
         }}
