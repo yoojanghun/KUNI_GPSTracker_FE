@@ -11,7 +11,7 @@ import {
   Play,
 } from "lucide-react";
 import { DLogHeader } from "./DLogHeader";
-import { makeOverlayHTML } from "@/components/DLogcomponents/MapOverlay";
+import { makeOverlayHTML } from "@/components/DLogComponents/MapOverlay";
 import indicator from "../../components/Indicators.svg";
 import { getLogDetail } from "@/Api/LogApi/getLogDetail";
 import type { getLogDetailResponse } from "@/Api/LogApi/interfaces/getLogDetailResponse";

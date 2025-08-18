@@ -1,4 +1,4 @@
-import { LogTable } from "@/components/DLogcomponents/LogTable";
+import { LogTable } from "@/components/DLogComponents/LogTable";
 
 export function DLogTable() {
   return (
