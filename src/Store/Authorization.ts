@@ -49,6 +49,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const validate = await validateToken({Authorization: res.token});
       if (validate.valid){
         set({ userId: validate.loginId });
+        console.log("userId 변경됨: ", validate.loginId);
         set({token: res.token});
       console.log("토큰 저장 완료");
       localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ token: res.token }));
