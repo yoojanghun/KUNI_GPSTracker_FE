@@ -5,51 +5,27 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-  PaginationEllipsis,
 } from "@/Components/ui/pagination";
 import { useEffect, useState } from "react";
 
-function getPages(current: number, total: number, tableWidth: number): (number | "...")[] {
-  const btnWidth = 40; // 페이지네이션 버튼 크기
-  const sideBtnWidth = 50 * 2; // prev + next 버튼 크기
-  const maxFullShow = Math.floor(((tableWidth - sideBtnWidth)/2) / btnWidth);
+function getPageNums(current: number, total: number, maxItem: number) {
+  const half = Math.floor(maxItem / 2);
+  let start = Math.max(1, current - half);
+  let end = start + maxItem - 1;
 
-  // 너비와 총 아이템 개수에 따라 모든 페이지네이션 노출
-  if (total <= maxFullShow) {
-    return Array.from({ length: total }, (_, i) => i + 1);
+  if (end > total) {
+    end = total;
+    start = Math.max(1, end - maxItem + 1);
   }
 
-  const pages: (number | "...")[] = [];
-
-  if (current <= 4) {
-    // 1 ~ 4 페이지까지는 항상 노출
-    for (let i = 1; i <= Math.min(5, total); i++) {
-      pages.push(i);
-    }
-    if (total > 5) {
-      pages.push("...");
-      pages.push(total);
-    }
-  } else if (current >= total - 3) {
-    // 마지막 ~ 마지막 - 3 페이지까진 항상 노출
-    pages.push(1);
-    pages.push("...");
-    for (let i = Math.max(total - 4, 1); i <= total; i++) {
-      pages.push(i);
-    }
-  } else {
-    // 그 외의 경우 좌우에 ellipsis 표시
-    pages.push(1);
-    pages.push("...");
-    pages.push(current - 1);
-    pages.push(current);
-    pages.push(current + 1);
-    pages.push("...");
-    pages.push(total);
+  const pages: number[] = [];
+  for (let i = start; i <= end; i++) {
+    pages.push(i);
   }
 
   return pages;
 }
+
 
 export function TablePagination({
   tableRef,
@@ -77,7 +53,13 @@ export function TablePagination({
     return () => window.removeEventListener("resize", updateWidth);
   }, []);
 
-  const pageTokens = getPages(current, total, tableWidth);
+  // 페이지 아이템 수 계산
+  const numberButtonWidth = 40; // 페이지 번호 버튼 가로 길이
+  const sideButtonWidth = 50 * 2; // prev + next 버튼 총 너비
+  const availableWidth = tableWidth - sideButtonWidth;
+  const maxVisibleItems = Math.floor(availableWidth / numberButtonWidth);
+
+  const pageNums = getPageNums(current, total, maxVisibleItems);
 
   return (
     <div ref={tableRef} className="w-full flex justify-center">
@@ -90,18 +72,14 @@ export function TablePagination({
           </PaginationItem>
 
           <div className="flex gap-1 justify-center">
-            {pageTokens.map((token, idx) => (
+            {pageNums.map((item, idx) => (
               <PaginationItem key={idx}>
-                {token === "..." ? (
-                  <PaginationEllipsis />
-                ) : (
-                  <PaginationLink
-                    isActive={token === current}
-                    onClick={() => setCurrent(token as number)}
-                  >
-                    {token}
-                  </PaginationLink>
-                )}
+                <PaginationLink
+                  isActive={item === current}
+                  onClick={() => setCurrent(item)}
+                >
+                  {item}
+                </PaginationLink>
               </PaginationItem>
             ))}
           </div>

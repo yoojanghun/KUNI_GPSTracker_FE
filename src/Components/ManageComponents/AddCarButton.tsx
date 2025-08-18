@@ -15,7 +15,8 @@ import { Label } from "@/Components/ui/label";
 import { CircleCheck, CircleX, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { useRegistCarMutation } from "@/Queries/useRegistCarsQuery";
+import { carRegist } from "@/Api/ManageApi/carRegist";
+import { useCarStore } from "@/Store/carStore";
 
 export function AddCarButton() {
   const [inputDialog, setInputDialog] = useState(false);
@@ -23,7 +24,7 @@ export function AddCarButton() {
   const [vehicleName, setVehicleName] = useState("");
   const [attemptedSubmit, setAttemptedSubmit] = useState(false);
 
-  const registCar = useRegistCarMutation();
+  const fetchCars = useCarStore((state) => state.fetchCars);
 
   // TODO: react-hook-form 도입 고려 (리펙토링 시)
   // 입력값 유효성 검사
@@ -114,32 +115,41 @@ export function AddCarButton() {
                 className="bg-[#8D99FF] gap-3 hover:bg-[#8D99FF]/80"
                 onClick={async () => {
                   setAttemptedSubmit(true);
-                  if (!isvehicleNumberValid() || !isModelNameValid()) {
-                    return;
-                  }
-                  registCar.mutate(
-                    { vehicleNumber, vehicleName },
-                    {
-                      onSuccess: ({ vehicleNumber: vn }) => {
-                        toast(
-                          <span>
-                            <strong>{vn}</strong> 차량이 등록되었습니다.
-                          </span>,
-                          { icon: <CircleCheck /> }
-                        );
-                        setInputDialog(false);
-                        setVehicleNumber("");
-                        setVehicleName("");
-                        setAttemptedSubmit(false);
-                      },
-                      onError: () => {
-                        toast(
-                          <span>서버 오류로 인해 차량 등록에 실패하였습니다.</span>,
-                          { icon: <CircleX /> }
-                        );
-                      },
+                  if (isvehicleNumberValid() && isModelNameValid()) {
+                    setInputDialog(false);
+                    const res = await carRegist({
+                      vehicleNumber,
+                      vehicleName,
+                    });
+                    setAttemptedSubmit(false);
+                    if (
+                      vehicleName === res.vehicleName &&
+                      vehicleNumber === res.vehicleNumber
+                    ) {
+                      fetchCars({sort:"createDate,DESC"});
+                      toast(
+                        <span>
+                          <strong>{vehicleNumber}</strong> 차량이
+                          등록되었습니다.
+                        </span>,
+                        {
+                          icon: <CircleCheck />,
+                        }
+                      );
+                    } else {
+                      toast(
+                        <span>
+                          서버 오류로 인해 차량 등록에 실패하였습니다.
+                        </span>,
+                        {
+                          icon: <CircleX />,
+                        }
+                      );
                     }
-                  );
+
+                    setVehicleNumber("");
+                    setVehicleName("");
+                  }
                 }}
               >
                 입력 완료

@@ -4,10 +4,13 @@ import { useDLogStore } from "@/Store/dlogStore";
 
 
 export function LogResetButton() {
-  const { applySearch } = useDLogStore.getState();
+  const fetchDLogs = useDLogStore((state) => state.fetchDLogs);
   const setVehicleNumber = useDLogStore((state) => state.setVehicleNumber);
   const setStartTime = useDLogStore((state) => state.setStartTime);
   const setEndTime = useDLogStore((state) => state.setEndTime);
+
+  const tableRowHeight = 70;
+  const itemsPerPage = Math.floor((window.innerHeight) / tableRowHeight);
 
   return (
     <div className="flex flex-col">
@@ -17,7 +20,9 @@ export function LogResetButton() {
             setVehicleNumber("");
             setStartTime("");
             setEndTime("");
-            applySearch();
+            await fetchDLogs({
+              size: itemsPerPage
+            })
           }}
         className="bg-[#717171] gap-3 hover:bg-[#717171]/80"
         
