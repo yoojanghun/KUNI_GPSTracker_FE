@@ -1,7 +1,7 @@
-import { CarNumInput } from "@/components/DLogComponents/CarNumInput";
-import { DateSelection } from "@/components/DLogComponents/DateSelection";
-import { LogResetButton } from "@/components/DLogComponents/LogResetButton";
-import { LogSearchButton } from "@/components/DLogComponents/LogSearchButton";
+import { CarNumInput } from "@/components/DLogcomponents/CarNumInput";
+import { DateSelection } from "@/components/DLogcomponents/DateSelection";
+import { LogResetButton } from "@/components/DLogcomponents/LogResetButton";
+import { LogSearchButton } from "@/components/DLogcomponents/LogSearchButton";
 
 export function DLogInputs() {
   return (

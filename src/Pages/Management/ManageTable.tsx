@@ -1,4 +1,4 @@
-import CarTable from "@/components/ManageComponents/CarTable";
+import CarTable from "@/components/Managecomponents/CarTable";
 
 export function ManageTable() {
     return (
