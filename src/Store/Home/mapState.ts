@@ -2,9 +2,11 @@ import { create } from "zustand";
 
 const DEFAULT_CENTER = { lat: 36.0, lng: 128.0 };
 
+type CarStatus = "전체" | "ACTIVE" | "INACTIVE" | "INSPECTING";
+
 type CarStatusBtnStore = {
-	carStatusBtn: string;
-	setCarStatusBtn: (selectedCarStatusBtn: string) => void;
+	carStatusBtn: CarStatus;
+	setCarStatusBtn: (selectedCarStatusBtn: CarStatus) => void;
 }
 
 type HomeMapStateStore = {
