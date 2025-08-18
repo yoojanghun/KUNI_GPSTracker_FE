@@ -13,8 +13,9 @@ RUN npm install
 COPY . .
 
 # Build the project
-RUN npm run build
 RUN ls -al /app/src/components
 RUN echo "🔍 파일 목록:" && find /app/src
+RUN npm run build
+
 
 # The 'dist' folder is now available in /app/dist
