@@ -16,6 +16,8 @@ import { type CarStatusNum, fetchCarStatistics } from "@/Api/Home/CarStatistics"
 import { useEffect, useState, useRef } from "react";
 import { prcInterval } from 'precision-timeout-interval';
 
+type CarStatus = "전체" | "ACTIVE" | "INACTIVE" | "INSPECTING";
+
 function Home() {
   const [carStat, setCarStat] = useState<CarStatusNum | null>(null);
   // carStat = {vehicles: 500, active: 0, inactive: 500, inspect: 0}
@@ -120,10 +122,6 @@ function Home() {
               </div>
             </div>
           </div>
-          {/* <div className="flex flex-col items-center">
-            <span className="text-3xl font-bold mb-1">{percentage}%</span>
-            <span className="opacity-60">가동률</span>
-          </div> */}
         </div>
       </div>
       <div className="flex gap-4 h-[80%]">
@@ -176,7 +174,7 @@ function Home() {
                 <input
                   type="checkbox"
                   value="전체"
-                  onChange={(e) => setCarStatusBtn(e.target.value)}
+                  onChange={(e) => setCarStatusBtn(e.target.value as CarStatus)}
                   checked={carStatusBtn === "전체"}
                   className="w-4 h-4 mr-1"
                 />
@@ -185,9 +183,9 @@ function Home() {
               <label className="flex items-center font-bold mr-1 min-w-[100px]">
                 <input
                   type="checkbox"
-                  value="운행중"
-                  onChange={(e) => setCarStatusBtn(e.target.value)}
-                  checked={carStatusBtn === "운행중"}
+                  value="ACTIVE"
+                  onChange={(e) => setCarStatusBtn(e.target.value as CarStatus)}
+                  checked={carStatusBtn === "ACTIVE"}
                   className="w-4 h-4 mr-1"
                 />
                 <img src={workingIndicator} className="mr-1 w-6" />
@@ -196,9 +194,9 @@ function Home() {
               <label className="flex items-center font-bold mr-1 min-w-[100px]">
                 <input
                   type="checkbox"
-                  value="미운행"
-                  onChange={(e) => setCarStatusBtn(e.target.value)}
-                  checked={carStatusBtn === "미운행"}
+                  value="INACTIVE"
+                  onChange={(e) => setCarStatusBtn(e.target.value as CarStatus)}
+                  checked={carStatusBtn === "INACTIVE"}
                   className="w-4 h-4 mr-1"
                 />
                 <img src={notWorkingIndicator} className="mr-1 w-6" />
@@ -207,9 +205,9 @@ function Home() {
               <label className="flex items-center font-bold mr-1 min-w-[100px]">
                 <input
                   type="checkbox"
-                  value="점검중"
-                  onChange={(e) => setCarStatusBtn(e.target.value)}
-                  checked={carStatusBtn === "점검중"}
+                  value="INSPECTING"
+                  onChange={(e) => setCarStatusBtn(e.target.value as CarStatus)}
+                  checked={carStatusBtn === "INSPECTING"}
                   className="w-4 h-4 mr-1"
                 />
                 <img src={checkingIndicator} className="mr-1 w-6" />

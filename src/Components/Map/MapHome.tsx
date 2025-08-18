@@ -1,8 +1,9 @@
 import { useEffect, useRef, useMemo } from 'react';
 import { useHomeMapStore } from '@/Store/Home/mapState';
 import { useCarStatusBtnStore } from '@/Store/Home/mapState';
-import { useMapCarLocationStore } from '@/Store/Map/homeTotalCarsLoc';
+import { useAllCarLocationStore } from '@/Store/Map/homeTotalCarsLoc';
 import styles from "./MapCustomOverlay.module.css";
+import { prcInterval } from 'precision-timeout-interval';
 
 type MapTestProps = {
   maxLevel: number;
@@ -19,7 +20,10 @@ type CustomOverlayStyle = {
 function MapHome ({ maxLevel, minLevel }: MapTestProps) {
 
   const carStatusBtn = useCarStatusBtnStore(state => state.carStatusBtn);
-  const { homeMapCenter, setHomeMapCenter, homeMapLevel, setHomeMapLevel } = useHomeMapStore();
+  const homeMapCenter = useHomeMapStore(state => state.homeMapCenter);
+  const setHomeMapCenter = useHomeMapStore(state => state.setHomeMapCenter);
+  const homeMapLevel = useHomeMapStore(state => state.homeMapLevel);
+  const setHomeMapLevel = useHomeMapStore(state => state.setHomeMapLevel)
 
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<kakao.maps.Map | null>(null);
@@ -37,14 +41,35 @@ function MapHome ({ maxLevel, minLevel }: MapTestProps) {
   const markersRef = useRef<Record<string, kakao.maps.Marker>>({});
   const overlayRef = useRef<Record<string, kakao.maps.CustomOverlay>>({});
 
-  const startPolling = useMapCarLocationStore(state => state.startPolling);
-  const stopPolling = useMapCarLocationStore(state => state.stopPolling);
-  const carLocations = useMapCarLocationStore(state => state.carLocations);
+  const allCarsPolling = useAllCarLocationStore(state => state.allCarsPolling);
+  const allCarLocations = useAllCarLocationStore(state => state.allCarLocations);
   
-  // 컴포넌트가 unmount될 때 clean up 함수가 실행됨.
+  const intervalCtrl = useRef<ReturnType<typeof prcInterval> | null>(null);
+  const isBusy = useRef<boolean>(false);
+
+  const removeHandlers = useRef<Record<string, Array<() => void>>>({});
+
+  // 컴포넌트가 unmount될 때, useEffect가 다시 실행될 때 clean up 함수가 실행됨.
   useEffect(() => {
-    startPolling();
-    return () => stopPolling();
+    const fetchAllCarsLocation = async () => {
+      if(isBusy.current) return;
+      isBusy.current = true;
+      try {
+        await allCarsPolling();
+        console.log("전체 차량 gps");
+      }
+      catch(e) {
+        console.error(e);
+      }
+      finally {
+        isBusy.current = false;
+      }
+    }
+
+    void fetchAllCarsLocation();
+    intervalCtrl.current = prcInterval(9000, fetchAllCarsLocation);
+
+    return () => intervalCtrl.current?.cancel();
   }, []);
 
   // 단순 계산(입력과 출력만 있는 것)
@@ -215,38 +240,32 @@ function MapHome ({ maxLevel, minLevel }: MapTestProps) {
   }, [])
 
   useEffect(() => {
-    // const currentCars = positions.map(p => p.vehicleNumber);         // 현재 차량의 number을 가져옴
+    const currentCars = allCarLocations.map(car => car.vehicleNumber);         // 현재 차량의 number을 가져옴
 
     totalClustererRef.current?.clear();
     runningClustererRef.current?.clear();
     notRunningClustererRef.current?.clear();
     inspectedClustererRef.current?.clear();
 
-    activeOverlayRef.current?.setMap(null);
-    activeMarkerRef.current = null;
-    activeMarkerImgRef.current = null;
-
-    const offHandlers: Array<() => void> = [];                // removeListener는 undefined를 반환
-
     const makeMarkers = (status?: string): kakao.maps.Marker[] => {
       const createdMarkers:kakao.maps.Marker[] = [];            // 생성된 마커의 배열을 반환하기 위해 사용
-      carLocations
-        .filter(p => p.status === status || !status)
-        .forEach(p => {
-          const latLng = new kakao.maps.LatLng(p.latitude, p.longitude);
+      allCarLocations
+        .filter(car => car.status === status || !status)
+        .forEach(car => {
+          const latLng = new kakao.maps.LatLng(car.latitude, car.longitude);
           const { 
             defaultMarkerImg: defaultImg, 
             hoverMarkerImg: hoverImg, 
             bgColor, 
             textColor
-          } = markerMap[p.status];
+          } = markerMap[car.status];
 
-          let marker = markersRef.current[p.vehicleNumber];            // markersRef: 지도에 표시된 마커 (차량 번호: {마커})
+          let marker = markersRef.current[car.vehicleNumber];            // markersRef: 지도에 표시된 마커 (차량 번호: {마커})
           if(marker) {                                          // 해당 차량이 이미 있으면 지도에 이미 있는 marker와 overlay의 
             marker.setPosition(latLng);                         // 위치 업데이트 (열어서 보여주는 동작X)            
             marker.setImage(defaultImg);                          
-            if(overlayRef.current[p.vehicleNumber]) {
-              overlayRef.current[p.vehicleNumber].setPosition(latLng);   // overlay위치를 업데이트 (열어서 보여주는 동작X)
+            if(overlayRef.current[car.vehicleNumber]) {
+              overlayRef.current[car.vehicleNumber].setPosition(latLng);   // overlay위치를 업데이트 (열어서 보여주는 동작X)
             }
           }
           else {
@@ -256,16 +275,16 @@ function MapHome ({ maxLevel, minLevel }: MapTestProps) {
               image: defaultImg,
               map: mapInstance.current
             });
-            markersRef.current[p.vehicleNumber] = marker;
+            markersRef.current[car.vehicleNumber] = marker;
 
             const overlay = new kakao.maps.CustomOverlay({            // 오버레이 생성 (한 번만 실행)
               content: `
                 <div class="${styles["overlay-bubble"]}">
                   <div class="px-3 py-1 text-center">
-                    <div class="font-bold">${p.vehicleNumber}</div>
-                    <div class="font-bold my-1">${p.type}</div>
+                    <div class="font-bold">${car.vehicleNumber}</div>
+                    <div class="font-bold my-1">${car.type}</div>
                     <div class="${bgColor} ${textColor} p-1 font-bold rounded-sm text-center">
-                      ${p.status}
+                      ${car.status}
                     </div>
                   </div>
                 </div>`,
@@ -275,7 +294,7 @@ function MapHome ({ maxLevel, minLevel }: MapTestProps) {
               zIndex: 99
             });
 
-            overlayRef.current[p.vehicleNumber] = overlay;         // overlayRef: 지도에 표시할 오버레이 (차량 번호: {오버레이})
+            overlayRef.current[car.vehicleNumber] = overlay;         // overlayRef: 지도에 표시할 오버레이 (차량 번호: {오버레이})
 
             const setOverlay = () => {                      // event 등록도 한 번만 실행
               marker.setImage(hoverImg);
@@ -309,15 +328,14 @@ function MapHome ({ maxLevel, minLevel }: MapTestProps) {
               }
             }
             kakao.maps.event.addListener(marker, "mouseover", setOverlay);
-            offHandlers.push(() => kakao.maps.event.removeListener(marker, "mouseover", setOverlay));
-
             kakao.maps.event.addListener(marker, "mouseout", deleteOverlay);
-            offHandlers.push(() => kakao.maps.event.removeListener(marker, "mouseout", deleteOverlay));
-
             kakao.maps.event.addListener(marker, "click", controlClickOverlay);
-            offHandlers.push(() => kakao.maps.event.removeListener(marker, "click", controlClickOverlay));
 
-            markersRef.current[p.vehicleNumber] = marker;
+            removeHandlers.current[car.vehicleNumber] = [
+              () => kakao.maps.event.removeListener(marker, "mouseover", setOverlay),
+              () => kakao.maps.event.removeListener(marker, "mouseout", deleteOverlay),
+              () => kakao.maps.event.removeListener(marker, "click", controlClickOverlay)
+            ]
           }
           createdMarkers.push(marker);        // createdMarkers에 마커의 배열이 들어감
         });
@@ -325,14 +343,15 @@ function MapHome ({ maxLevel, minLevel }: MapTestProps) {
       return createdMarkers;
     }
 
-    // Object.keys(markersRef.current).forEach(key => {      // markersRef의 number 배열에 현재 차량(currentCars) number가 포함이 안되었을 때 삭제
-    //   if(!currentCars.includes(key)) {
-    //     markersRef.current[key].setMap(null);
-    //     overlayRef.current[key].setMap(null);
-    //     delete markersRef.current[key];
-    //     delete overlayRef.current[key];
-    //   }
-    // })
+    Object.keys(markersRef.current).forEach(carNumber => {      // markersRef의 number 배열에 현재 차량(currentCars) number가 포함이 안되었을 때 삭제
+      if(!currentCars.includes(carNumber)) {
+        removeHandlers.current[carNumber].forEach(fn => fn());
+        markersRef.current[carNumber].setMap(null);
+        overlayRef.current[carNumber].setMap(null);
+        delete markersRef.current[carNumber];
+        delete overlayRef.current[carNumber];
+      }
+    })
 
     if(carStatusBtn === "전체") {
       totalClustererRef.current?.addMarkers(makeMarkers());
@@ -340,15 +359,15 @@ function MapHome ({ maxLevel, minLevel }: MapTestProps) {
     else {
       if(!runningClustererRef.current || !notRunningClustererRef.current || !inspectedClustererRef.current) return;
       const mapRef: Record<string, {clusterRef: kakao.maps.MarkerClusterer, statusName: string}> = {
-        "운행중": {
+        "ACTIVE": {
           clusterRef: runningClustererRef.current,
           statusName: "ACTIVE"
         },
-        "미운행": {
+        "INACTIVE": {
           clusterRef:notRunningClustererRef.current,
           statusName: "INACTIVE"
         },
-        "점검중": {
+        "INSPECTING": {
           clusterRef: inspectedClustererRef.current,
           statusName: "INSPECTING"
         }
@@ -358,15 +377,7 @@ function MapHome ({ maxLevel, minLevel }: MapTestProps) {
 
       mapRefClusterRef.addMarkers(makeMarkers(mapRefStatusName));
     }
-
-    return () => {
-      offHandlers.forEach(off => off());
-      Object.values(markersRef.current).forEach(marker => marker.setMap(null));
-      Object.values(overlayRef.current).forEach(overlay => overlay.setMap(null));
-      markersRef.current = {};
-      overlayRef.current = {};
-    };
-  }, [carLocations, carStatusBtn])
+  }, [allCarLocations, carStatusBtn])
 
   return (
     <div ref={mapContainerRef} style={{ width: '100%', height: '100%'}}/>
