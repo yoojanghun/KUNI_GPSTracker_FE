@@ -1,18 +1,24 @@
 import ky from 'ky';
+import { useAuthStore } from '@/Store/Authorization';
 import { handleResponse } from './hooks/handleResponse';
-export const instance = ky.create({
 
-  prefixUrl: "https://api.gps-tracker.store/", // baseURL 설정
-  headers: {
-    Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ5b29qYW5naHVuIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzU1NDIwODYxLCJleHAiOjE3NTU1MDcyNjF9.EPrNVxcFCgdwkGkVkxtLFgLW1ysJjEukPb2eGWGGDKI',
-    // 이후 헤더 항목 추가
-  },
+
+export const instance = ky.create({
+  prefixUrl: "https://api.gps-tracker.store/", // baseURL 설정, TODO: env로 안전하게 관리
   hooks: {
     beforeRequest: [
       async (request) => {
+        // 인증 토큰을 전역 상태에서 읽어와 헤더에 주입
+        const token = useAuthStore.getState().token;
+        if (token) {
+          request.headers.set("Authorization", `Bearer ${token}`);
+        }
+
+        // POST 요청일 경우 Content-Type 헤더 추가, TODO: 헤더별로 ky 인스턴스 분리
         if (request.method === 'POST') {
           request.headers.set('Content-Type', 'application/json');
         }
+        
       }
     ],
      afterResponse: [
@@ -29,8 +35,8 @@ export const api = instance.extend({
   // 재시도 요청
   retry: {
     limit: 5, // 재시도 횟수
-    statusCodes: [401, 400, 500], // 재시도 진행할 응답코드
-    methods: ['get', 'post', 'delete'], // 재시도 진행할 http 메서드
+    statusCodes: [400, 404, 500], // 재시도 진행할 응답코드
+    methods: ['get'], // 재시도 진행할 http 메서드
     backoffLimit: 3 * 1000 // 재시도 간격 최대값
   }
 })

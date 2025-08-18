@@ -12,22 +12,33 @@ export function DateSelection() {
   const endTime = useDLogStore((state) => state.endTime);
   const setStartTime = useDLogStore((state) => state.setStartTime);
   const setEndTime = useDLogStore((state) => state.setEndTime);
+  const { applySearch } = useDLogStore.getState();
 
+  // Helper: format Date -> 'YYYY-MM-DD'
+    const toYMD = (d: Date) => {
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return `${y}-${m}-${day}`;
+    };
   useEffect(() => {
-    const today = new Date();
-    const oneWeekAgo = new Date();
-    oneWeekAgo.setDate(today.getDate() - 7);
+    
 
-    setStartTime(oneWeekAgo.toLocaleDateString());
-    setEndTime(today.toLocaleDateString());
+    // Anchor to KST "today" (avoid local TZ drift)
+    const now = new Date();
+    const kst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+    const today = new Date(Date.UTC(kst.getUTCFullYear(), kst.getUTCMonth(), kst.getUTCDate()));
+    const oneWeekAgo = new Date(today);
+    oneWeekAgo.setUTCDate(today.getUTCDate() - 7);
+
+    setStartTime(toYMD(oneWeekAgo));
+    setEndTime(toYMD(today));
+    applySearch();
   }, []);
 
-  // Date validation: startTime must be before or equal endTime, or both empty
   const isDateValid =
     (!startTime && !endTime) ||
-    (!startTime && endTime) ||
-    (startTime && !endTime) ||
-    (startTime && endTime && new Date(startTime) <= new Date(endTime));
+    (startTime && endTime && startTime <= endTime);
 
   const [openStart, setOpenStart] = useState(false);
   const [openEnd, setOpenEnd] = useState(false);
@@ -44,7 +55,7 @@ export function DateSelection() {
           <PopoverTrigger asChild>
             <Button
               variant={"outline"}
-              id="date"
+              id="startDate"
               className={cn(
                 "w-48 justify-between font-normal",
                 !isDateValid && !startTime && "border-red-500"
@@ -57,16 +68,12 @@ export function DateSelection() {
           <PopoverContent className="w-auto overflow-hidden p-0" align="start">
             <Calendar
               mode="single"
-              selected={startTime ? new Date(startTime) : undefined}
+              selected={startTime ? new Date(`${startTime}T00:00:00+09:00`) : undefined}
               captionLayout="dropdown"
               onSelect={(date) => {
                 if (!date) return;
-                const selected = date.toLocaleDateString();
-                if (selected === startTime) {
-                  setStartTime("");
-                } else {
-                  setStartTime(selected);
-                }
+                const selected = toYMD(date);
+                setStartTime(selected);
                 setOpenStart(false);
               }}
             />
@@ -83,7 +90,7 @@ export function DateSelection() {
           <PopoverTrigger asChild>
             <Button
               variant={"outline"}
-              id="date"
+              id="endDate"
               className={cn(
                 "w-48 justify-between font-normal",
                 !isDateValid && !endTime && "border-red-500"
@@ -96,16 +103,12 @@ export function DateSelection() {
           <PopoverContent className="w-auto overflow-hidden p-0" align="start">
             <Calendar
               mode="single"
-              selected={endTime ? new Date(endTime) : undefined}
+              selected={endTime ? new Date(`${endTime}T00:00:00+09:00`) : undefined}
               captionLayout="dropdown"
               onSelect={(date) => {
                 if (!date) return;
-                const selected = date.toLocaleDateString();
-                if (selected === endTime) {
-                  setEndTime("");
-                } else {
-                  setEndTime(selected);
-                }
+                const selected = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+                setEndTime(selected);
                 setOpenEnd(false);
               }}
             />

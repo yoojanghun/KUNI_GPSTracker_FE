@@ -2,6 +2,8 @@ import { NavLink } from "react-router-dom";
 import logo from "../assets/logo.svg";
 import { CarFront, Folder, MapPin, Wrench } from "lucide-react";
 import type { JSX } from "react";
+import { Button } from "./ui/button";
+import { useAuthStore } from "@/Store/Authorization";
 
 interface NavItem {
     to: string;
@@ -18,7 +20,8 @@ const navItems: NavItem[] = [
 
 const Navbar = () => {
   return (
-    <nav className="flex flex-col items-center bg-[#F5F6FF] h-screen min-w-[200px]">
+    <div className="flex flex-col h-screen bg-[#F5F6FF] min-w-[200px]">
+      <nav className="flex flex-col items-center">
       <NavLink className="mb-3" to="/" end>
         <img src={logo} alt="logo" />
       </NavLink>
@@ -36,7 +39,17 @@ const Navbar = () => {
           <span>{label}</span>
         </NavLink>
       ))}
+      
     </nav>
+    <div className="p-4 mt-auto">
+      <Button 
+      className="w-full cursor-pointer hover:bg-[#8D99FF]/80 bg-[#8D99FF]"
+      onClick={() => useAuthStore.getState().logout()}
+      >로그아웃</Button>
+    </div>
+    </div>
+    
+    
   );
 }
 
