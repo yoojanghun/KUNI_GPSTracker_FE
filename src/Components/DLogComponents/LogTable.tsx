@@ -69,7 +69,7 @@ const { data, isLoading, isFetching } = useDlogsQuery({
           )}
 
           {!isLoading && logs.map((dlog) => (
-            <TableRow key={dlog.id} className="text-center">
+            <TableRow key={dlog.id} className="text-center" onClick={() => navigate(`/log/${dlog.id}`, { state: { id: dlog.id } })}>
               <TableCell></TableCell>
               <TableCell className="font-medium">{dlog.vehicleNumber}</TableCell>
               <TableCell>{dlog.vehicleName}</TableCell>
@@ -79,7 +79,7 @@ const { data, isLoading, isFetching } = useDlogsQuery({
               <TableCell className="text-right">
                 <ChevronRight
                   className="inline-block pr-2 cursor-pointer"
-                  onClick={() => navigate(`/log/${dlog.id}`, { state: { id: dlog.id } })}
+                  
                 />
               </TableCell>
             </TableRow>

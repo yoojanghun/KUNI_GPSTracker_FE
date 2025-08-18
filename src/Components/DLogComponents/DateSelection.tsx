@@ -14,14 +14,15 @@ export function DateSelection() {
   const setEndTime = useDLogStore((state) => state.setEndTime);
   const { applySearch } = useDLogStore.getState();
 
-  useEffect(() => {
-    // Helper: format Date -> 'YYYY-MM-DD'
+  // Helper: format Date -> 'YYYY-MM-DD'
     const toYMD = (d: Date) => {
       const y = d.getFullYear();
       const m = String(d.getMonth() + 1).padStart(2, "0");
       const day = String(d.getDate()).padStart(2, "0");
       return `${y}-${m}-${day}`;
     };
+  useEffect(() => {
+    
 
     // Anchor to KST "today" (avoid local TZ drift)
     const now = new Date();
@@ -37,8 +38,6 @@ export function DateSelection() {
 
   const isDateValid =
     (!startTime && !endTime) ||
-    (!startTime && endTime) ||
-    (startTime && !endTime) ||
     (startTime && endTime && startTime <= endTime);
 
   const [openStart, setOpenStart] = useState(false);
@@ -56,7 +55,7 @@ export function DateSelection() {
           <PopoverTrigger asChild>
             <Button
               variant={"outline"}
-              id="date"
+              id="startDate"
               className={cn(
                 "w-48 justify-between font-normal",
                 !isDateValid && !startTime && "border-red-500"
@@ -73,7 +72,7 @@ export function DateSelection() {
               captionLayout="dropdown"
               onSelect={(date) => {
                 if (!date) return;
-                const selected = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+                const selected = toYMD(date);
                 setStartTime(selected);
                 setOpenStart(false);
               }}
@@ -91,7 +90,7 @@ export function DateSelection() {
           <PopoverTrigger asChild>
             <Button
               variant={"outline"}
-              id="date"
+              id="endDate"
               className={cn(
                 "w-48 justify-between font-normal",
                 !isDateValid && !endTime && "border-red-500"
