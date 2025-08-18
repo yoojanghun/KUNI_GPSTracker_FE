@@ -93,7 +93,7 @@ export function AddCarButton() {
                 >
                   {attemptedSubmit && !isModelNameValid()
                     ? "차량명을 입력해주세요"
-                    : "차량명"}
+                    : "차량명 (현재는 FERARRI, PORSCHE, MERCEDES만 지원됨)"}
                 </Label>
                 <Input
                   id="vehicleName"

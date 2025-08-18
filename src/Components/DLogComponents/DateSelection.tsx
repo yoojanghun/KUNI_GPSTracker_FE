@@ -49,7 +49,7 @@ export function DateSelection() {
         {isDateValid || startTime ? (
           <Label htmlFor="date" className="px-1 py-1 text-[#9E9E9E]">시작 날짜</Label>
         ) : (
-          <span className="text-transparent">-</span>
+          <Label className="px-1 py-1 text-red-500">필수 입력</Label>
         )}
         <Popover open={openStart} onOpenChange={setOpenStart}>
           <PopoverTrigger asChild>
@@ -84,7 +84,7 @@ export function DateSelection() {
         {isDateValid || endTime ? (
           <Label htmlFor="date" className="px-1 py-1 text-[#9E9E9E]">종료 날짜</Label>
         ) : (
-          <span className="text-transparent">-</span>
+          <Label className="px-1 py-1 text-red-500">필수 입력</Label>
         )}
         <Popover open={openEnd} onOpenChange={setOpenEnd}>
           <PopoverTrigger asChild>
