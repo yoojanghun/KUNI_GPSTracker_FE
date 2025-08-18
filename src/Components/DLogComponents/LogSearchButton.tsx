@@ -1,4 +1,4 @@
-import { Button } from "@/Components/ui/button";
+import { Button } from "@/components/ui/button";
 import { CircleAlert, Search } from "lucide-react";
 import { useDLogStore } from "@/Store/dlogStore";
 import { toast } from "sonner";

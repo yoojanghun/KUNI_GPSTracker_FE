@@ -1,5 +1,7 @@
+/// TODO: 차량명 길게 입력했을 때 서버가 401을 뱉는데, 별다른 에러코드로 처리하는 것으로 수정해야 함
+
 import { useState } from "react";
-import { Button } from "@/Components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -8,10 +10,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/Components/ui/dialog";
+} from "@/components/ui/dialog";
 
-import { Input } from "@/Components/ui/input";
-import { Label } from "@/Components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { CircleCheck, CircleX, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -93,7 +95,7 @@ export function AddCarButton() {
                 >
                   {attemptedSubmit && !isModelNameValid()
                     ? "차량명을 입력해주세요"
-                    : "차량명"}
+                    : "차량명 (현재는 FERARRI, PORSCHE, MERCEDES만 지원됨)"}
                 </Label>
                 <Input
                   id="vehicleName"

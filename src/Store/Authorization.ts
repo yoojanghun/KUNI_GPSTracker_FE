@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { logIn } from "@/Api/AuthApi/logIn";
 import { SignUpApi } from "@/Api/AuthApi/signUp";
+import { validateToken } from "@/Api/AuthApi/validate";
 
 // 로컬 스토리지 키 상수
 const AUTH_STORAGE_KEY = "auth";
@@ -8,25 +9,31 @@ const AUTH_STORAGE_KEY = "auth";
 // 인증 상태 타입
 interface AuthState {
   token: string | null;
+  userId: string;
   isBootstrapping: boolean;
 
   isAuthLoading: boolean;
   authError: string | null;
+  logoutType: "manual" | "expired" | null; // manual: 로그아웃 버튼 사용, expired: 토큰 만료
 
   login: (username: string, password: string) => Promise<void>;
-  logout: () => void;
+  logout: (type: "manual" | "expired" | null) => void;
   bootstrapFromStorage: () => Promise<void>;
-  signUp: (params: { username: string; password: string; email: string; role: "ADMIN" | "USER" }) => Promise<boolean>;
+  signUp: (params: { username: string; password: string; email: string;}) => Promise<boolean>;
   setAuthError: (err: string) => void;
+  setUserId: (userId: string) => void;
+  setLogOutType: (type: "manual" | "expired" | null) => void;
 }
 
 // Zustand 스토어 생성
 export const useAuthStore = create<AuthState>((set, get) => ({
   token: null,
+  userId: "",
   isBootstrapping: true,
 
   isAuthLoading: false,
   authError: null,
+  logoutType: null,
 
   // 아이디/비밀번호로 로그인 요청을 전역에서 처리
   login: async (username: string, password: string) => {
@@ -39,8 +46,18 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         throw new Error("토큰이 응답에 없습니다.");
       }
       // 토큰 저장 처리
-      set({token: res.token});
+      const validate = await validateToken({Authorization: res.token});
+      if (validate.valid){
+        set({ userId: validate.loginId });
+        console.log("userId 변경됨: ", validate.loginId);
+        set({token: res.token});
+      console.log("토큰 저장 완료");
       localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ token: res.token }));
+      }
+      else{
+        throw new Error("유효하지 않은 토큰입니다.");
+      }
+      
 
     } catch (err: any) {
       // 에러 메시지 저장
@@ -54,11 +71,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   // 회원가입 요청을 전역에서 처리
-  signUp: async ({ username, password, email, role }) => {
+  signUp: async ({ username, password, email}) => {
     set({ isAuthLoading: true, authError: null });
     try {
       // 회원가입 API 호출 (서버 스펙에 맞춰 엔드포인트 조정 가능)
-      const resp = await SignUpApi({ id: username.trim(), password: password.trim(), email: email.trim(), role: role.trim() as "ADMIN" | "USER" });
+      const resp = await SignUpApi({ id: username.trim(), password: password.trim(), email: email.trim()});
       if (resp.id !== username.trim()) {
         
           throw new Error("회원가입 요청에 실패했습니다.");
@@ -75,19 +92,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   // 로그아웃 처리: 상태/스토리지 초기화
-  logout: () => {
+  logout: (type) => {
+    set({ logoutType: type });
     set({ token: null });
+    set({ userId: "" });
     localStorage.removeItem(AUTH_STORAGE_KEY);
-
-    // 라우팅 처리 필요 시 window.location 사용 (라우터 의존성 제거 목적)
-
-    try {
-      if (window.location.pathname !== "/") {
-        // window.location.replace("/login"); // 로그인 페이지로 이동하도록 라우팅 구조에 맞게 조정
-      }
-    } catch {
-      // 브라우저 환경 가정
-    }
   },
 
   // 앱 부팅 시 스토리지에서 세션 복원
@@ -113,6 +122,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   setAuthError: (err) => set({ authError: err }),
+
+  setUserId: (userId) => set({ userId: userId }),
+
+  setLogOutType: (type) => set({ logoutType: type }),
 }));
 
 

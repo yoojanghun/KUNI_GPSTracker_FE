@@ -1,13 +1,14 @@
 import { Link } from "react-router-dom";
-import { Input } from "@/Components/ui/input";
-import { Button } from "@/Components/ui/button";
-import { Card, CardContent } from "@/Components/ui/card";
-import { UserRound, Lock } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { UserRound, Lock, CircleCheckBig, ShieldX } from "lucide-react";
 import Illustrator from "../../assets/illustrator.png";
 import logo from "../../assets/logo.svg";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuthStore } from "@/Store/Authorization";
+import { toast } from "sonner";
 
 export function Login() {
   const [username, setUsername] = useState<string>("");
@@ -15,6 +16,26 @@ export function Login() {
 
   // 전역 인증 스토어 상태와 액션
   const { isAuthLoading, authError, login, setAuthError } = useAuthStore();
+
+  // 로그인 페이지 이동 타입
+  const logoutType = useAuthStore((state) => state.logoutType);
+  const setLogOutType = useAuthStore((state) => state.setLogOutType);
+
+
+  useEffect (() => { 
+    if (logoutType === 'manual') {
+      toast("로그아웃 되었습니다", {
+        icon: <CircleCheckBig/>  
+      });
+      setLogOutType(null);
+    }
+    else if (logoutType === 'expired') {
+      toast("세션이 만료되었습니다. 다시 로그인해 주세요", {
+        icon: <ShieldX/>  
+      });
+      setLogOutType(null);
+    }
+   }, [])
 
   // 라우팅 이동 훅
   const navigate = useNavigate();
@@ -29,11 +50,16 @@ export function Login() {
     try {
       // 전역 스토어가 API 호출과 토큰 저장을 처리
       await login(username, password);
+      console.log("로그인 성공");
 
       // 원래 가려던 경로(from)가 있으면 그쪽으로, 없으면 /home
-      const params = new URLSearchParams(location.search);
+      if (!isAuthLoading){
+        console.log("메인페이지 이동");
+        const params = new URLSearchParams(location.search);
       const from = params.get("from") ?? "/";
       navigate(from, { replace: true });
+      }
+      
     } catch {
       // 실패 시 authError 상태가 설정되어 있음
       // 필요한 경우 토스트나 인라인 에러 표시로 연결
