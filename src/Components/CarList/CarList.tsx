@@ -29,7 +29,6 @@ import {
   useCarListPageStore,
   useTrackCarStore,
   useCarStatusOptionStore,
-  useSelectedCarLatLng,
 } from "@/Store/LocationSearch/carList";
 import { useCarStore } from "@/Store/carStore";
 import { useDLogStore } from "@/Store/dlogStore";
@@ -48,17 +47,19 @@ type CarList = {
 }
 
 function CarList() {
-  const { searchedCar, setSearchedCar} = useSearchedCar();
-  const { selectedCar, setSelectedCar } = useSelectCarStore();
-  const { carListPage, setCarListPage } = useCarListPageStore();
-  const { setMapCenterCarList, setMapLevelCarList} = useTrackCarStore();
-  const { carStatusOption, setCarStatusOption } = useCarStatusOptionStore();
+  const searchedCar = useSearchedCar(state => state.searchedCar);
+  const setSearchedCar = useSearchedCar(state => state.setSearchedCar);
+  const selectedCar = useSelectCarStore(state => state.selectedCar);
+  const setSelectedCar = useSelectCarStore(state => state.setSelectedCar);
+  const carListPage = useCarListPageStore(state => state.carListPage);
+  const setCarListPage = useCarListPageStore(state => state.setCarListPage);
+  const setMapCenterCarList = useTrackCarStore(state => state.setMapCenterCarList);
+  const setMapLevelCarList = useTrackCarStore(state => state.setMapLevelCarList);
+  const carStatusOption = useCarStatusOptionStore(state => state.carStatusOption);
+  const setCarStatusOption = useCarStatusOptionStore(state => state.setCarStatusOption);
 
   const [logs, setLogs] = useState<CarList[]>([]);
   const [totalPages, setTotalPages] = useState<number>(1)
-  const setSelectedCarLatLng = useSelectedCarLatLng(
-    (state) => state.setLatLng
-  );
 
   const [isVisible, setIsVisible] = useState<boolean>(true);
   const [selectedCarInfo, setSelectedCarInfo] = useState<SelectedCar | null>(null);
@@ -103,29 +104,27 @@ function CarList() {
       setSelectedCarInfo(null);
       return;
     }
-    fetchSelectedCarStat(selectedCar.vehicleNumber, 0)
+    fetchSelectedCarStat(selectedCar.vehicleNumber)
       .then(car => {
         setSelectedCarInfo(car);
-        setSelectedCarLatLng(car.location); 
-        console.log("첫 번째 gpsRecordId");})
+        console.log("첫 번째 gps (한 차량)");})
       .catch(console.error);
   }, [selectedCar?.vehicleNumber]);
 
   useEffect(() => {
-    if (!selectedCar || selectedCarInfo?.gpsRecordId == null) return;
+    if (!selectedCar) return;
 
     const intervalCtrl = prcInterval(3000, () => {
-      fetchSelectedCarStat(selectedCar.vehicleNumber, selectedCarInfo.gpsRecordId)
+      fetchSelectedCarStat(selectedCar.vehicleNumber)
         .then(car => {
           setSelectedCarInfo(car); 
-          setSelectedCarLatLng(car.location);   
-          console.log("gpsRecordId");
+          console.log("gps는 이거에요 (한 차량): ", car.location);
         })
         .catch(console.error);
     });
 
     return () => intervalCtrl.cancel();
-  }, [selectedCar, selectedCarInfo?.gpsRecordId]);
+  }, [selectedCar]);
 
   // 만약 selectedCar가 존재(차량 리스트에서 차량 선택) 그리고, carListPage라는 변수가 true라면 정보페이지를 보여줌
   if (selectedCar && carListPage) {
