@@ -21,7 +21,14 @@ import {
   TableCell,
   TableRow,
 } from "@/Components/ui/table";
-import { TablePagination } from "../TablePagination";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/Components/ui/pagination"
 import { StatusBadge } from "../StatusBadge";
 import { useAllCarLocationStore } from "@/Store/Map/locationSearchTotalCarsLoc"
 import { 
@@ -59,7 +66,8 @@ function CarList() {
   const setCarStatusOption = useCarStatusOptionStore(state => state.setCarStatusOption);
 
   const [logs, setLogs] = useState<CarList[]>([]);
-  const [totalPages, setTotalPages] = useState<number>(1)
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const [isVisible, setIsVisible] = useState<boolean>(true);
   const [selectedCarInfo, setSelectedCarInfo] = useState<SelectedCar | null>(null);
@@ -69,7 +77,6 @@ function CarList() {
   const setCarNumManage = useCarStore((state) => state.setVehicleName);
   
   const tableRef = useRef<HTMLDivElement>(null); // 테이블의 너비값을 전달하기 위한 wrapper
-  const [currentPage, setCurrentPage] = useState(1);
 
   const allCarLocations = useAllCarLocationStore((state) => state.allCarLocations);
 
@@ -130,7 +137,7 @@ function CarList() {
   if (selectedCar && carListPage) {
     return (
       <section
-        className={`${styles["car-list"]} border w-75 max-h-130 flex flex-col rounded-xl bg-white box-border p-3`}
+        className={`${styles["car-list"]} border w-80 max-h-130 flex flex-col rounded-xl bg-white box-border p-3`}
       >
         <div className="flex justify-between items-center font-bold text-xl pr-1">
           <button
@@ -231,6 +238,24 @@ function CarList() {
     );
   }
 
+  const allPages = [...Array(totalPages)].map((_, i) => i + 1);
+  let visiblePages: number[] = [];
+
+  if(totalPages <= 5) {
+    visiblePages = allPages;
+  }
+  else {
+    if(currentPage <= 3) {
+      visiblePages = allPages.slice(0, 5);
+    }
+    else if(currentPage >= totalPages - 2) {
+      visiblePages = allPages.slice(-5);
+    }
+    else {
+      visiblePages = allPages.slice(currentPage - 3, currentPage + 2);
+    }
+  }
+
   return (
     <section
       ref={tableRef}
@@ -298,15 +323,11 @@ function CarList() {
                     key={car.carNumber} 
                     className="cursor-pointer flex justify-between"
                     onClick={() => {
-                      // allCarLocations에서 carNumber 찾기
-                      // allCarLocations 배열은 지도의 모든 차량 gps(500대)가 담긴 배열 (/api/dashboard/map의 반환값)
                       const carLocObj = allCarLocations.find((carObj) => carObj.vehicleNumber === car.carNumber )
                       if(!carLocObj) {
                         window.alert("차량이 리스트엔 있는데, 지도엔 없어요")
                         return
                       };
-
-                      // zustand에 클릭된 차량의 gps값을 저장하여 그 차량의 위치를 중심으로 지도 이동
                       setMapCenterCarList({
                         lat: carLocObj.latitude,
                         lng: carLocObj.longitude,
@@ -326,12 +347,33 @@ function CarList() {
                 ))}
               </TableBody>
             </Table>
-            <TablePagination
-              tableRef={tableRef}
-              total={totalPages}
-              current={currentPage}
-              setCurrent={setCurrentPage}
-            />
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious 
+                    className="w-10" 
+                    onClick={() => currentPage > 1 && setCurrentPage(currentPage - 1)}
+                  />
+                </PaginationItem>
+                <PaginationItem>
+                  {visiblePages
+                    .map(page => 
+                      <PaginationLink 
+                        onClick={() => setCurrentPage(page)} 
+                        isActive={page === currentPage}
+                      >
+                        {page}
+                      </PaginationLink>)
+                  }
+                </PaginationItem>
+                <PaginationItem>
+                  <PaginationNext 
+                    className="w-10"
+                    onClick={() => currentPage < totalPages && setCurrentPage(currentPage + 1)}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
           </div>
         </>
       )}
