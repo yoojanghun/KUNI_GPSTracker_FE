@@ -15,43 +15,41 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { Separator } from "@/components/ui/separator";
-
-// This is sample data.
-const data = {
-  // TODO: 실제 유저의 데이터로 교체
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-  live: [
-    {
-      name: "운행 정보",
-      url: "/",
-      icon: CarFront,
-    },
-    {
-      name: "위치 조회",
-      url: "/location",
-      icon: MapPin,
-    },
-  ],
-  database: [
-    {
-      name: "차량 관리",
-      url: "/management",
-      icon: Wrench,
-    },
-    {
-      name: "운행 일지",
-      url: "/log",
-      icon: Folder,
-    },
-  ]
-};
+import { useAuthStore } from "@/Store/Authorization";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const userId = useAuthStore((state) => state.userId);
+
+  const data = {
+    user: {
+      name: userId,
+    },
+    live: [
+      {
+        name: "운행 정보",
+        url: "/",
+        icon: CarFront,
+      },
+      {
+        name: "위치 조회",
+        url: "/location",
+        icon: MapPin,
+      },
+    ],
+    database: [
+      {
+        name: "차량 관리",
+        url: "/management",
+        icon: Wrench,
+      },
+      {
+        name: "운행 일지",
+        url: "/log",
+        icon: Folder,
+      },
+    ]
+  };
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -59,7 +57,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavProjects projects={data.live} title="실시간 조회" />
-        <Separator orientation="vertical" className="h-12 mx-4" />
         <NavProjects projects={data.database} title="데이터 관리"/>
       </SidebarContent>
       <SidebarFooter>

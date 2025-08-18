@@ -2,12 +2,13 @@ import { Link } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { UserRound, Lock } from "lucide-react";
+import { UserRound, Lock, CircleCheckBig, ShieldX } from "lucide-react";
 import Illustrator from "../../assets/illustrator.png";
 import logo from "../../assets/logo.svg";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuthStore } from "@/Store/Authorization";
+import { toast } from "sonner";
 
 export function Login() {
   const [username, setUsername] = useState<string>("");
@@ -15,6 +16,26 @@ export function Login() {
 
   // 전역 인증 스토어 상태와 액션
   const { isAuthLoading, authError, login, setAuthError } = useAuthStore();
+
+  // 로그인 페이지 이동 타입
+  const logoutType = useAuthStore((state) => state.logoutType);
+  const setLogOutType = useAuthStore((state) => state.setLogOutType);
+
+
+  useEffect (() => { 
+    if (logoutType === 'manual') {
+      toast("로그아웃 되었습니다", {
+        icon: <CircleCheckBig/>  
+      });
+      setLogOutType(null);
+    }
+    else if (logoutType === 'expired') {
+      toast("세션이 만료되었습니다. 다시 로그인해 주세요", {
+        icon: <ShieldX/>  
+      });
+      setLogOutType(null);
+    }
+   }, [])
 
   // 라우팅 이동 훅
   const navigate = useNavigate();

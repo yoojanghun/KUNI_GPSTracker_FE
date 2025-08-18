@@ -2,14 +2,17 @@ import type {
   validateRequest,
   validateResponse,
 } from "./interfaces/validateType";
-import { authApi } from "../authIndex";
+import { validateApi } from "../validateIndex";
 
 export const validateToken = async (
   request: validateRequest
 ): Promise<validateResponse> => {
-
-  const data = await authApi
-    .get("api/token/validate")
+  const data = await validateApi
+    .get("api/token/validate", {
+      headers: {
+        Authorization: `Bearer ${request.Authorization}`,
+      },
+    })
     .json<validateResponse>();
   return data;
 };

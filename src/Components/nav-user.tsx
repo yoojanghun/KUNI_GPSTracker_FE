@@ -1,5 +1,3 @@
-"use client"
-
 import {
   ChevronsUpDown,
   LogOut,
@@ -24,13 +22,13 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 
+import { useAuthStore } from "@/Store/Authorization"
+
 export function NavUser({
   user,
 }: {
   user: {
     name: string
-    email: string
-    avatar: string
   }
 }) {
   const { isMobile } = useSidebar()
@@ -74,7 +72,7 @@ export function NavUser({
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={() => useAuthStore.getState().logout("manual")}>
               <LogOut />
               로그아웃
             </DropdownMenuItem>

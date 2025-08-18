@@ -1,16 +1,26 @@
 import ky from "ky";
 import { handleResponse } from "./hooks/handleResponse";
 import { useAuthStore } from "@/Store/Authorization";
+import { validateToken } from "./AuthApi/validate";
 
 export const instance = ky.create({
   prefixUrl: "https://api.gps-tracker.store/", // baseURL 설정, TODO: env로 안전하게 관리
   hooks: {
     beforeRequest: [
-      (request) => {
+      async (request) => {
+
+        const setUserId = useAuthStore.getState().setUserId;
         const token = useAuthStore.getState().token;
+
         console.log("token: ", token);
+
         if (token) {
-          request.headers.set("Authorization", `Bearer ${token}`);
+          const validate = await validateToken({Authorization: token});
+          if(validate.valid){
+            setUserId(validate.loginId);
+            request.headers.set("Authorization", `Bearer ${token}`);
+          }
+          
         }
 
         // POST 요청일 경우 Content-Type 헤더 추가, TODO: 헤더별로 ky 인스턴스 분리

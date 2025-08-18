@@ -8,7 +8,7 @@ export const handleRequest: BeforeRequestHook = async (request) => {
   // 인증 토큰을 전역 상태에서 읽어와 토큰 유효성 검증 및 헤더에 주입
   const token = useAuthStore.getState().token;
   console.log("token: ", token);
-  const setUserId = useAuthStore.getState().setUserId;
+
   if (token) {
     console.log("validate 요청 시작");
     const validate = await validateToken({Authorization: token});
@@ -16,12 +16,11 @@ export const handleRequest: BeforeRequestHook = async (request) => {
     console.log("validate 여부: ", validate.valid)
     if(validate.valid){
       request.headers.set("Authorization", `Bearer ${token}`);
-      setUserId(validate.loginId);
       console.log('유효한 토큰, userId: ', validate.loginId);
     }
     else{
       console.log("유효하지 않은 토큰");
-      useAuthStore.getState().logout();
+      useAuthStore.getState().logout("expired");
     }
     
   }
