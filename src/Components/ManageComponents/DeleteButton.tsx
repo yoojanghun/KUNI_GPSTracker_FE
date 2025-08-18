@@ -4,8 +4,8 @@ import {
   DialogHeader,
   DialogFooter,
   DialogTitle,
-} from "@/Components/ui/dialog";
-import { Button } from "@/Components/ui/button";
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { CircleAlert, FileX2, Trash } from "lucide-react";
 import { toast } from "sonner";
 

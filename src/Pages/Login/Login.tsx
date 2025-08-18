@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
-import { Input } from "@/Components/ui/input";
-import { Button } from "@/Components/ui/button";
-import { Card, CardContent } from "@/Components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { UserRound, Lock } from "lucide-react";
 import Illustrator from "../../assets/illustrator.png";
 import logo from "../../assets/logo.svg";

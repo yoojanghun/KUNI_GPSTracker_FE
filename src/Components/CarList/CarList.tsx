@@ -14,13 +14,13 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/Components/ui/select";
+} from "@/components/ui/select";
 import {
   Table,
   TableBody,
   TableCell,
   TableRow,
-} from "@/Components/ui/table";
+} from "@/components/ui/table";
 import { TablePagination } from "../TablePagination";
 import { StatusBadge } from "../StatusBadge";
 import { useMapCarLocationStore } from "@/Store/Map/locationSearchTotalCarsLoc"

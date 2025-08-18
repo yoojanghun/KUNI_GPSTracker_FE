@@ -1,10 +1,10 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
-import { Input } from "@/Components/ui/input";
-import { Label } from "@/Components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/Components/ui/radio-group";
-import { Button } from "@/Components/ui/button";
-import { Card, CardContent } from "@/Components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { UserRound, Lock, Mail, TriangleAlert, CircleCheckBig } from "lucide-react";
 import Illustrator from "../../assets/illustrator.png";
 import logo from "../../assets/logo.svg";

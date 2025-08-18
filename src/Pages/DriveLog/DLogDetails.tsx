@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useRef, useEffect, useState } from "react";
-import { Separator } from "@/Components/ui/separator";
+import { Separator } from "@/components/ui/separator";
 import {
   ArrowLeft,
   CircleSlash,
@@ -11,7 +11,7 @@ import {
   Play,
 } from "lucide-react";
 import { DLogHeader } from "./DLogHeader";
-import { makeOverlayHTML } from "@/Components/DLogComponents/MapOverlay";
+import { makeOverlayHTML } from "@/components/DLogComponents/MapOverlay";
 import indicator from "../../Components/Indicators.svg";
 import { getLogDetail } from "@/Api/LogApi/getLogDetail";
 import type { getLogDetailResponse } from "@/Api/LogApi/interfaces/getLogDetailResponse";

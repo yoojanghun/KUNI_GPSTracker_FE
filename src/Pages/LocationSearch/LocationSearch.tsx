@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import Draggable from 'react-draggable';
-import CarList from "@/Components/CarList/CarList.tsx";
-import MapLocationSearch from "@/Components/Map/MapLocationSearch";
+import CarList from "@/components/CarList/CarList";
+import MapLocationSearch from "@/components/Map/MapLocationSearch";
 
 function LocationSearch() {
     const nodeRef = useRef<HTMLDivElement>(null);

@@ -1,4 +1,4 @@
-import { Button } from "@/Components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 import { useCarStore } from "../../Store/carStore";
 

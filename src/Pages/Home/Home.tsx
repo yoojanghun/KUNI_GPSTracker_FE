@@ -7,8 +7,8 @@ import notWorkingIndicator from "../../assets/car-status-icons/not-working-indic
 import workingIndicator from "../../assets/car-status-icons/working-indicator.svg";
 import styles from "./Home.module.css";
 
-import CarsPerDayChart from "@/Components/CarsPerDayChart";
-import MapHome from "@/Components/Map/MapHome";
+import CarsPerDayChart from "@/components/CarsPerDayChart";
+import MapHome from "@/components/Map/MapHome";
 
 import { useCarStatusBtnStore } from "@/Store/Home/mapState";
 

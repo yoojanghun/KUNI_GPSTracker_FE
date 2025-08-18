@@ -6,10 +6,10 @@ import {
   TableHeader,
   TableHead,
   TableRow,
-} from "@/Components/ui/table";
-import { Checkbox } from "@/Components/ui/checkbox";
-import { StatusBadge } from "@/Components/StatusBadge";
-import { TablePagination } from "@/Components/TablePagination";
+} from "@/components/ui/table";
+import { Checkbox } from "@/components/ui/checkbox";
+import { StatusBadge } from "@/components/StatusBadge";
+import { TablePagination } from "@/components/TablePagination";
 import { ArrowDownUp } from "lucide-react";
 import type { getCarListRequest } from "@/Api/ManageApi/interfaces/getCarListRequest";
 import { useCarStore } from "@/Store/carStore";
