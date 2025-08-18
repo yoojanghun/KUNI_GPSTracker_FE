@@ -29,11 +29,16 @@ export function Login() {
     try {
       // 전역 스토어가 API 호출과 토큰 저장을 처리
       await login(username, password);
+      console.log("로그인 성공");
 
       // 원래 가려던 경로(from)가 있으면 그쪽으로, 없으면 /home
-      const params = new URLSearchParams(location.search);
+      if (!isAuthLoading){
+        console.log("메인페이지 이동");
+        const params = new URLSearchParams(location.search);
       const from = params.get("from") ?? "/";
       navigate(from, { replace: true });
+      }
+      
     } catch {
       // 실패 시 authError 상태가 설정되어 있음
       // 필요한 경우 토스트나 인라인 에러 표시로 연결

@@ -8,6 +8,7 @@ const AUTH_STORAGE_KEY = "auth";
 // 인증 상태 타입
 interface AuthState {
   token: string | null;
+  userId: string;
   isBootstrapping: boolean;
 
   isAuthLoading: boolean;
@@ -18,11 +19,13 @@ interface AuthState {
   bootstrapFromStorage: () => Promise<void>;
   signUp: (params: { username: string; password: string; email: string; role: "ADMIN" | "USER" }) => Promise<boolean>;
   setAuthError: (err: string) => void;
+  setUserId: (userId: string) => void;
 }
 
 // Zustand 스토어 생성
 export const useAuthStore = create<AuthState>((set, get) => ({
   token: null,
+  userId: "",
   isBootstrapping: true,
 
   isAuthLoading: false,
@@ -40,6 +43,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       }
       // 토큰 저장 처리
       set({token: res.token});
+      console.log("토큰 저장 완료");
       localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ token: res.token }));
 
     } catch (err: any) {
@@ -77,6 +81,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   // 로그아웃 처리: 상태/스토리지 초기화
   logout: () => {
     set({ token: null });
+    set({ userId: "" });
     localStorage.removeItem(AUTH_STORAGE_KEY);
 
     // 라우팅 처리 필요 시 window.location 사용 (라우터 의존성 제거 목적)
@@ -113,6 +118,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   setAuthError: (err) => set({ authError: err }),
+
+  setUserId: (userId) => set({ userId: userId }),
 }));
 
 

@@ -15,6 +15,7 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar";
+import { Separator } from "@/components/ui/separator";
 
 // This is sample data.
 const data = {
@@ -58,6 +59,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavProjects projects={data.live} title="실시간 조회" />
+        <Separator orientation="vertical" className="h-12 mx-4" />
         <NavProjects projects={data.database} title="데이터 관리"/>
       </SidebarContent>
       <SidebarFooter>
