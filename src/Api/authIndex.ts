@@ -9,7 +9,6 @@ export const instance = ky.create({
     beforeRequest: [
       async (request) => {
 
-        const setUserId = useAuthStore.getState().setUserId;
         const token = useAuthStore.getState().token;
 
         console.log("token: ", token);
@@ -17,7 +16,6 @@ export const instance = ky.create({
         if (token) {
           const validate = await validateToken({Authorization: token});
           if(validate.valid){
-            setUserId(validate.loginId);
             request.headers.set("Authorization", `Bearer ${token}`);
           }
           

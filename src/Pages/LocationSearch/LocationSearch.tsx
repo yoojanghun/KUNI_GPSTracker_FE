@@ -7,7 +7,7 @@ function LocationSearch() {
     const nodeRef = useRef<HTMLDivElement>(null);
 
     return (
-        <main className="flex-1 box-border relative">
+        <main className="flex-1 h-screen relative">
             <MapLocationSearch maxLevel={12} />
             <Draggable nodeRef={nodeRef} bounds="parent" cancel="label">
                 <div ref={nodeRef} className="absolute top-4 left-4 z-20 w-[200px] cursor-grab">
