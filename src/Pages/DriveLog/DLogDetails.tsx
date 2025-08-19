@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useRef, useEffect, useState } from "react";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -28,7 +28,10 @@ export function DLogDetails() {
 
   // id값과 일치하는 데이터 fetch
   const navigate = useNavigate();
+  const location = useLocation();
   const { Id } = useParams();
+  const page = location.state?.page ?? 1;
+
 
   useEffect(() => {
     if (!Id) return;
@@ -40,7 +43,7 @@ export function DLogDetails() {
           toast("존재하지 않는 기록입니다.", {
             icon: <FileQuestionMark/>
           })
-          navigate("/log");
+          navigate("/log", {state: { page }});
         }
       });
   }, [Id]);
@@ -197,7 +200,7 @@ export function DLogDetails() {
           </span>
         </div>
         <div
-          onClick={() => navigate("/log")}
+          onClick={() => navigate("/log", { state: { page } })}
           className="flex font-bold cursor-pointer hover:bg-gray-400/10 px-1 py-1 rounded-[5px]"
         >
           <ArrowLeft />

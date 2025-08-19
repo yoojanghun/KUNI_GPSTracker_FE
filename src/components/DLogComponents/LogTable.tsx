@@ -1,6 +1,6 @@
 // src/components/DLogComponents/LogTable.tsx
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ChevronRight, ClockArrowDown, ClockArrowUp } from "lucide-react";
 import { TablePagination } from "@/components/TablePagination";
@@ -11,11 +11,14 @@ import { CircleQuestionMark } from "lucide-react";
 
 export function LogTable() {
   const navigate = useNavigate();
+  const location = useLocation();
   const tableRef = useRef<HTMLDivElement>(null);
 
   // 화면 높이에 따른 rows-per-page (간단 계산)
   const tableRowHeight = 70;
-  const [currentPage, setCurrentPage] = useState(1);
+
+  const defaultPage = location.state?.page ?? 1;
+  const [currentPage, setCurrentPage] = useState(defaultPage);
   const itemsPerPage = useMemo(() => Math.max(1, Math.floor(window.innerHeight / tableRowHeight)), []);
 
   const [sortDirection, setSortDirection] = useState<"onTime,ASC" | "onTime,DESC">("onTime,ASC");
@@ -81,7 +84,7 @@ useEffect(() => {
           )}
 
           {!isLoading && logs.map((dlog) => (
-            <TableRow key={dlog.id} className="text-center cursor-pointer" onClick={() => navigate(`/log/${dlog.id}`, { state: { id: dlog.id } })}>
+            <TableRow key={dlog.id} className="text-center cursor-pointer" onClick={() => navigate(`/log/${dlog.id}`, { state: { id: dlog.id, page: currentPage } })}>
               <TableCell></TableCell>
               <TableCell className="font-medium">{dlog.vehicleNumber}</TableCell>
               <TableCell>{dlog.vehicleName}</TableCell>
