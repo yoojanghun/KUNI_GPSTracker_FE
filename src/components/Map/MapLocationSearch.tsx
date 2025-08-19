@@ -517,11 +517,25 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
     visibleCarLocations
       .filter(car => car.status === carStatusOption || carStatusOption === "전체")
       .map(car => {
+        const {
+          defaultMarkerImg: defaultImg,
+          hoverMarkerImg: hoverImg,
+          bgColor,
+          textColor,
+          statusName
+        } = markerMap[car.status];
+
         const latLng = new kakao.maps.LatLng(car.latitude, car.longitude);
         let marker = markersRef.current[car.vehicleNumber];
         let overlay = overlayRef.current[car.vehicleNumber];
         if(marker) {
           marker.setPosition(latLng);
+          if(selectedCar?.vehicleNumber === car.vehicleNumber) {
+            marker.setImage(hoverImg);
+          }
+          else {
+            marker.setImage(defaultImg);
+          }
           if(overlay) {
             overlay.setPosition(latLng);
           }
