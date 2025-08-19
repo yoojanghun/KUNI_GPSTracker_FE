@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { DLogHeader } from "./DLogHeader";
 import { makeOverlayHTML } from "@/components/DLogComponents/MapOverlay";
-import indicator from "../../Components/Indicators.svg";
+import indicator from "../../components/Indicators.svg";
 import car from "../../assets/Car.svg"
 import { getLogDetail } from "@/Api/LogApi/getLogDetail";
 import type { getLogDetailResponse } from "@/Api/LogApi/interfaces/getLogDetailResponse";
