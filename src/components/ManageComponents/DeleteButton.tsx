@@ -63,7 +63,7 @@ export function DeleteButton() {
               setIsOpen(false);
               toast("차량 삭제 중..", {
                 action: {
-                  label: "되돌리기",
+                  label: "취소하기",
                   onClick: () => {
                     if (deleteTimerRef.current) {
                       clearTimeout(deleteTimerRef.current);
