@@ -1,4 +1,4 @@
-// src/Components/DLogComponents/LogTable.tsx
+// src/components/DLogComponents/LogTable.tsx
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -60,17 +60,17 @@ useEffect(() => {
             <TableHead className="w-[35px] text-start cursor-pointer">
               <div className="flex items-center justify-center gap-1">
                 {sortDirection === "onTime,ASC" ? (
-                  <ClockArrowUp onClick={handleSort} />
+                  <ClockArrowUp color="#3772FF" strokeWidth={3} onClick={handleSort} />
                 ) : (
-                  <ClockArrowDown onClick={handleSort} />
+                  <ClockArrowDown color="#3772FF" strokeWidth={3} onClick={handleSort} />
                 )}
               </div>
             </TableHead>
-            <TableHead className="text-start"><div className="flex items-center justify-center">차량 번호</div></TableHead>
-            <TableHead className="text-start"><div className="flex items-center justify-center">차량명</div></TableHead>
-            <TableHead className="text-start"><div className="flex items-center justify-center">시작 시간</div></TableHead>
-            <TableHead className="text-start"><div className="flex items-center justify-center">종료 시간</div></TableHead>
-            <TableHead className="w-[100px] text-start"><div className="flex items-center justify-center">총 주행거리</div></TableHead>
+            <TableHead className="text-start"><div className="flex items-center justify-center text-[#ACACAC] font-bold">차량 번호</div></TableHead>
+            <TableHead className="text-start"><div className="flex items-center justify-center text-[#ACACAC] font-bold">차량명</div></TableHead>
+            <TableHead className="text-start"><div className="flex items-center justify-center text-[#ACACAC] font-bold">시작 시간</div></TableHead>
+            <TableHead className="text-start"><div className="flex items-center justify-center text-[#ACACAC] font-bold">종료 시간</div></TableHead>
+            <TableHead className="w-[100px] text-start"><div className="fflex items-center justify-center text-[#ACACAC] font-bold">총 주행거리</div></TableHead>
             <TableHead className="text-right"></TableHead>
           </TableRow>
         </TableHeader>
