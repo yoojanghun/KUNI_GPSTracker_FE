@@ -21,6 +21,7 @@ export interface SelectedCar {
 	drivingDistanceKm: number;
 	location: Location;
 	gpsRecordId: number;
+	status: string;
 }
 
 export async function fetchSelectedCarStat(vehicleNumber: string): Promise<SelectedCar> {

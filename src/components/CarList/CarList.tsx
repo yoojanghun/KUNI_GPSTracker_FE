@@ -54,6 +54,8 @@ type CarList = {
   totalDist: number;
 }
 
+type CarStatus = "전체" | "ACTIVE" | "INACTIVE" | "INSPECTING";
+
 function CarList() {
   const searchedCar = useSearchedCar(state => state.searchedCar);
   const setSearchedCar = useSearchedCar(state => state.setSearchedCar);
@@ -106,6 +108,10 @@ function CarList() {
     console.log("페이지네이션");
   }, [totalCarLoc]);
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [carStatusOption])
+
   // 아래는 하나의 차량을 선택했을 때, 해당 차량 gps, 정보 가져오는 api(수정 필요)
   useEffect(() => {
     if (!selectedCar) {
@@ -148,7 +154,8 @@ function CarList() {
             <ArrowLeft className="w-6 h-6 mr-2" />
             <span className="text-lg font-bold">뒤로 가기</span>
           </button>
-          <Select value={carStatusOption} onValueChange={setCarStatusOption}>
+          <Select value={carStatusOption} 
+            onValueChange={(value) => {setCarStatusOption(value as CarStatus)}}>
             <SelectTrigger className="border-2 px-1 cursor-pointer rounded-sm min-w-[85px]">
               <SelectValue placeholder="전체" />
             </SelectTrigger>
@@ -156,7 +163,7 @@ function CarList() {
               <SelectItem value="전체" className="cursor-pointer">
                 전체
               </SelectItem>
-              <SelectItem value="ACTIVE" className="cursor-pointer">
+              <SelectItem value="ACTIVE" className="cursor-pointer" onClick={ () => setCurrentPage(1)}>
                 <StatusBadge status={"ACTIVE"} />
               </SelectItem>
               <SelectItem value="INACTIVE" className="cursor-pointer">
@@ -185,21 +192,35 @@ function CarList() {
                   <th className={`${styles["th"]} w-30`}>상태</th>
                   <td className={styles["td"]}>
                     <span className={`p-1 px-2 font-bold text-sm rounded-sm`}>
-                      <StatusBadge status={selectedCar.status} />
+                      {selectedCarInfo?.status
+                        ? selectedCarInfo?.status
+                        : "2분 기다려주세요"}
                     </span>
                   </td>
                 </tr>
                 <tr>
                   <th className={`${styles["th"]} w-30`}>운행일자</th>
-                  <td className={styles["td"]}>{selectedCarInfo?.drivingDate}</td>
+                  <td className={styles["td"]}>
+                    {selectedCarInfo?.drivingDate
+                      ? `${selectedCarInfo?.drivingDate}`
+                      : "2분 기다려주세요"}
+                  </td>
                 </tr>
                 <tr>
                   <th className={`${styles["th"]} w-30`}>운행시간</th>
-                  <td className={styles["td"]}>{selectedCarInfo?.drivingTime} 분</td>
+                  <td className={styles["td"]}>
+                    {selectedCarInfo?.drivingTime 
+                      ? `${selectedCarInfo?.drivingTime} 분` 
+                      : "2분 기다려주세요"}
+                  </td>
                 </tr>
                 <tr>
                   <th className={`${styles["th"]} w-30`}>운행거리</th>
-                  <td className={styles["td"]}>{selectedCarInfo?.drivingDistanceKm} m</td>
+                  <td className={styles["td"]}>
+                    {selectedCarInfo?.drivingDistanceKm 
+                      ? `${selectedCarInfo?.drivingDistanceKm} m`
+                      : "2분 기다려주세요"}
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -225,7 +246,6 @@ function CarList() {
             </button>
           </>
         )}
-        {/* carList.tsx창 최소화(isVisible이 false), 최대화(isVisible이 true) 버튼 */}
         <button
           ref={hideBtnRef}
           onClick={() => {
