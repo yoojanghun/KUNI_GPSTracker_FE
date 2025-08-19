@@ -12,7 +12,8 @@ import {
 } from "lucide-react";
 import { DLogHeader } from "./DLogHeader";
 import { makeOverlayHTML } from "@/components/DLogComponents/MapOverlay";
-import indicator from "../../components/Indicators.svg";
+import indicator from "../../Components/Indicators.svg";
+import car from "../../assets/Car.svg"
 import { getLogDetail } from "@/Api/LogApi/getLogDetail";
 import type { getLogDetailResponse } from "@/Api/LogApi/interfaces/getLogDetailResponse";
 
@@ -89,13 +90,18 @@ export function DLogDetails() {
           new kakao.maps.Size(28, 28),
           { offset: new kakao.maps.Point(14, 14) }
         );
+        const carMarkerImage = new kakao.maps.MarkerImage(
+          car,
+          new kakao.maps.Size(56, 56),
+          { offset: new kakao.maps.Point(28, 28) }
+        );
         const startMarker = new kakao.maps.Marker({
           position: startPosition,
           image: markerImage,
         });
         const endMarker = new kakao.maps.Marker({
           position: endPosition,
-          image: markerImage,
+          image: carMarkerImage,
         });
 
         const startOverlay = new kakao.maps.CustomOverlay({

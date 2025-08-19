@@ -36,6 +36,7 @@ export default function CarTable() {
   const setCars = useCarStore((state) => state.setCars);
   const totalPages = useCarStore((state) => state.totalPage);
   const setTotalPage = useCarStore((state) => state.setTotalPage);
+  const applySearch = useCarStore((state) => state.applySearch);
 
   const tableRowHeight = 70;
   const itemsPerPage = Math.floor((window.innerHeight) / tableRowHeight);
@@ -95,6 +96,10 @@ useEffect(() => {
   setCars(data?.content ?? []);
   setTotalPage(data?.totalPages ?? 0);
 }, [data, setCars, setTotalPage]);
+
+useEffect(() => { 
+  applySearch();
+ },[]);
 
   // 응답 데이터 매핑 (API 스펙에 맞춰 조정)
   // const cars = data?.content ?? [];
