@@ -18,7 +18,7 @@ pipeline {
             steps {
                 script {
                     // 프론트엔드 소스코드가 있는 디렉토리에서 Docker 빌드를 실행합니다.
-                    sh "docker build -t frontend-builder -f infra/DockerFile ./"
+                    sh "docker build -t frontend-builder -f infra/DockerFile ."
                 }
             }
         }
