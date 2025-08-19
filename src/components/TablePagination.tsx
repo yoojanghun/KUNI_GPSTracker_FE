@@ -6,13 +6,25 @@ import {
   PaginationNext,
   PaginationPrevious,
   PaginationEllipsis,
+  PaginationDoublePrevious,
+  PaginationDoubleNext,
 } from "@/components/ui/pagination";
 import { useEffect, useState } from "react";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from "./ui/context-menu";
 
-function getPages(current: number, total: number, tableWidth: number): (number | "...")[] {
+function getPages(
+  current: number,
+  total: number,
+  tableWidth: number
+): (number | "...")[] {
   const btnWidth = 40; // 페이지네이션 버튼 크기
   const sideBtnWidth = 50 * 2; // prev + next 버튼 크기
-  const maxFullShow = Math.floor(((tableWidth - sideBtnWidth)/2) / btnWidth);
+  const maxFullShow = Math.floor((tableWidth - sideBtnWidth) / 2 / btnWidth);
 
   // 너비와 총 아이템 개수에 따라 모든 페이지네이션 노출
   if (total <= maxFullShow) {
@@ -84,6 +96,20 @@ export function TablePagination({
       <Pagination className="flex items-center">
         <PaginationContent className="flex items-center gap-2">
           <PaginationItem>
+            <ContextMenu>
+              <ContextMenuTrigger asChild>
+                <PaginationDoublePrevious
+                  onClick={() => {
+                    current > 3 ? setCurrent(current - 3) : setCurrent(1);
+                  }}
+                />
+              </ContextMenuTrigger>
+              <ContextMenuContent>
+                <ContextMenuItem onClick={() => setCurrent(1)}>처음으로 이동</ContextMenuItem>
+                <ContextMenuItem onClick={() => { current > 10 ? setCurrent(current - 10) : setCurrent(1)}}>10페이지 뒤로</ContextMenuItem>
+              </ContextMenuContent>
+            </ContextMenu>
+
             <PaginationPrevious
               onClick={() => current > 1 && setCurrent(current - 1)}
             />
@@ -110,6 +136,21 @@ export function TablePagination({
             <PaginationNext
               onClick={() => current < total && setCurrent(current + 1)}
             />
+            <ContextMenu>
+              <ContextMenuTrigger asChild>
+                <PaginationDoubleNext
+                  onClick={() => {
+                    current < total - 2
+                      ? setCurrent(current + 3)
+                      : setCurrent(total);
+                  }}
+                />
+              </ContextMenuTrigger>
+              <ContextMenuContent>
+                <ContextMenuItem onClick={() =>  setCurrent(total)}>마지막으로 이동</ContextMenuItem>
+                <ContextMenuItem onClick={() => { current < total - 9 ? setCurrent(current + 10) : setCurrent(total) }}>10페이지 앞으로</ContextMenuItem>
+              </ContextMenuContent>
+            </ContextMenu>
           </PaginationItem>
         </PaginationContent>
       </Pagination>

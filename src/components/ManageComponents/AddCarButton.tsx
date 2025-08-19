@@ -42,7 +42,7 @@ export function AddCarButton() {
         <form>
           <DialogTrigger asChild>
             <Button
-              className="bg-[#8D99FF] gap-3 hover:bg-[#8D99FF]/80"
+              className="bg-[#4255FF] cursor-pointer gap-3 hover:bg-[#2B40FF]"
               onClick={() => {}}
             >
               <Plus strokeWidth={3} size={20} />
@@ -113,7 +113,7 @@ export function AddCarButton() {
             <DialogFooter>
               <Button
                 type="button"
-                className="bg-[#8D99FF] gap-3 hover:bg-[#8D99FF]/80"
+                className="bg-[#4255FF] gap-3 cursor-pointer hover:bg-[#2B40FF]"
                 onClick={async () => {
                   setAttemptedSubmit(true);
                   if (!isvehicleNumberValid() || !isModelNameValid()) {
