@@ -7,6 +7,7 @@ import {
   Clipboard,
   Clock,
   ClockFading,
+  FileQuestionMark,
   Map,
   Play,
 } from "lucide-react";
@@ -16,6 +17,7 @@ import indicator from "../../Components/Indicators.svg";
 import car from "../../assets/Car.svg"
 import { getLogDetail } from "@/Api/LogApi/getLogDetail";
 import type { getLogDetailResponse } from "@/Api/LogApi/interfaces/getLogDetailResponse";
+import { toast } from "sonner";
 
 export function DLogDetails() {
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -34,6 +36,12 @@ export function DLogDetails() {
       .then((log) => setLog(log))
       .catch((err) => {
         console.error("상세 기록 가져오기 실패", err);
+        if (!log) {
+          toast("존재하지 않는 기록입니다.", {
+            icon: <FileQuestionMark/>
+          })
+          navigate("/log");
+        }
       });
   }, [Id]);
 
