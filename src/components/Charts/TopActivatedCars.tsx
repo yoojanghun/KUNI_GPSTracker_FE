@@ -12,18 +12,15 @@ import {
 const data = [
   {
     name: '소나타',
-    운행시간: 2400,
-    amt: 2400,
+    운행횟수: 2,
   },
   {
     name: '롤스로이스',
-    운행시간: 1398,
-    amt: 2210,
+    운행횟수: 5,
   },
   {
     name: '아반테',
-    운행시간: 9800,
-    amt: 2290,
+    운행횟수: 8,
   },
 ];
 
@@ -44,10 +41,10 @@ const TopActivatedCars = () => {
         >
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="name" />
-          <YAxis />
+          <YAxis domain={[0, 12]}/>
           <Tooltip cursor={false} />
           <Legend />
-          <Bar dataKey="운행시간" stackId="a" fill="#8884d8" />
+          <Bar dataKey="운행횟수" stackId="a" fill="#8884d8" />
         </BarChart>
       </ResponsiveContainer>
     </div>

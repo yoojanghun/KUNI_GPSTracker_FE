@@ -20,7 +20,8 @@ type ChartData = {
 	운행횟수: number;
 	day: string;
 }
-
+// data 변경 → (react-query가 상태 갱신) → 리렌더 발생 
+// → 그 렌더에서 useMemo가 maxNum을 재계산 → 변경된 domain으로 차트가 갱신
 function CarsPerDayChart() {
 	const { ref, inView } = useInView({ threshold: 0 });
 
@@ -32,7 +33,7 @@ function CarsPerDayChart() {
 		placeholderData: (prev) => prev, 
 	});
 
-	const chartData: ChartData[] = useMemo(() => { 
+	const carsPerDay = useMemo<ChartData[]>(() => { 
 		if (!data) return []; 
 		return data.dayCount.slice(-7).map((d, idx) => ({ 
 			name: d.day, 
@@ -41,17 +42,28 @@ function CarsPerDayChart() {
 		})); 
 	}, [data]);
 
-	// [&_*:focus]: &(현재요소) _(아래) *(모든요소) :focus(focus될 때)
+	const maxCarNum = useMemo<number>(() => {
+		if(!data) return 0;
+		let maxNum = 0;
+		data.dayCount.slice(-7).forEach(d => {
+			if(Number(d.totalCar) > maxNum) {
+				maxNum = Number(d.totalCar);
+			} 
+		})
+		return Number(maxNum);
+	}, [data])
+
+	// [&_*:focus]: &(현재요소) _(아래) *(모든요소) :focus(focus될 때) 를 의마한다.
 	return ( 
 		<div ref={ref} className="w-full h-full [&_*:focus]:outline-none"> 
 			{error && <div>에러: {(error as Error).message}</div>} 
 			{!data && (isLoading || isFetching) && <div>로딩 중…</div>} 
-			{chartData.length > 0 && ( 
+			{carsPerDay.length > 0 && ( 
 				<ResponsiveContainer> 
-					<LineChart data={chartData}> 
+					<LineChart data={carsPerDay}> 
 						<CartesianGrid strokeDasharray="3 3" /> 
 						<XAxis dataKey="day" /> 
-						<YAxis type="number" domain={[0, 600]} /> 
+						<YAxis type="number" domain={[0, Math.max(12, maxCarNum)]} /> 
 						<Tooltip /> 
 						<Line type="monotone" dataKey="운행횟수" stroke="#8884d8" /> 
 					</LineChart> 
@@ -61,3 +73,4 @@ function CarsPerDayChart() {
 }
 
 export default CarsPerDayChart
+

@@ -163,7 +163,7 @@ function CarList() {
               <SelectItem value="전체" className="cursor-pointer">
                 전체
               </SelectItem>
-              <SelectItem value="ACTIVE" className="cursor-pointer" onClick={ () => setCurrentPage(1)}>
+              <SelectItem value="ACTIVE" className="cursor-pointer">
                 <StatusBadge status={"ACTIVE"} />
               </SelectItem>
               <SelectItem value="INACTIVE" className="cursor-pointer">
