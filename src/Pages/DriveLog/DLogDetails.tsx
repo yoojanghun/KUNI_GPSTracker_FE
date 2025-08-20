@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useRef, useEffect, useState } from "react";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -7,14 +7,17 @@ import {
   Clipboard,
   Clock,
   ClockFading,
+  FileQuestionMark,
   Map,
   Play,
 } from "lucide-react";
 import { DLogHeader } from "./DLogHeader";
 import { makeOverlayHTML } from "@/components/DLogComponents/MapOverlay";
 import indicator from "../../components/Indicators.svg";
+import car from "../../assets/Car.svg"
 import { getLogDetail } from "@/Api/LogApi/getLogDetail";
 import type { getLogDetailResponse } from "@/Api/LogApi/interfaces/getLogDetailResponse";
+import { toast } from "sonner";
 
 export function DLogDetails() {
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -25,7 +28,10 @@ export function DLogDetails() {
 
   // id값과 일치하는 데이터 fetch
   const navigate = useNavigate();
+  const location = useLocation();
   const { Id } = useParams();
+  const page = location.state?.page ?? 1;
+
 
   useEffect(() => {
     if (!Id) return;
@@ -33,6 +39,12 @@ export function DLogDetails() {
       .then((log) => setLog(log))
       .catch((err) => {
         console.error("상세 기록 가져오기 실패", err);
+        if (!log) {
+          toast("존재하지 않는 기록입니다.", {
+            icon: <FileQuestionMark/>
+          })
+          navigate("/log", {state: { page }});
+        }
       });
   }, [Id]);
 
@@ -89,13 +101,18 @@ export function DLogDetails() {
           new kakao.maps.Size(28, 28),
           { offset: new kakao.maps.Point(14, 14) }
         );
+        const carMarkerImage = new kakao.maps.MarkerImage(
+          car,
+          new kakao.maps.Size(56, 56),
+          { offset: new kakao.maps.Point(28, 28) }
+        );
         const startMarker = new kakao.maps.Marker({
           position: startPosition,
           image: markerImage,
         });
         const endMarker = new kakao.maps.Marker({
           position: endPosition,
-          image: markerImage,
+          image: carMarkerImage,
         });
 
         const startOverlay = new kakao.maps.CustomOverlay({
@@ -183,7 +200,7 @@ export function DLogDetails() {
           </span>
         </div>
         <div
-          onClick={() => navigate("/log")}
+          onClick={() => navigate("/log", { state: { page } })}
           className="flex font-bold cursor-pointer hover:bg-gray-400/10 px-1 py-1 rounded-[5px]"
         >
           <ArrowLeft />
