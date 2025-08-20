@@ -95,7 +95,7 @@ export function TablePagination({
     <div ref={tableRef} className="w-full flex justify-center">
       <Pagination className="flex items-center">
         <PaginationContent className="flex items-center gap-2">
-          <PaginationItem>
+          <PaginationItem className="cursor-pointer">
             <ContextMenu>
               <ContextMenuTrigger asChild>
                 <PaginationDoublePrevious
@@ -117,7 +117,7 @@ export function TablePagination({
 
           <div className="flex gap-1 justify-center">
             {pageTokens.map((token, idx) => (
-              <PaginationItem key={idx}>
+              <PaginationItem key={idx} className="cursor-pointer">
                 {token === "..." ? (
                   <PaginationEllipsis />
                 ) : (
@@ -132,7 +132,7 @@ export function TablePagination({
             ))}
           </div>
 
-          <PaginationItem>
+          <PaginationItem className="cursor-pointer">
             <PaginationNext
               onClick={() => current < total && setCurrent(current + 1)}
             />

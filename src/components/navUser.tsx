@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/sidebar"
 
 import { useAuthStore } from "@/Store/Authorization"
+import { Skeleton } from "./ui/skeleton"
 
 export function NavUser({
   user,
@@ -40,7 +41,7 @@ export function NavUser({
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground cursor-pointer"
             >
               <Avatar className="h-8 w-8 rounded-lg">
                 {/* <AvatarImage src={user.avatar} alt={user.name} />
@@ -48,7 +49,13 @@ export function NavUser({
                 <User size={28}/>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{user.name}</span>
+                <span className="truncate font-medium">
+                  {
+                  user.name
+                  ? user.name
+                  : <Skeleton className="inline-block h-[1.3em] w-[90%]"/>
+                  }
+                  </span>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />
             </SidebarMenuButton>
@@ -72,7 +79,7 @@ export function NavUser({
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => useAuthStore.getState().logout("manual")}>
+            <DropdownMenuItem onClick={() => useAuthStore.getState().logout("manual")} className="cursor-pointer">
               <LogOut />
               로그아웃
             </DropdownMenuItem>

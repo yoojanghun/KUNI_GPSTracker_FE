@@ -10,11 +10,13 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { StatusBadge } from "@/components/StatusBadge";
 import { TablePagination } from "@/components/TablePagination";
-import { ArrowDownUp, CircleQuestionMark } from "lucide-react";
+import { ArrowDownUp, ChevronDown, ChevronUp, CircleQuestionMark, Dot } from "lucide-react";
 import type { getCarListRequest } from "@/Api/ManageApi/interfaces/getCarListRequest";
 import { useCarStore } from "@/Store/carStore";
 import { useManageQuery } from "@/Queries/useManageQuery";
 import { toast } from "sonner";
+import { Skeleton } from "../ui/skeleton";
+import { cn } from "@/lib/utils";
 
 export default function CarTable() {
 
@@ -127,38 +129,53 @@ useEffect(() => {
         <TableHeader>
           <TableRow>
             <TableHead
-              className="w-[35px] text-start cursor-pointer"
+              className="w-[35px] text-start"
               onClick={() => handleSort("vehicleNumber")}
             >
-              <div className="flex items-center justify-center gap-1">
-                <ArrowDownUp size={14} />
+              <div className={cn("inline-flex items-center justify-center gap-1 cursor-pointer text-[#000000]/60 hover:text-[#000000]", sortKey === "vehicleNumber" && "text-[#000000] hover:text-[#000000]/60" )}>
+                { sortKey === "vehicleNumber" && sortDirection === "ASC" && <ChevronUp size={14} /> }
+                { sortKey === "vehicleNumber" && sortDirection === "DESC" && <ChevronDown size={14} />}
+                {/* 공간 차지용 아이콘 */}
+                { sortKey !== "vehicleNumber" && <ChevronDown size={14} className="invisible" />} 
                 <span>차량 번호</span>
               </div>
             </TableHead>
             <TableHead
-              className="text-center cursor-pointer"
+              className="text-center "
               onClick={() => handleSort("type")}
             >
-              <div className="flex items-center justify-center gap-1">
-                <ArrowDownUp size={14} />
+              <div className={cn("inline-flex items-center justify-center gap-1 cursor-pointer text-[#000000]/60 hover:text-[#000000]", sortKey === "type" && "text-[#000000] hover:text-[#000000]/60" )}>
+              { sortKey === "type" && sortDirection === "ASC" && <ChevronUp size={14} /> }
+                { sortKey === "type" && sortDirection === "DESC" && <ChevronDown size={14} />}
+                {/* 공간 차지용 아이콘 */}
+                { sortKey !== "type" && <ChevronDown size={14} className="invisible" />} 
+                
                 <span>차량명</span>
               </div>
             </TableHead>
             <TableHead
-              className="text-center cursor-pointer"
+              className="text-center"
               onClick={() => handleSort("totalDist")}
             >
-              <div className="flex items-center justify-center gap-1">
-                <ArrowDownUp size={14} />
+              <div className={cn("inline-flex items-center justify-center gap-1 cursor-pointer text-[#000000]/60 hover:text-[#000000]", sortKey === "totalDist" && "text-[#000000] hover:text-[#000000]/60" )}>
+              { sortKey === "totalDist" && sortDirection === "ASC" && <ChevronUp size={14} /> }
+                { sortKey === "totalDist" && sortDirection === "DESC" && <ChevronDown size={14} />}
+                {/* 공간 차지용 아이콘 */}
+                { sortKey !== "totalDist" && <ChevronDown size={14} className="invisible" />} 
+                
                 <span>주행거리</span>
               </div>
             </TableHead>
             <TableHead
-              className="text-center cursor-pointer"
+              className="text-center"
               onClick={() => handleSort("status")}
             >
-              <div className="flex items-center justify-center gap-1">
-                <ArrowDownUp size={14} />
+              <div className={cn("inline-flex items-center justify-center gap-1 cursor-pointer text-[#000000]/60 hover:text-[#000000]", sortKey === "status" && "text-[#000000] hover:text-[#000000]/60" )}>
+              { sortKey === "status" && sortDirection === "ASC" && <ChevronUp size={14} /> }
+                { sortKey === "status" && sortDirection === "DESC" && <ChevronDown size={14} />}
+                {/* 공간 차지용 아이콘 */}
+                { sortKey !== "status" && <ChevronDown size={14} className="invisible" />} 
+                
                 <span>상태</span>
               </div>
             </TableHead>
@@ -171,16 +188,32 @@ useEffect(() => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {isLoading && (
-            <TableRow>
-              <TableCell colSpan={5} className="text-center">불러오는 중…</TableCell>
-            </TableRow>
-          )}
+          {isLoading && 
+            Array.from({ length: itemsPerPage }).map((_, index) => (
+                <TableRow key={index} className="text-center">
+                  <TableCell>
+                    <Skeleton className="h-[1.3em] w-[80%]" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-[1.3em] w-[80%]" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-[1.3em] w-[80%]" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-[1.3em] w-[80%]" />
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Checkbox />
+                  </TableCell>
+                </TableRow>
+              ))
+          }
           {!isLoading && cars.map((car) => (
-            <TableRow key={car.carNumber} className="text-center">
+            <TableRow key={car.carNumber} className="text-center cursor-pointer">
               <TableCell className="font-medium">{car.carNumber}</TableCell>
               <TableCell>{car.type}</TableCell>
-              <TableCell>{car.totalDist.toLocaleString()} km</TableCell>
+              <TableCell>{(Number(car.totalDist) / 1000).toFixed(1)} km</TableCell>
               <TableCell>
                 <StatusBadge status={car.status} />
               </TableCell>

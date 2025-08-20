@@ -19,7 +19,7 @@ export function LogResetButton() {
             setEndTime("");
             applySearch();
           }}
-        className="bg-[#717171] gap-3 hover:bg-[#717171]/80"
+        className="bg-[#717171] gap-3 hover:bg-[#717171]/80 cursor-pointer"
         
       >
         <RotateCcw strokeWidth={3} size={20} /> 초기화
