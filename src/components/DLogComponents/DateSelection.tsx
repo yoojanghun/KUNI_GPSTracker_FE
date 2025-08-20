@@ -57,7 +57,7 @@ export function DateSelection() {
               variant={"outline"}
               id="startDate"
               className={cn(
-                "w-48 justify-between font-normal",
+                "w-48 justify-between font-normal cursor-pointer",
                 !isDateValid && !startTime && "border-red-500"
               )}
             >
@@ -92,7 +92,7 @@ export function DateSelection() {
               variant={"outline"}
               id="endDate"
               className={cn(
-                "w-48 justify-between font-normal",
+                "w-48 justify-between font-normal cursor-pointer",
                 !isDateValid && !endTime && "border-red-500"
               )}
             >

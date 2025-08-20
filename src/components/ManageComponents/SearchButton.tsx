@@ -8,7 +8,7 @@ export function SearchButton() {
   return (
     <Button
       onClick={() => applySearch()}
-      className="bg-[#000000] gap-3 hover:bg-[#000000]/80"
+      className="bg-[#000000] gap-3 hover:bg-[#000000]/80 cursor-pointer"
     >
       <Search strokeWidth={3} size={20} /> 검색
     </Button>

@@ -23,14 +23,14 @@ export function StatusSelect() {
   return (
     <div className="w-[110px]">
       <Select value={localStatus} onValueChange={handleChange}>
-        <SelectTrigger className="px-3 py-4">
+        <SelectTrigger className="px-3 py-4 cursor-pointer">
           <SelectValue placeholder="현황" />
         </SelectTrigger>
         <SelectContent>
-          <SelectGroup>
-            <SelectItem value="ACTIVE">운행중</SelectItem>
-            <SelectItem value="INACTIVE">미운행</SelectItem>
-            <SelectItem value="INSPECTING">수리중</SelectItem>
+          <SelectGroup className="cursor-pointer">
+            <SelectItem value="ACTIVE" className="cursor-pointer">운행중</SelectItem>
+            <SelectItem value="INACTIVE" className="cursor-pointer">미운행</SelectItem>
+            <SelectItem value="INSPECTING" className="cursor-pointer">수리중</SelectItem>
           </SelectGroup>
         </SelectContent>
       </Select>

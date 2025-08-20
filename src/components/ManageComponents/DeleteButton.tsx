@@ -32,7 +32,7 @@ export function DeleteButton() {
           if (selected.size > 0) setIsOpen(true);
           else toast("삭제할 차량을 선택해 주세요", { icon: <CircleAlert /> });
         }}
-        className=" bg-[#FF4343] gap-3 hover:bg-[#FF1717] whitespace-nowrap font-mono [font-variant-numeric:tabular-nums]"
+        className=" bg-[#FF4343] gap-3 hover:bg-[#FF1717] whitespace-nowrap font-mono [font-variant-numeric:tabular-nums] cursor-pointer"
         disabled={delMany.isPending || selected.size === 0}
       >
         <Trash strokeWidth={3} size={20} /> 삭제 ({selected.size})
