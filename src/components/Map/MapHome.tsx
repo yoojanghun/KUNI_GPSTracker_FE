@@ -70,7 +70,7 @@ function MapHome ({ maxLevel, minLevel }: MapTestProps) {
     intervalCtrl.current = prcInterval(9000, fetchAllCarsLocation);
 
     return () => intervalCtrl.current?.cancel();
-  }, []);
+  }, [carStatusBtn]);
 
   // 단순 계산(입력과 출력만 있는 것)
   // => useMemo
@@ -260,7 +260,7 @@ function MapHome ({ maxLevel, minLevel }: MapTestProps) {
             textColor
           } = markerMap[car.status];
 
-          let marker = markersRef.current[car.vehicleNumber];            // markersRef: 지도에 표시된 마커 (차량 번호: {마커})
+          let marker = markersRef.current[car.vehicleNumber];   // markersRef: 지도에 표시된 마커 (차량 번호: {마커})
           if(marker) {                                          // 해당 차량이 이미 있으면 지도에 이미 있는 marker와 overlay의 
             marker.setPosition(latLng);                         // 위치 업데이트 (열어서 보여주는 동작X)            
             marker.setImage(defaultImg);                          

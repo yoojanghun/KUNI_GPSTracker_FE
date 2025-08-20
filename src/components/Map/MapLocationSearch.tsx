@@ -61,7 +61,6 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
   const activeMarkerImgRef = useRef<kakao.maps.MarkerImage | null>(null);
 
   const markersRef = useRef<Record<string, kakao.maps.Marker>>({});
-  const selectedMarkerNumRef = useRef<string | null>(null);
   const overlayRef = useRef<Record<string, kakao.maps.CustomOverlay>>({});
 
   const intervalCtrl = useRef<ReturnType<typeof prcInterval> | null> (null);
@@ -70,6 +69,10 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
   const allCarsRef = useRef<CarInfo[]>([]);
   const targetedCars = useRef<string[]>([]);
   const removeHandlers = useRef<Record<string, Array<() => void>>>({});
+
+  // 마커의 최신 상태, useMemo의 최신 오버레이 스타일 저장
+  const markerStatusRef = useRef<Record<string, { status: string }>>({});
+  const markerStyleRef = useRef<Record<string, CustomOverlayStyle>>({});
 
   // 아래 코드에서 그냥 allCarsRef.current대신 allCarLocations로 쓰면 최신 allCarLocations를 
   // 반영하지 못할 수 있다. 따라서 useRef로 관리.
@@ -99,9 +102,10 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
 
     intervalCtrl.current = prcInterval(3000, async () => {
       if(!mapInstance.current) return;
-      const level = mapInstance.current.getLevel();
-      const step = stepRef.current;
-      console.log('[tick]', { step, level });
+
+      // const level = mapInstance.current.getLevel();
+      // const step = stepRef.current;
+      // console.log('[tick]', { step, level });
       if(isBusy.current) return;
       isBusy.current = true;      // true => 나 지금 바쁘다
       try {
@@ -111,13 +115,13 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
           stepRef.current += 1;
           console.log("전체 차량 gps");
         }
-        else if(stepRef.current > 0 && stepRef.current < 5) {
+        else if(stepRef.current > 0 && stepRef.current < 4) {
           if(mapInstance.current.getLevel() <= 8) {
             await visibleCarsPolling(targetedCars.current);
             console.log("보이는 차량 gps");
           }
           stepRef.current += 1;
-          if(stepRef.current === 5) {
+          if(stepRef.current === 4) {
             stepRef.current = 0;
           }
         }
@@ -214,7 +218,7 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
     }
     kakao.maps.event.addListener(mapInstance.current, "idle", mapCenterLevelEvent);
 
-    const mapCornerGpsEvent = () => {
+    const mapCornerGpsSearch = () => {
       if(!mapInstance.current) return;
       if(mapInstance.current.getLevel() > 8) return;
       const bounds = mapInstance.current.getBounds();
@@ -233,7 +237,7 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
             carObj.longitude <= maxLng)
         .map(carObj => carObj.vehicleNumber);
     }
-    kakao.maps.event.addListener(mapInstance.current, "idle", mapCornerGpsEvent);
+    kakao.maps.event.addListener(mapInstance.current, "idle", mapCornerGpsSearch);
 
     // 화면에서 드래그 범위를 벗어나면 지도의 중심으로 다시 위치
     const bounds = new kakao.maps.LatLngBounds(
@@ -266,7 +270,7 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
     return () => {
       if(!mapInstance.current || !zoomControlRef.current) return;
       kakao.maps.event.removeListener(mapInstance.current, 'idle', mapCenterLevelEvent);
-      kakao.maps.event.removeListener(mapInstance.current, "idle", mapCornerGpsEvent);
+      kakao.maps.event.removeListener(mapInstance.current, "idle", mapCornerGpsSearch);
       kakao.maps.event.removeListener(mapInstance.current, "dragend", preventDrag);
       mapInstance.current.removeControl(zoomControlRef.current);
     };
@@ -319,13 +323,13 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
       if(activeOverlayRef.current) {
         activeOverlayRef.current.setMap(null);
       }
+      // active된 마가 있다면, 예전 default 이미지로 되돌린다.
       if(activeMarkerRef.current && activeMarkerImgRef.current) {
         activeMarkerRef.current.setImage(activeMarkerImgRef.current);
       }
       activeOverlayRef.current = null;
       activeMarkerRef.current = null;
       activeMarkerImgRef.current = null;
-      selectedMarkerNumRef.current = null;
       setSelectedCar(null);
     }
     kakao.maps.event.addListener(mapInstance.current, "click", removeOverlayMap)
@@ -337,6 +341,7 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
   }, [])
 
   // 마커와 클러스터링 생성, 만들어진 마커로 지도 클러스터링
+  // 차량 있으면 위치만 변경(차량 있어도 status바뀌면 marker 색, overlay 업데이트), 차량 없으면 마커 생성 
   useEffect(() => {
     // 모든 차량(500대)의 차량 번호를 가져옴
     const currentCars = allCarLocations.map(car => car.vehicleNumber);
@@ -352,27 +357,63 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
         .filter(car => car.status === status || !status)
         .forEach(car => {
           const latLng = new kakao.maps.LatLng(car.latitude, car.longitude);
-          const {
-            defaultMarkerImg: defaultImg,
-            hoverMarkerImg: hoverImg,
-            bgColor,
-            textColor,
-            statusName
-          } = markerMap[car.status];
 
-          let marker = markersRef.current[car.vehicleNumber];   
-          let overlay = overlayRef.current[car.vehicleNumber];
+          let marker = markersRef.current[car.vehicleNumber];   // 이미 만들어진 마커
+          let overlay = overlayRef.current[car.vehicleNumber];  // 이미 만들어진 overlay
 
-          // 저장된 마커가 존재할 때
           if(marker) {
             marker.setPosition(latLng);
-            if(overlay) {
-              overlay.setPosition(latLng);
+            marker.setImage(markerMap[car.status].defaultMarkerImg);
+            if(overlay) overlay.setPosition(latLng);
+
+            const prevState = markerStatusRef.current[car.vehicleNumber].status;
+            if(prevState !== car.status) {
+              markerStatusRef.current[car.vehicleNumber] = { status: car.status };
+              markerStyleRef.current[car.vehicleNumber] = markerMap[car.status];
+
+              const {
+                defaultMarkerImg: newDefaultImg,
+                hoverMarkerImg: newHoverImg,
+                bgColor: newBgColor,
+                textColor: newTextColor,
+                statusName: newStatusName
+              } = markerStyleRef.current[car.vehicleNumber];
+
+              if(overlay) {
+                overlay.setContent(`
+                  <div class="${styles["overlay-bubble"]}">
+                    <div class="px-3 py-1 text-center flex flex-col items-center">
+                      <div class="font-bold">${car.vehicleNumber}</div>
+                      <div class="font-bold my-1">${car.type}</div>
+                      <div class="${newBgColor} ${newTextColor} w-15 p-1 font-bold rounded-sm text-center">
+                        ${newStatusName}
+                      </div>
+                    </div>
+                  </div>`);
+              }
+
+              if(activeMarkerRef.current === marker) {
+                activeMarkerImgRef.current = newDefaultImg;
+                marker.setImage(newHoverImg);
+              }
+              else {
+                marker.setImage(newDefaultImg);
+              }
             }
           }
           else {
+            markerStatusRef.current[car.vehicleNumber] = { status: car.status };
+            markerStyleRef.current[car.vehicleNumber] = markerMap[car.status];
+            const currentStyle = markerStyleRef.current[car.vehicleNumber];
+            const {
+              defaultMarkerImg: defaultImg,
+              bgColor,
+              textColor,
+              statusName
+            } = currentStyle;
+
             if(!mapInstance.current) return;
-            marker = new kakao.maps.Marker({                          // 마커 생성 (한 번만 실행)
+            marker = new kakao.maps.Marker({            // 마커 생성 (한 번만 실행)
               position: latLng,
               image: defaultImg,
               map: mapInstance.current
@@ -396,36 +437,41 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
               zIndex: 99
             });
             overlayRef.current[car.vehicleNumber] = overlay;
-
+            
             const setOverlay = () => {
-              marker.setImage(hoverImg);
+              const style = markerStyleRef.current[car.vehicleNumber] ?? markerMap[car.status];
+              marker.setImage(style.hoverMarkerImg);
               overlay.setMap(mapInstance.current);
             }
             const deleteOverlay = () => {
               if(activeOverlayRef.current !== overlay) {
-                marker.setImage(defaultImg);
+                const style = markerStyleRef.current[car.vehicleNumber] ?? markerMap[car.status];
+                marker.setImage(style.defaultMarkerImg);
                 overlay.setMap(null);
               }
             }
             const controlClickOverlay = () => {
+              const style = markerStyleRef.current[car.vehicleNumber] ?? markerMap[car.status];
+
               if(activeOverlayRef.current === overlay) {    // active된 게 자기 자신
                 overlay.setMap(null);
+                if(activeMarkerRef.current) {
+                  activeMarkerRef.current.setImage(style.defaultMarkerImg);
+                }
                 activeOverlayRef.current = null;
                 activeMarkerRef.current = null;
                 activeMarkerImgRef.current = null;
               }
-              else {    // active된 것이 다른 마커
-                if(activeOverlayRef.current) {
-                  activeOverlayRef.current.setMap(null);
-                }
+              else {    // active된 것이 다른 마커 OR null된 자신의 마커를 클릭
+                if(activeOverlayRef.current) activeOverlayRef.current.setMap(null);
                 if(activeMarkerRef.current && activeMarkerImgRef.current) {
                   activeMarkerRef.current.setImage(activeMarkerImgRef.current);
                 }
-                marker.setImage(hoverImg);
+                marker.setImage(style.hoverMarkerImg);
                 overlay.setMap(mapInstance.current);
-                activeOverlayRef.current = overlay;
-                activeMarkerRef.current = marker;
-                activeMarkerImgRef.current = defaultImg;
+                activeOverlayRef.current = overlay;   
+                activeMarkerRef.current = marker;     
+                activeMarkerImgRef.current = style.defaultMarkerImg;
                 setSelectedCar(car);
                 setCarListPage(true);
               }
@@ -454,6 +500,8 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
         overlayRef.current[carNumber].setMap(null);
         delete markersRef.current[carNumber];
         delete overlayRef.current[carNumber];
+        delete markerStyleRef.current[carNumber];
+        delete markerStatusRef.current[carNumber];
       }
     })
 
@@ -507,27 +555,81 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
     if(selectedMarker && selectedMarkerOverlay) {
       selectedMarkerOverlay.setMap(mapInstance.current);
       selectedMarker.setImage(hoverImg);
-      activeOverlayRef.current = selectedMarkerOverlay;
+      activeOverlayRef.current = selectedMarkerOverlay;   
       activeMarkerRef.current = selectedMarker;
       activeMarkerImgRef.current = defaultImg;
     }
   }, [selectedCar])
 
   useEffect(() => {
-    visibleCarLocations
-      .filter(car => car.status === carStatusOption || carStatusOption === "전체")
-      .map(car => {
-        const latLng = new kakao.maps.LatLng(car.latitude, car.longitude);
-        let marker = markersRef.current[car.vehicleNumber];
-        let overlay = overlayRef.current[car.vehicleNumber];
-        if(marker) {
-          marker.setPosition(latLng);
-          if(overlay) {
-            overlay.setPosition(latLng);
-          }
+    visibleCarLocations.forEach(car => {
+      const marker = markersRef.current[car.vehicleNumber];
+      if (!marker) return; 
+      const overlay = overlayRef.current[car.vehicleNumber];
+
+      const latLng = new kakao.maps.LatLng(car.latitude, car.longitude);
+      marker.setPosition(latLng);
+      if (overlay) overlay.setPosition(latLng);
+
+      const prevStatus = markerStatusRef.current[car.vehicleNumber]?.status;
+      if (prevStatus !== car.status) {
+        markerStatusRef.current[car.vehicleNumber] = { status: car.status };
+        markerStyleRef.current[car.vehicleNumber] = markerMap[car.status];
+
+        const {
+          defaultMarkerImg: defaultImg,
+          hoverMarkerImg: hoverImg,
+          bgColor,
+          textColor,
+          statusName,
+        } = markerStyleRef.current[car.vehicleNumber];
+
+        // 오버레이 내용 갱신
+        if (overlay) {
+          overlay.setContent(`
+            <div class="${styles["overlay-bubble"]}">
+              <div class="px-3 py-1 text-center flex flex-col items-center">
+                <div class="font-bold">${car.vehicleNumber}</div>
+                <div class="font-bold my-1">${car.type}</div>
+                <div class="${bgColor} ${textColor} w-15 p-1 font-bold rounded-sm text-center">
+                  ${statusName}
+                </div>
+              </div>
+            </div>`);
         }
-      })
-  }, [visibleCarLocations, carStatusOption])
+
+        // 선택된 마커면 hover 유지, 아니면 기본 이미지
+        if (activeMarkerRef.current === marker) {
+          activeMarkerImgRef.current = defaultImg;
+          marker.setImage(hoverImg);
+        } else {
+          marker.setImage(defaultImg);
+        }
+      }
+    });
+  }, [visibleCarLocations]);
+
+  // 차량의 status가 carStatusOption의 값과 일치할 때만 overlay를 표시
+  useEffect(() => {
+    if(!selectedCar || carStatusOption === "전체" || !activeOverlayRef.current) return;
+    if(selectedCar.status !== carStatusOption) {
+      activeOverlayRef.current.setMap(null);
+
+      const marker = markersRef.current[selectedCar.vehicleNumber];
+      const style = markerStyleRef.current[selectedCar.vehicleNumber] ?? markerMap[selectedCar.status];
+      if (marker && style) {
+        marker.setImage(style.defaultMarkerImg);
+      } 
+      else if (activeMarkerRef.current && activeMarkerImgRef.current) {
+        activeMarkerRef.current.setImage(activeMarkerImgRef.current);
+      }
+      activeOverlayRef.current = null;
+      activeMarkerRef.current = null;
+      activeMarkerImgRef.current = null;
+      setSelectedCar(null);
+    }
+
+  }, [carStatusOption, selectedCar]);
 
   return (
     <div ref={mapContainerRef} style={{ width: '100%', height: '100%'}}/>
@@ -535,3 +637,110 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
 };
 
 export default MapLocationSearch;
+
+
+// ------------------------------------------------------------------------------
+
+  // useEffect(() => {
+
+  //   const setMarkers = (status?: string) => {
+  //     const createdMarkers: kakao.maps.Marker[] = [];
+  //     allCarLocations
+  //       .filter(car => car.status === status || !status)
+  //       .map(car => {
+  //         let marker =  markersRef.current[car.vehicleNumber];  // 이미 만들어진 마커 존재?
+  //         if(marker) {
+
+  //         }
+  //         else {
+  //           if(!mapInstance.current) return;
+  //           const latLng = new kakao.maps.LatLng(car.latitude, car.longitude);
+  //           markerStatusRef.current[car.vehicleNumber] = { status: car.status };
+
+  //           const {
+  //             defaultMarkerImg: defaultImg,
+  //             bgColor,
+  //             textColor,
+  //             statusName
+  //           } = markerMap[car.status];
+  //           markerStyleRef.current[car.vehicleNumber] = markerMap[car.status];
+
+  //           const newMarker = new kakao.maps.Marker({            // 마커 생성 (한 번만 실행)
+  //             position: latLng,
+  //             image: defaultImg,
+  //             map: mapInstance.current
+  //           });
+  //           markersRef.current[car.vehicleNumber] = newMarker;
+
+  //           const newOverlay = new kakao.maps.CustomOverlay({            // 오버레이 생성 (한 번만 실행)
+  //             content: `
+  //               <div class="${styles["overlay-bubble"]}">
+  //                 <div class="px-3 py-1 text-center flex flex-col items-center">
+  //                   <div class="font-bold">${car.vehicleNumber}</div>
+  //                   <div class="font-bold my-1">${car.type}</div>
+  //                   <div class="${bgColor} ${textColor} w-15 p-1 font-bold rounded-sm text-center">
+  //                     ${statusName}
+  //                   </div>
+  //                 </div>
+  //               </div>`,
+  //             position: latLng,
+  //             xAnchor: 0.55,    
+  //             yAnchor: 1.5,
+  //             zIndex: 99
+  //           });
+  //           overlayRef.current[car.vehicleNumber] = newOverlay;
+
+  //           const setOverlay = () => {
+  //             const markerStyle = markerStyleRef.current[car.vehicleNumber] ?? markerMap[car.status];
+  //             const overlay = overlayRef.current[car.vehicleNumber];    // 가장 최근 overlay
+  //             newMarker.setImage(markerStyle.hoverMarkerImg);
+  //             overlay.setMap(mapInstance.current);
+  //           };
+  //           const deleteOverlay = () => {
+  //             if(activeMarkerRef.current !== newMarker) {   // active된 것이 자기자신이 아닐때
+  //               const markerStyle = markerStyleRef.current[car.vehicleNumber] ?? markerMap[car.status];
+  //               const overlay = overlayRef.current[car.vehicleNumber];    // 가장 최근 overlay
+  //               newMarker.setImage(markerStyle.defaultMarkerImg);
+  //               overlay.setMap(null);
+  //             }
+  //           };
+  //           const controlClickOverlay = () => {
+  //             const markerStyle = markerStyleRef.current[car.vehicleNumber] ?? markerMap[car.status];
+  //             const overlay = overlayRef.current[car.vehicleNumber];    // 가장 최근 overlay
+  //             if(activeMarkerRef.current) {
+  //               if(activeMarkerRef.current === newMarker) {   // active가 자기자신, 자기자신 클릭
+  //                 newMarker.setImage(markerStyle.defaultMarkerImg);
+  //                 overlay.setMap(null);
+  //                 setSelectedCar(null);
+  //               }
+  //               else {      // active가 다른 marker, 자기자신 클릭시
+
+  //               }
+  //             }
+  //             else {
+  //               newMarker.setImage(markerStyle.hoverMarkerImg);
+  //               overlay.setMap(mapInstance.current);
+  //               activeMarkerRef.current = newMarker;
+  //               setSelectedCar(car);
+  //               setCarListPage(true);
+  //             }
+  //           };
+
+  //           kakao.maps.event.addListener(newMarker, "mouseover", setOverlay);
+  //           kakao.maps.event.addListener(newMarker, "mouseout", deleteOverlay);
+  //           kakao.maps.event.addListener(newMarker, "click", controlClickOverlay);
+  //         }
+  //       }
+  //     )
+  //     return createdMarkers
+  //   }
+
+  //   if(carStatusOption === "전체") {
+
+  //   }
+  //   else {
+
+  //   }
+  // }, [carStatusOption, allCarLocations])
+
+// ------------------------------------------------------------------------------

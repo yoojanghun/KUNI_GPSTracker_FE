@@ -1,3 +1,10 @@
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel"
 import { MapPin, Calendar } from "lucide-react";
 import total from "../../assets/car-status-icons/total.svg";
 import working from "../../assets/car-status-icons/working.svg";
@@ -5,7 +12,6 @@ import notWorking from "../../assets/car-status-icons/not-working.svg";
 import checkingIndicator from "../../assets/car-status-icons/checking-indicator.svg";
 import notWorkingIndicator from "../../assets/car-status-icons/not-working-indicator.svg";
 import workingIndicator from "../../assets/car-status-icons/working-indicator.svg";
-import styles from "./Home.module.css";
 
 import CarsPerDayChart from "@/components/CarsPerDayChart";
 import MapHome from "@/components/Map/MapHome";
@@ -128,7 +134,21 @@ function Home() {
               <span className="text-xl">이번주 일별 운행 건수</span>
             </div>
             <div className="w-[100%] h-[90%]">
-              <CarsPerDayChart />
+              <Carousel>
+                <CarouselContent>
+                  <CarouselItem>
+                    <CarsPerDayChart />
+                  </CarouselItem>
+                  <CarouselItem>
+                    안녕하세요
+                  </CarouselItem>
+                  <CarouselItem>
+                    알겠습니까
+                  </CarouselItem>
+                </CarouselContent>
+                <CarouselPrevious />
+                <CarouselNext />
+              </Carousel>
             </div>
           </div>
         </div>
