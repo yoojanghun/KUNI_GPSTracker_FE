@@ -194,7 +194,7 @@ function CarList() {
                     <span className={`p-1 px-2 font-bold text-sm rounded-sm`}>
                       {selectedCarInfo?.status
                         ? selectedCarInfo?.status
-                        : "2분 기다려주세요"}
+                        : "data Looading"}
                     </span>
                   </td>
                 </tr>
@@ -203,7 +203,7 @@ function CarList() {
                   <td className={styles["td"]}>
                     {selectedCarInfo?.drivingDate
                       ? `${selectedCarInfo?.drivingDate}`
-                      : "2분 기다려주세요"}
+                      : "data Looading"}
                   </td>
                 </tr>
                 <tr>
@@ -211,7 +211,7 @@ function CarList() {
                   <td className={styles["td"]}>
                     {selectedCarInfo?.drivingTime 
                       ? `${selectedCarInfo?.drivingTime} 분` 
-                      : "2분 기다려주세요"}
+                      : "data Looading"}
                   </td>
                 </tr>
                 <tr>
@@ -219,7 +219,7 @@ function CarList() {
                   <td className={styles["td"]}>
                     {selectedCarInfo?.drivingDistanceKm 
                       ? `${selectedCarInfo?.drivingDistanceKm} m`
-                      : "2분 기다려주세요"}
+                      : "data Looading"}
                   </td>
                 </tr>
               </tbody>

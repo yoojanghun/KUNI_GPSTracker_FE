@@ -1,10 +1,3 @@
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel"
 import { MapPin, Calendar } from "lucide-react";
 import total from "../../assets/car-status-icons/total.svg";
 import working from "../../assets/car-status-icons/working.svg";
@@ -12,8 +5,10 @@ import notWorking from "../../assets/car-status-icons/not-working.svg";
 import checkingIndicator from "../../assets/car-status-icons/checking-indicator.svg";
 import notWorkingIndicator from "../../assets/car-status-icons/not-working-indicator.svg";
 import workingIndicator from "../../assets/car-status-icons/working-indicator.svg";
+import styles from "./Home.module.css";
 
-import CarsPerDayChart from "@/components/CarsPerDayChart";
+import CarsPerDayChart from "@/components/Charts/CarsPerDayChart";
+import TopActivatedCars from "@/components/Charts/TopActivatedCars";
 import MapHome from "@/components/Map/MapHome";
 
 import { useCarStatusBtnStore } from "@/Store/Home/mapState";
@@ -23,12 +18,14 @@ import { useEffect, useState, useRef } from "react";
 import { prcInterval } from 'precision-timeout-interval';
 import { Separator } from "@/components/ui/separator";
 
+import useEmblaCarousel from 'embla-carousel-react'
+
 type CarStatus = "전체" | "ACTIVE" | "INACTIVE" | "INSPECTING";
 
 function Home() {
   const [carStat, setCarStat] = useState<CarStatusNum | null>(null);
-  // carStat = {vehicles: 500, active: 0, inactive: 500, inspect: 0}
   const prevCarStat = useRef<CarStatusNum | null>(null);
+  const [emblaRef] = useEmblaCarousel();
 
   const { carStatusBtn, setCarStatusBtn } = useCarStatusBtnStore();
 
@@ -133,22 +130,17 @@ function Home() {
               <Calendar className="w-6 h-6 mr-2" />
               <span className="text-xl">이번주 일별 운행 건수</span>
             </div>
-            <div className="w-[100%] h-[90%]">
-              <Carousel>
-                <CarouselContent>
-                  <CarouselItem>
+            <div className="w-full h-[90%]">
+              <div className={styles.embla} ref={emblaRef}>
+                <div className={styles.embla__container}>
+                  <div className={styles.embla__slide}>
                     <CarsPerDayChart />
-                  </CarouselItem>
-                  <CarouselItem>
-                    안녕하세요
-                  </CarouselItem>
-                  <CarouselItem>
-                    알겠습니까
-                  </CarouselItem>
-                </CarouselContent>
-                <CarouselPrevious />
-                <CarouselNext />
-              </Carousel>
+                  </div>
+                  <div className={styles.embla__slide}>
+                    <TopActivatedCars />
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
