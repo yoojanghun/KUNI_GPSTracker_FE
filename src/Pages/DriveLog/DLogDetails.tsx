@@ -18,6 +18,7 @@ import car from "../../assets/Car.svg"
 import { getLogDetail } from "@/Api/LogApi/getLogDetail";
 import type { getLogDetailResponse } from "@/Api/LogApi/interfaces/getLogDetailResponse";
 import { toast } from "sonner";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function DLogDetails() {
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -186,17 +187,17 @@ export function DLogDetails() {
     return <div>잘못된 접근입니다</div>;
   }
 
-  if (!log) {
-    return <div>로딩 중...</div>;
-  }
-
   return (
-    <div className="flex flex-col gap-6 py-6 md:py-8 w-full max-w-screen-xl mx-auto">
+    <div className="flex flex-col gap-6 py-6 md:py-8 w-full h-screen max-w-screen-xl mx-auto">
       <div className="w-full px-4 md:px-12 flex flex-wrap gap-3 justify-between items-center">
         <div className="flex items-center gap-3">
           <DLogHeader />
           <span className="whitespace-nowrap text-lg md:text-xl font-medium text-[#969696]">
-            {log.vehicleNumber}, {log.vehicleName}
+            {
+              log
+              ? `${log.vehicleNumber}, ${log.vehicleName}`
+              : <Skeleton className="inline-block h-[1.3em] w-[15ch]"/>
+            }
           </span>
         </div>
         <div
@@ -218,7 +219,11 @@ export function DLogDetails() {
                 시작 시간
               </div>
               <div className="text-[#969696] text-xs sm:text-sm md:text-base break-words whitespace-normal">
-                {log.onTime.replace("T", " ")}
+                {
+                log
+                ? log.onTime?.replace("T", " ") ?? "시간 정보가 없습니다."
+              : <Skeleton className="inline-block h-[1.3em] w-[12ch]"/>
+                }
               </div>
             </div>
             {/* 종료 시간 */}
@@ -228,7 +233,9 @@ export function DLogDetails() {
                 종료 시간
               </div>
               <div className="text-[#969696] text-xs sm:text-sm md:text-base break-words whitespace-normal">
-                {log.offTime.replace("T", " ")}
+                {log 
+                ? log.offTime?.replace("T", " ") ?? "시간 정보가 없습니다."
+              : <Skeleton className="inline-block h-[1.3em] w-[12ch]"/>}
               </div>
             </div>
             {/* 총 운행거리 */}
@@ -238,7 +245,10 @@ export function DLogDetails() {
                 총 운행거리
               </div>
               <div className="text-[#969696] text-xs sm:text-sm md:text-base truncate">
-                {(Number(log.sumDist) / 1000).toFixed(1).toLocaleString()} km
+                {log
+                ? `${(Number(log.sumDist) / 1000).toFixed(1).toLocaleString()} km`
+                : <Skeleton className="inline-block h-[1.3em] w-[6ch]"/>
+                }
               </div>
             </div>
             {/* 시작/종료 주소 */}
@@ -248,7 +258,10 @@ export function DLogDetails() {
                   <Play size={20} />
                 </div>
                 <div className="text-[#969696] text-[11px] sm:text-xs md:text-sm break-words whitespace-normal">
-                  {!startAddr ? "주소 불러오는 중.." : startAddr}
+                  {startAddr 
+                  ? startAddr
+                  : <Skeleton className="inline-block h-[1.3em] w-[17ch]"/>
+                  }
                 </div>
               </div>
               <Separator orientation="vertical" className="hidden" />
@@ -258,7 +271,10 @@ export function DLogDetails() {
                   <CircleSlash size={20} />
                 </div>
                 <div className="text-[#969696] text-[11px] sm:text-xs md:text-sm break-words whitespace-normal">
-                  {!endAddr ? "주소 불러오는 중.." : endAddr}
+                  {endAddr 
+                  ? endAddr
+                  : <Skeleton className="inline-block h-[1.3em] w-[17ch]"/>
+                  }
                 </div>
               </div>
             </div>
@@ -269,11 +285,15 @@ export function DLogDetails() {
               <Map size={22} />
               운행 경로
             </div>
-            <div
+            {mapRef
+            ? <div
               ref={containerRef}
               id="map"
               className="w-full h-[260px] sm:h-[320px] md:h-[420px] lg:h-[520px] rounded-[6px]"
             ></div>
+            : <Skeleton className="w-[100%] h-[260px] sm:h-[320px] md:h-[420px] lg:h-[520px] rounded-[6px]"/>
+            }
+
           </div>
         </div>
         <div className="mt-6" />

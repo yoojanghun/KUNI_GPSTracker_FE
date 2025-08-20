@@ -15,6 +15,7 @@ import type { getCarListRequest } from "@/Api/ManageApi/interfaces/getCarListReq
 import { useCarStore } from "@/Store/carStore";
 import { useManageQuery } from "@/Queries/useManageQuery";
 import { toast } from "sonner";
+import { Skeleton } from "../ui/skeleton";
 
 export default function CarTable() {
 
@@ -171,11 +172,27 @@ useEffect(() => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {isLoading && (
-            <TableRow>
-              <TableCell colSpan={5} className="text-center">불러오는 중…</TableCell>
-            </TableRow>
-          )}
+          {isLoading && 
+            Array.from({ length: itemsPerPage }).map((_, index) => (
+                <TableRow key={index} className="text-center">
+                  <TableCell>
+                    <Skeleton className="h-[1.3em] w-[80%]" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-[1.3em] w-[80%]" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-[1.3em] w-[80%]" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-[1.3em] w-[80%]" />
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Checkbox />
+                  </TableCell>
+                </TableRow>
+              ))
+          }
           {!isLoading && cars.map((car) => (
             <TableRow key={car.carNumber} className="text-center">
               <TableCell className="font-medium">{car.carNumber}</TableCell>

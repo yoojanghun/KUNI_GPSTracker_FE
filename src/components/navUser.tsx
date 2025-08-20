@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/sidebar"
 
 import { useAuthStore } from "@/Store/Authorization"
+import { Skeleton } from "./ui/skeleton"
 
 export function NavUser({
   user,
@@ -48,7 +49,13 @@ export function NavUser({
                 <User size={28}/>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{user.name}</span>
+                <span className="truncate font-medium">
+                  {
+                  user.name
+                  ? user.name
+                  : <Skeleton className="inline-block h-[1.3em] w-[90%]"/>
+                  }
+                  </span>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />
             </SidebarMenuButton>

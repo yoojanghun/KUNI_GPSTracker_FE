@@ -22,6 +22,7 @@ import { useDlogsQuery } from "@/Queries/useDlogsQuery";
 import { useDLogStore } from "@/Store/dlogStore";
 import { toast } from "sonner";
 import { CircleQuestionMark } from "lucide-react";
+import { Skeleton } from "../ui/skeleton";
 
 export function LogTable() {
   const navigate = useNavigate();
@@ -122,13 +123,32 @@ export function LogTable() {
         </TableHeader>
 
         <TableBody>
-          {isLoading && (
-            <TableRow>
-              <TableCell colSpan={7} className="text-center">
-                불러오는 중…
-              </TableCell>
-            </TableRow>
-          )}
+          {isLoading && 
+          
+              Array.from({ length: itemsPerPage }).map((_, index) => (
+                <TableRow key={index} className="text-center">
+                  <TableCell>
+                    <Skeleton className="h-[1.3em] w-[80%]" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-[1.3em] w-[80%]" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-[1.3em] w-[80%]" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-[1.3em] w-[80%]" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-[1.3em] w-[80%]" />
+                  </TableCell>
+                  <TableCell>
+                    <ChevronRight className="inline-block pr-2" />
+                  </TableCell>
+                </TableRow>
+              ))
+            
+          }
 
           {!isLoading &&
             logs.map((dlog) => (
@@ -144,8 +164,12 @@ export function LogTable() {
                 <TableCell className="font-medium">
                   {dlog.vehicleNumber}
                 </TableCell>
-                <TableCell>{dlog.onTime.replace("T", " ")}</TableCell>
-                <TableCell>{dlog.offTime.replace("T", " ")}</TableCell>
+                <TableCell>
+                  {dlog.onTime?.replace("T", " ") ?? "시간 정보가 없습니다."}
+                </TableCell>
+                <TableCell>
+                  {dlog.offTime?.replace("T", " ") ?? "시간 정보가 없습니다."}
+                </TableCell>
 
                 <TableCell>{dlog.vehicleName}</TableCell>
                 <TableCell>

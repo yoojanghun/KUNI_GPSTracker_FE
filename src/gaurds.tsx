@@ -1,5 +1,6 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuthStore } from "@/Store/Authorization";
+import { Spinner } from "./components/ui/shadcn-io/spinner";
 
 // ProtectedRoute
 // 토큰이 없으면 로그인 페이지로 이동시키고, 있으면 자식 라우트를 렌더링
@@ -14,8 +15,8 @@ export function ProtectedRoute() {
 
   if (isBootstrapping) {
     return (
-      <div className="w-full h-screen flex items-center justify-center text-sm text-muted-foreground">
-        초기화 중...
+      <div className="w-full h-screen flex items-center justify-center text-sm text-muted-foreground bg-transparent">
+        <Spinner variant="circle"/>
       </div>
     );
   }
@@ -45,7 +46,7 @@ export function PublicOnlyRoute() {
   if (isBootstrapping) {
     return (
       <div className="w-full h-screen flex items-center justify-center text-sm text-muted-foreground">
-        초기화 중...
+        <Spinner variant="circle"/>
       </div>
     );
   }
