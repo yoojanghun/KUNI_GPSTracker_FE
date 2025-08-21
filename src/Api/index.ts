@@ -1,5 +1,4 @@
 import ky from 'ky';
-import { useAuthStore } from '@/Store/Authorization';
 import { handleResponse } from './hooks/handleResponse';
 import { handleRequest } from './hooks/handleRequest';
 

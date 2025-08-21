@@ -33,7 +33,7 @@ export const handleResponse: AfterResponseHook = async (
       console.log(
         `request: ${request.body}, options: ${options.body}, response: ${response.body}, message: ${message}`
       );
-      throw new Error(message);
+      throw response;
     }
   }
 

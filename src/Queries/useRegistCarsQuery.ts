@@ -51,11 +51,13 @@ export function useRegistCarMutation() {
       // 롤백용으로 이전 데이터 반환
       return { previous, key: queryKey as readonly unknown[] };
     },
-    onError: (_err, _vars, ctx) => {
+    onError: async (_err, _vars, ctx) => {
       // 롤백
       if (ctx?.previous && ctx?.key) {
         queryClient.setQueryData(ctx.key, ctx.previous);
       }
+
+      
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["manageCars"], exact: false });
