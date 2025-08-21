@@ -24,35 +24,40 @@
 ## 주요 기능
 
 ### 로그인 시스템
-- JWT 토큰 인증 방식 사용  
-![alt text](로그인.png)  
+- JWT 토큰 인증 방식 사용
+<img width="1508" height="856" alt="로그인" src="https://github.com/user-attachments/assets/db5616e1-f56c-4404-9b9c-9b94f366ca4f" />
+
+ 
 
 ---
 
 ### 운행 정보 대시보드 (메인 페이지)
-- 현재 보유 중인 차량의 운행 정보를 지도 및 통계자료와 함께 확인할 수 있습니다.  
-![alt text](대시보드.gif)  
+- 현재 보유 중인 차량의 운행 정보를 지도 및 통계자료와 함께 확인할 수 있습니다.
+![대시보드](https://github.com/user-attachments/assets/8ea7901b-a36c-4e88-b111-76feb9c38bf4)
+
+
 
 ---
 
 ### 위치 조회
 - 차량의 실시간 위치를 조회하여 지도 상에 표시하는 기능입니다.  
-![alt text](위치조회.gif)  
+ ![위치조회](https://github.com/user-attachments/assets/6f693f40-35ea-489d-b0eb-83993f04d9d8)
+
 
 ---
 
 ### 차량 관리
 - 새로운 차량을 등록하거나 기존 차량 정보를 수정/삭제하는 등, 시스템에 등록된 모든 차량을 효율적으로 관리할 수 있는 페이지입니다.  
-- ![alt text](차량관리_메인.png)  
-- ![alt text](차량관리_추가.png)  
-- ![alt text](차량관리_삭제.png)  
+
+<img width="1508" height="856" alt="차량관리_메인" src="https://github.com/user-attachments/assets/6b88374a-f253-450f-bdec-97b383219ddc" />
+<img width="1508" height="856" alt="차량관리_추가" src="https://github.com/user-attachments/assets/4129c37d-1a85-4de1-980f-add3db0c007f" />
+<img width="1508" height="856" alt="차량관리_삭제" src="https://github.com/user-attachments/assets/5c3fa990-8eee-4c7e-8a9e-e22c2312c9ac" />
 
 ---
 
 ### 운행 일지
-- 각 차량의 과거 운행 기록을 날짜별, 차량별로 조회하고 관리할 수 있습니다.  
-- ![alt text](운행일지_메인.png)  
-- ![alt text](운행일지_상세.png)  
+<img width="1508" height="856" alt="운행일지_상세" src="https://github.com/user-attachments/assets/0e9962d0-7aa0-46a2-a11e-fafc2fb2f3e5" />
+<img width="1508" height="856" alt="운행일지_메인" src="https://github.com/user-attachments/assets/f9d59f2a-fb99-4ae9-8f6c-5a69f3cce229" />
 
 ---
 
