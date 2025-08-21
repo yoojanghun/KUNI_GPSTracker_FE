@@ -103,6 +103,8 @@ function CarList() {
     }
   }, [currentPage, searchedCar, carStatusOption])
 
+  // 컴포넌트 렌더 => 의존성 배열 달라짐 => 의존성 배열 안 함수 다시 렌더
+  // 위의 문제를 useCallback으로 해결
   useEffect(() => {
     totalCarLoc();
     console.log("페이지네이션");
@@ -163,7 +165,7 @@ function CarList() {
               <SelectItem value="전체" className="cursor-pointer">
                 전체
               </SelectItem>
-              <SelectItem value="ACTIVE" className="cursor-pointer" onClick={ () => setCurrentPage(1)}>
+              <SelectItem value="ACTIVE" className="cursor-pointer">
                 <StatusBadge status={"ACTIVE"} />
               </SelectItem>
               <SelectItem value="INACTIVE" className="cursor-pointer">
@@ -194,7 +196,7 @@ function CarList() {
                     <span className={`p-1 px-2 font-bold text-sm rounded-sm`}>
                       {selectedCarInfo?.status
                         ? selectedCarInfo?.status
-                        : "2분 기다려주세요"}
+                        : "data Looading"}
                     </span>
                   </td>
                 </tr>
@@ -203,7 +205,7 @@ function CarList() {
                   <td className={styles["td"]}>
                     {selectedCarInfo?.drivingDate
                       ? `${selectedCarInfo?.drivingDate}`
-                      : "2분 기다려주세요"}
+                      : "data Looading"}
                   </td>
                 </tr>
                 <tr>
@@ -211,7 +213,7 @@ function CarList() {
                   <td className={styles["td"]}>
                     {selectedCarInfo?.drivingTime 
                       ? `${selectedCarInfo?.drivingTime} 분` 
-                      : "2분 기다려주세요"}
+                      : "data Looading"}
                   </td>
                 </tr>
                 <tr>
@@ -219,7 +221,7 @@ function CarList() {
                   <td className={styles["td"]}>
                     {selectedCarInfo?.drivingDistanceKm 
                       ? `${selectedCarInfo?.drivingDistanceKm} m`
-                      : "2분 기다려주세요"}
+                      : "data Looading"}
                   </td>
                 </tr>
               </tbody>
@@ -380,6 +382,7 @@ function CarList() {
                   {visiblePages
                     .map(page => 
                       <PaginationLink 
+                        key={page}
                         onClick={() => setCurrentPage(page)} 
                         isActive={page === currentPage}
                       >
