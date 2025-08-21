@@ -68,7 +68,7 @@ export function AddCarButton() {
                 >
                   {attemptedSubmit && !isvehicleNumberValid()
                     ? "차량 번호를 입력해주세요"
-                    : "차량 번호"}
+                    : "차량 번호 (하, 허, 호만 지원됨)"}
                 </Label>
                 <Input
                   id="vehicleNumber"

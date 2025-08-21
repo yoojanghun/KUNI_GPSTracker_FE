@@ -1,7 +1,12 @@
 import ky from 'ky';
-import { handleResponse } from './hooks/handleResponse';
+import { createHandleResponse } from './hooks/handleResponse';
 import { handleRequest } from './hooks/handleRequest';
+import { useAuthStore } from '@/Store/Authorization';
 
+
+const handleResponse = createHandleResponse(() => {
+  useAuthStore.getState().logout("expired");
+});
 
 export const instance = ky.create({
   prefixUrl: "https://api.gps-tracker.store/", // baseURL 설정, TODO: env로 안전하게 관리
