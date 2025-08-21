@@ -1,4 +1,4 @@
-import { MapPin, Calendar } from "lucide-react";
+import { MapPin, Calendar, ChevronRight, ChevronLeft } from "lucide-react";
 import total from "../../assets/car-status-icons/total.svg";
 import working from "../../assets/car-status-icons/working.svg";
 import notWorking from "../../assets/car-status-icons/not-working.svg";
@@ -8,7 +8,7 @@ import workingIndicator from "../../assets/car-status-icons/working-indicator.sv
 import styles from "./Home.module.css";
 
 import CarsPerDayChart from "@/components/Charts/CarsPerDayChart";
-import TopActivatedCars from "@/components/Charts/TopActivatedCars";
+import TopActivatedCarsChart from "@/components/Charts/TopActivatedCars";
 import MapHome from "@/components/Map/MapHome";
 
 import { useCarStatusBtnStore } from "@/Store/Home/mapState";
@@ -25,7 +25,7 @@ type CarStatus = "전체" | "ACTIVE" | "INACTIVE" | "INSPECTING";
 function Home() {
   const [carStat, setCarStat] = useState<CarStatusNum | null>(null);
   const prevCarStat = useRef<CarStatusNum | null>(null);
-  const [emblaRef] = useEmblaCarousel();
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
 
   const { carStatusBtn, setCarStatusBtn } = useCarStatusBtnStore();
 
@@ -64,6 +64,18 @@ function Home() {
   } = carStat;
 
   const percentage = Math.round((activeCarsNum / totalCarsNum) * 100);
+
+  const handlePrevClick = () => {
+    if (emblaApi) {
+      emblaApi.scrollPrev();
+    }
+  };
+
+  const handleNextClick = () => {
+    if (emblaApi) {
+      emblaApi.scrollNext();
+    }
+  };
 
   return (
     <main className={`flex-col box-border p-5 w-full min-h-[calc(100vh*0.75)]`}>
@@ -130,17 +142,27 @@ function Home() {
               <Calendar className="w-6 h-6 mr-2" />
               <span className="text-xl">이번주 일별 운행 건수</span>
             </div>
-            <div className="w-full h-[90%]">
+            <div className="w-full h-[90%] relative">
               <div className={styles.embla} ref={emblaRef}>
                 <div className={styles.embla__container}>
-                  <div className={styles.embla__slide}>
+                  <div className={`${styles.embla__slide} pr-7`}>
                     <CarsPerDayChart />
                   </div>
-                  <div className={styles.embla__slide}>
-                    <TopActivatedCars />
+                  <div className={`${styles.embla__slide} pr-1`}>
+                    <TopActivatedCarsChart />
                   </div>
                 </div>
               </div>
+              <button className={`${styles["prev-btn"]} prev-btn absolute left-0 top-[45%] opacity-50 cursor-pointer`} 
+                onClick={handlePrevClick}
+              >
+                <ChevronLeft className="w-12 h-12"/>
+              </button>
+              <button className={`${styles["prev-btn"]} absolute -right-4 top-[45%] opacity-50 cursor-pointer`}
+                onClick={handleNextClick}
+              >
+                <ChevronRight className="w-12 h-12"/>
+              </button>
             </div>
           </div>
         </div>

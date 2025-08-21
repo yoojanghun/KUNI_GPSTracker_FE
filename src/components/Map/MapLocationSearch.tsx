@@ -363,8 +363,13 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
 
           if(marker) {
             marker.setPosition(latLng);
-            marker.setImage(markerMap[car.status].defaultMarkerImg);
             if(overlay) overlay.setPosition(latLng);
+            if(activeMarkerRef.current === marker) {
+              marker.setImage(markerMap[car.status].hoverMarkerImg);
+            } 
+            else {
+              marker.setImage(markerMap[car.status].defaultMarkerImg);
+            }
 
             const prevState = markerStatusRef.current[car.vehicleNumber].status;
             if(prevState !== car.status) {

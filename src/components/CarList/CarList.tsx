@@ -103,6 +103,8 @@ function CarList() {
     }
   }, [currentPage, searchedCar, carStatusOption])
 
+  // 컴포넌트 렌더 => 의존성 배열 달라짐 => 의존성 배열 안 함수 다시 렌더
+  // 위의 문제를 useCallback으로 해결
   useEffect(() => {
     totalCarLoc();
     console.log("페이지네이션");
@@ -380,6 +382,7 @@ function CarList() {
                   {visiblePages
                     .map(page => 
                       <PaginationLink 
+                        key={page}
                         onClick={() => setCurrentPage(page)} 
                         isActive={page === currentPage}
                       >
