@@ -361,52 +361,7 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
           let marker = markersRef.current[car.vehicleNumber];   // 이미 만들어진 마커
           let overlay = overlayRef.current[car.vehicleNumber];  // 이미 만들어진 overlay
 
-          if(marker) {
-            marker.setPosition(latLng);
-            if(overlay) overlay.setPosition(latLng);
-            if(activeMarkerRef.current === marker) {
-              marker.setImage(markerMap[car.status].hoverMarkerImg);
-            } 
-            else {
-              marker.setImage(markerMap[car.status].defaultMarkerImg);
-            }
-
-            const prevState = markerStatusRef.current[car.vehicleNumber].status;
-            if(prevState !== car.status) {
-              markerStatusRef.current[car.vehicleNumber] = { status: car.status };
-              markerStyleRef.current[car.vehicleNumber] = markerMap[car.status];
-
-              const {
-                defaultMarkerImg: newDefaultImg,
-                hoverMarkerImg: newHoverImg,
-                bgColor: newBgColor,
-                textColor: newTextColor,
-                statusName: newStatusName
-              } = markerStyleRef.current[car.vehicleNumber];
-
-              if(overlay) {
-                overlay.setContent(`
-                  <div class="${styles["overlay-bubble"]}">
-                    <div class="px-3 py-1 text-center flex flex-col items-center">
-                      <div class="font-bold">${car.vehicleNumber}</div>
-                      <div class="font-bold my-1">${car.type}</div>
-                      <div class="${newBgColor} ${newTextColor} w-15 p-1 font-bold rounded-sm text-center">
-                        ${newStatusName}
-                      </div>
-                    </div>
-                  </div>`);
-              }
-
-              if(activeMarkerRef.current === marker) {
-                activeMarkerImgRef.current = newDefaultImg;
-                marker.setImage(newHoverImg);
-              }
-              else {
-                marker.setImage(newDefaultImg);
-              }
-            }
-          }
-          else {
+          if(!marker) {
             markerStatusRef.current[car.vehicleNumber] = { status: car.status };
             markerStyleRef.current[car.vehicleNumber] = markerMap[car.status];
             const currentStyle = markerStyleRef.current[car.vehicleNumber];
@@ -561,21 +516,7 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
       activeMarkerRef.current = selectedMarker;
       activeMarkerImgRef.current = style.defaultMarkerImg;
     }
-
-    let overlay = overlayRef.current[selectedCar.vehicleNumber];
-    if(overlay) {
-      overlay.setContent(`
-        <div class="${styles["overlay-bubble"]}">
-          <div class="px-3 py-1 text-center flex flex-col items-center">
-            <div class="font-bold">${selectedCar.vehicleNumber}</div>
-              <div class="font-bold my-1">${selectedCar.type}</div>
-              <div class="${style.bgColor} ${style.textColor} w-15 p-1 font-bold rounded-sm text-center">
-                ${style.statusName}
-              </div>
-            </div>
-          </div>`);
-    }
-  }, [selectedCar, selectedCar?.status])
+  }, [selectedCar])
 
   useEffect(() => {
     visibleCarLocations.forEach(car => {
@@ -587,7 +528,7 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
       marker.setPosition(latLng);
       if (overlay) overlay.setPosition(latLng);
 
-      const prevStatus = markerStatusRef.current[car.vehicleNumber].status;
+      const prevStatus = markerStatusRef.current[car.vehicleNumber]?.status;
       if (prevStatus !== car.status) {
         markerStatusRef.current[car.vehicleNumber] = { status: car.status };
         markerStyleRef.current[car.vehicleNumber] = markerMap[car.status];
@@ -624,6 +565,54 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
       }
     });
   }, [visibleCarLocations]);
+
+  useEffect(() => {
+    allCarLocations.forEach(car => {
+      const marker = markersRef.current[car.vehicleNumber];
+      if (!marker) return; 
+      const overlay = overlayRef.current[car.vehicleNumber];
+
+      const latLng = new kakao.maps.LatLng(car.latitude, car.longitude);
+      marker.setPosition(latLng);
+      if (overlay) overlay.setPosition(latLng);
+
+      const prevStatus = markerStatusRef.current[car.vehicleNumber]?.status;
+      if (prevStatus !== car.status) {
+        markerStatusRef.current[car.vehicleNumber] = { status: car.status };
+        markerStyleRef.current[car.vehicleNumber] = markerMap[car.status];
+
+        const {
+          defaultMarkerImg: defaultImg,
+          hoverMarkerImg: hoverImg,
+          bgColor,
+          textColor,
+          statusName,
+        } = markerStyleRef.current[car.vehicleNumber];
+
+        // 오버레이 내용 갱신
+        if (overlay) {
+          overlay.setContent(`
+            <div class="${styles["overlay-bubble"]}">
+              <div class="px-3 py-1 text-center flex flex-col items-center">
+                <div class="font-bold">${car.vehicleNumber}</div>
+                <div class="font-bold my-1">${car.type}</div>
+                <div class="${bgColor} ${textColor} w-15 p-1 font-bold rounded-sm text-center">
+                  ${statusName}
+                </div>
+              </div>
+            </div>`);
+        }
+
+        // 선택된 마커면 hover 유지, 아니면 기본 이미지
+        if (activeMarkerRef.current === marker) {
+          activeMarkerImgRef.current = defaultImg;
+          marker.setImage(hoverImg);
+        } else {
+          marker.setImage(defaultImg);
+        }
+      }
+    });
+  }, [allCarLocations])
 
   return (
     <div ref={mapContainerRef} style={{ width: '100%', height: '100%'}}/>
