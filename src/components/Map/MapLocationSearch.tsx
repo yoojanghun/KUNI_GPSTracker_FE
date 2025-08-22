@@ -81,12 +81,15 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
   }, [allCarLocations]);
 
   useEffect(() => {
+    console.log("전체 차량 gps 업데이트", allCarLocations);
+  }, [allCarLocations]);
+
+  useEffect(() => {
     const firstFetch = async () => {
       isBusy.current = true;
       try {
         await allCarsPolling();
         stepRef.current += 1;
-        console.log("전체 차량 gps");
       }
       catch(e) {
         console.error(e);
@@ -109,12 +112,10 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
         if(stepRef.current === 0) {
           await allCarsPolling();
           stepRef.current += 1;
-          console.log("전체 차량 gps");
         }
         else if(stepRef.current > 0 && stepRef.current < 4) {
           if(mapInstance.current.getLevel() <= 8) {
             await visibleCarsPolling(targetedCars.current);
-            console.log("보이는 차량 gps");
           }
           stepRef.current += 1;
           if(stepRef.current === 4) {
@@ -551,11 +552,6 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
     const selectedMarker = markersRef.current[selectedCar.vehicleNumber];
     const selectedMarkerOverlay = overlayRef.current[selectedCar.vehicleNumber];
 
-    // const {
-    //   defaultMarkerImg: defaultImg,
-    //   hoverMarkerImg: hoverImg,
-    // } = markerMap[selectedCar.status];
-
     const style = markerStyleRef.current[selectedCar.vehicleNumber] ?? markerMap[selectedCar.status];
 
     if(selectedMarker && selectedMarkerOverlay) {
@@ -614,28 +610,6 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
       }
     });
   }, [visibleCarLocations]);
-
-  // 차량의 status가 carStatusOption의 값과 일치할 때만 overlay를 표시
-  // useEffect(() => {
-  //   if(!selectedCar || carStatusOption === "전체" || !activeOverlayRef.current) return;
-  //   if(selectedCar.status !== carStatusOption) {
-  //     activeOverlayRef.current.setMap(null);
-
-  //     const marker = markersRef.current[selectedCar.vehicleNumber];
-  //     const style = markerStyleRef.current[selectedCar.vehicleNumber] ?? markerMap[selectedCar.status];
-  //     if (marker && style) {
-  //       marker.setImage(style.defaultMarkerImg);
-  //     } 
-  //     else if (activeMarkerRef.current && activeMarkerImgRef.current) {
-  //       activeMarkerRef.current.setImage(activeMarkerImgRef.current);
-  //     }
-  //     activeOverlayRef.current = null;
-  //     activeMarkerRef.current = null;
-  //     activeMarkerImgRef.current = null;
-  //     setSelectedCar(null);
-  //   }
-
-  // }, [carStatusOption, selectedCar]);
 
   return (
     <div ref={mapContainerRef} style={{ width: '100%', height: '100%'}}/>

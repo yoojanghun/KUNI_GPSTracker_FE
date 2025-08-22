@@ -75,18 +75,3 @@ function TopActivatedCarsChart() {
 };
 
 export default TopActivatedCarsChart;
-
-// const data = [
-//   {
-//     vehicleNumber: '소나타',
-//     driveCount: 2,
-//   },
-//   {
-//     vehicleNumber: '롤스로이스',
-//     driveCount: 5,
-//   },
-//   {
-//     vehicleNumber: '아반테',
-//     driveCount: 8,
-//   },
-// ];
