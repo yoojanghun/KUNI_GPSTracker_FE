@@ -195,7 +195,7 @@ function CarList() {
                   <td className={styles["td"]}>
                     <span className={`p-1 px-2 font-bold text-sm rounded-sm`}>
                       {selectedCarInfo?.status
-                        ? selectedCarInfo?.status
+                        ? <StatusBadge status={`${selectedCarInfo.status}`} />
                         : "data Looading"}
                     </span>
                   </td>
