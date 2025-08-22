@@ -123,7 +123,7 @@ function CarList() {
     fetchSelectedCarStat(selectedCar.vehicleNumber)
       .then(car => {
         setSelectedCarInfo(car);
-        console.log("첫 번째 gps (한 차량)");})
+        console.log("첫 번째 gps (한 차량)", car);})
       .catch(console.error);
   }, [selectedCar?.vehicleNumber]);
 
@@ -211,7 +211,7 @@ function CarList() {
                 <tr>
                   <th className={`${styles["th"]} w-30`}>운행시간</th>
                   <td className={styles["td"]}>
-                    {selectedCarInfo?.drivingTime 
+                    {selectedCarInfo?.drivingTime || selectedCarInfo?.drivingTime === 0
                       ? `${selectedCarInfo?.drivingTime} 분` 
                       : "data Looading"}
                   </td>
@@ -219,7 +219,7 @@ function CarList() {
                 <tr>
                   <th className={`${styles["th"]} w-30`}>운행거리</th>
                   <td className={styles["td"]}>
-                    {selectedCarInfo?.drivingDistanceKm 
+                    {selectedCarInfo?.drivingDistanceKm || selectedCarInfo?.drivingDistanceKm === 0
                       ? `${selectedCarInfo?.drivingDistanceKm} m`
                       : "data Looading"}
                   </td>
