@@ -264,7 +264,7 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
 
     // zoom 컨트롤러 생성
     const zoomControl = new kakao.maps.ZoomControl();
-    mapInstance.current.addControl(zoomControl, kakao.maps.ControlPosition.BOTTOMRIGHT);
+    mapInstance.current.addControl(zoomControl, kakao.maps.ControlPosition.BOTTOMLEFT);
     zoomControlRef.current = zoomControl;
 
     return () => {
