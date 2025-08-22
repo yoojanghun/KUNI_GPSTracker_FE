@@ -561,7 +561,21 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
       activeMarkerRef.current = selectedMarker;
       activeMarkerImgRef.current = style.defaultMarkerImg;
     }
-  }, [selectedCar])
+
+    let overlay = overlayRef.current[selectedCar.vehicleNumber];
+    if(overlay) {
+      overlay.setContent(`
+        <div class="${styles["overlay-bubble"]}">
+          <div class="px-3 py-1 text-center flex flex-col items-center">
+            <div class="font-bold">${selectedCar.vehicleNumber}</div>
+              <div class="font-bold my-1">${selectedCar.type}</div>
+              <div class="${style.bgColor} ${style.textColor} w-15 p-1 font-bold rounded-sm text-center">
+                ${style.statusName}
+              </div>
+            </div>
+          </div>`);
+    }
+  }, [selectedCar, selectedCar?.status])
 
   useEffect(() => {
     visibleCarLocations.forEach(car => {
@@ -573,7 +587,7 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
       marker.setPosition(latLng);
       if (overlay) overlay.setPosition(latLng);
 
-      const prevStatus = markerStatusRef.current[car.vehicleNumber]?.status;
+      const prevStatus = markerStatusRef.current[car.vehicleNumber].status;
       if (prevStatus !== car.status) {
         markerStatusRef.current[car.vehicleNumber] = { status: car.status };
         markerStyleRef.current[car.vehicleNumber] = markerMap[car.status];
