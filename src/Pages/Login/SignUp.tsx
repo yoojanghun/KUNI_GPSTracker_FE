@@ -1,11 +1,16 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { UserRound, Lock, Mail, TriangleAlert, CircleCheckBig } from "lucide-react";
+import {
+  UserRound,
+  Lock,
+  Mail,
+  TriangleAlert,
+  CircleCheckBig,
+  RotateCcw,
+} from "lucide-react";
 import Illustrator from "../../assets/illustrator.png";
 import logo from "../../assets/logo.svg";
 import { useAuthStore } from "@/Store/Authorization";
@@ -17,6 +22,7 @@ export function SignUp() {
   const [password, setPassword] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [isValidName, setIsValidName] = useState<boolean>(false);
+  const [isDuplicateClicked, setIsDuplicateClicked] = useState<boolean>(false);
 
   // 전역 인증 스토어 상태와 액션
   const { isAuthLoading, setAuthError, signUp } = useAuthStore();
@@ -30,26 +36,26 @@ export function SignUp() {
 
   const checkDuplicated = async () => {
     // TODO: 실제 중복 확인 API 연동 필요 시 store에 위임
-    try{
-      const duplicated = await duplicate({id: username});
-      console.log("Duplicated: ",duplicated);
-      if(!duplicated.ok){
+    try {
+      const duplicated = await duplicate({ id: username });
+      console.log("Duplicated: ", duplicated);
+      if (!duplicated.ok) {
         setIsValidName(false);
+        setIsDuplicateClicked(false);
         toast("중복이거나 올바르지 않은 아이디입니다.", {
-      icon: <TriangleAlert/>
-    });
+          icon: <TriangleAlert />,
+        });
       } else {
         setIsValidName(true);
         toast("사용 가능한 아이디입니다.", {
-      icon: <CircleCheckBig/>
-    })
+          icon: <CircleCheckBig />,
+        });
+      }
+    } catch {
+      toast("중복 검증에 실패하였습니다. 다시 시도해 주세요", {
+        icon: <TriangleAlert />,
+      });
     }
-  }
-  catch{
-    toast("중복 검증에 실패하였습니다. 다시 시도해 주세요", {
-      icon: <TriangleAlert/>
-    })
-  }
   };
 
   const onSubmit = async (e: React.FormEvent) => {
@@ -58,16 +64,17 @@ export function SignUp() {
     try {
       const res = await signUp({ username, password, email });
       toast("회원가입에 성공하였습니다", {
-      icon: <CircleCheckBig/>
-    });
-    setUsername("");
-    setPassword("");
-    setEmail("");
-    setIsValidName(false);
+        icon: <CircleCheckBig />,
+      });
+      setUsername("");
+      setPassword("");
+      setEmail("");
+      setIsValidName(false);
     } catch {
       toast("회원가입에 실패하였습니다. 다시 시도해 주세요", {
-      icon: <TriangleAlert/>
-    })
+        icon: <TriangleAlert />,
+      });
+      setIsDuplicateClicked(false);
     }
   };
 
@@ -113,7 +120,7 @@ export function SignUp() {
                   <Link
                     to="/login"
                     className="font-semibold underline underline-offset-4"
-                    onClick={() => setAuthError('')}
+                    onClick={() => setAuthError("")}
                   >
                     로그인 하기
                   </Link>
@@ -123,25 +130,41 @@ export function SignUp() {
               <form className="space-y-4">
                 {/* 아이디 */}
                 <div className="space-y-2">
-                  <div className="relative">
+                  <div className="relative group">
                     <UserRound className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                    {isValidName && (
+                      <RotateCcw 
+                      className="cursor-pointer absolute right-27 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                      size={16}
+                      strokeWidth={3}
+                      color="#838383"
+                      onClick={() => {
+                        
+                        setIsValidName(false);
+                        setIsDuplicateClicked(false);
+                      }} />
+                    )}
                     <div className="flex gap-3">
                       <Input
                         id="username"
                         placeholder="아이디 입력"
                         autoComplete="username"
-                        className="pl-10 h-12"
+                        className="pl-10 h-12 peer"
                         value={username}
+                        disabled={isDuplicateClicked || isValidName}
                         onChange={(e) => setUsername(e.target.value)}
                       />
                       <Button
-                      type="button"
+                        type="button"
                         variant={"outline"}
-                        onClick={checkDuplicated}
+                        onClick={() => {
+                          setIsDuplicateClicked(true);
+                          checkDuplicated();
+                        }}
                         className="h-12 text-black hover:opacity-90"
-                        disabled={isValid}
+                        disabled={isValidName || isDuplicateClicked}
                       >
-                        {isValid ? "확인 완료" : "중복 확인"}
+                        {isValidName ? "확인 완료" : "중복 확인"}
                       </Button>
                     </div>
                   </div>
@@ -178,7 +201,6 @@ export function SignUp() {
                     />
                   </div>
                 </div>
-
 
                 <Button
                   type="submit"

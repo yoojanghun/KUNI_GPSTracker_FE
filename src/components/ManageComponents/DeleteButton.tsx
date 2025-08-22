@@ -77,6 +77,7 @@ export function DeleteButton() {
               deleteTimerRef.current = setTimeout(() => {
                 delMany.mutate(toDelete, {
                   onSuccess: () => {
+                    toast.dismiss();
                     toast(
                       toDeleteHidden > 0 ? (
                         <span>

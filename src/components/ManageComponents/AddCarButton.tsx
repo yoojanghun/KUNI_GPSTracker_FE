@@ -68,7 +68,7 @@ export function AddCarButton() {
                 >
                   {attemptedSubmit && !isvehicleNumberValid()
                     ? "차량 번호를 입력해주세요"
-                    : "차량 번호"}
+                    : "차량 번호 (하, 허, 호만 지원됨)"}
                 </Label>
                 <Input
                   id="vehicleNumber"
@@ -95,7 +95,7 @@ export function AddCarButton() {
                 >
                   {attemptedSubmit && !isModelNameValid()
                     ? "차량명을 입력해주세요"
-                    : "차량명 (현재는 FERARRI, PORSCHE, MERCEDES만 지원됨)"}
+                    : "차량명 (현재는 FERRARI, PORSCHE, MERCEDES만 지원됨)"}
                 </Label>
                 <Input
                   id="vehicleName"
@@ -134,11 +134,20 @@ export function AddCarButton() {
                         setVehicleName("");
                         setAttemptedSubmit(false);
                       },
-                      onError: () => {
-                        toast(
-                          <span>서버 오류로 인해 차량 등록에 실패하였습니다.</span>,
+                      onError: (error) => {
+                        if (error.status === 400) {
+                          toast(
+                          <span>입력값이 유효하지 않습니다.</span>,
                           { icon: <CircleX /> }
                         );
+                        }
+                        else {
+                          toast(
+                          <span>서버 오류로 인해 차량 등록에 실패했습니다.</span>,
+                          { icon: <CircleX /> }
+                        );
+                        }
+                        
                       },
                     }
                   );
