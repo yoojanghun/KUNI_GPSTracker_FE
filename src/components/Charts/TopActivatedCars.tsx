@@ -11,6 +11,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { useInView } from "react-intersection-observer";
 import { type TopActivatedCar, fetchTopActivatedCars } from '@/Api/Home/TopActivatedCars';
+import { useMemo } from 'react';
 
 function TopActivatedCarsChart() {
 
@@ -24,6 +25,23 @@ function TopActivatedCarsChart() {
     refetchInterval: inView ? 15_000 : false,
     placeholderData: (prev) => prev
   })
+
+  const maxCarNum = useMemo<number>(() => {
+    if(!data) return 0;
+    let maxNum = 0;
+    data.forEach(car => {
+      if(car.driveCount > maxNum) {
+        maxNum = car.driveCount;
+      }
+    });
+    if(maxNum % 4 === 0) {
+      return maxNum;
+    }
+    else {
+      maxNum += 4 - (maxNum % 4);
+      return maxNum;
+    }
+  }, [data]);
 
   return (
     <div ref={ref} className="w-full h-full [&_*:focus]:outline-none">
@@ -43,7 +61,7 @@ function TopActivatedCarsChart() {
           >
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="vehicleNumber" />
-            <YAxis domain={[0, 12]}
+            <YAxis domain={[0, Math.max(12, maxCarNum)]}
               tickFormatter={(num) => (Number(num) === 0 ? "" : String(num))}
             />
             <Tooltip cursor={false} />
