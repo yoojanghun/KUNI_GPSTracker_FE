@@ -357,25 +357,15 @@ function MapHome ({ maxLevel, minLevel }: MapTestProps) {
       totalClustererRef.current?.addMarkers(makeMarkers());
     }
     else {
-      if(!runningClustererRef.current || !notRunningClustererRef.current || !inspectedClustererRef.current) return;
-      const mapRef: Record<string, {clusterRef: kakao.maps.MarkerClusterer, statusName: string}> = {
-        "ACTIVE": {
-          clusterRef: runningClustererRef.current,
-          statusName: "ACTIVE"
-        },
-        "INACTIVE": {
-          clusterRef:notRunningClustererRef.current,
-          statusName: "INACTIVE"
-        },
-        "INSPECTING": {
-          clusterRef: inspectedClustererRef.current,
-          statusName: "INSPECTING"
-        }
+      if(!runningClustererRef.current || !notRunningClustererRef.current || 
+        !inspectedClustererRef.current) return;
+      const mapRef = {
+        "ACTIVE": runningClustererRef.current,
+        "INACTIVE": notRunningClustererRef.current,
+        "INSPECTING": inspectedClustererRef.current,
       }
-      const mapRefClusterRef = mapRef[carStatusBtn].clusterRef;
-      const mapRefStatusName = mapRef[carStatusBtn].statusName;
 
-      mapRefClusterRef.addMarkers(makeMarkers(mapRefStatusName));
+      mapRef[carStatusBtn].addMarkers(makeMarkers(carStatusBtn));
     }
   }, [allCarLocations, carStatusBtn])
 
