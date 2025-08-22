@@ -104,7 +104,7 @@ function Home() {
           </div>
           <Separator orientation="vertical" className="h-20 mx-6" />
           <div className="flex gap-4 min-w-[280px]">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 min-w-[300px]">
               <img className="w-15 h-15 mr-3" src={notWorking} alt="미운행 차량 아이콘" />
               <div>
                 <span className="text-4xl font-bold mr-3">{100 - percentage}%</span>
@@ -115,7 +115,7 @@ function Home() {
               </div>
             </div>
             <div className="flex flex-col gap-2">
-              <div className="flex items-center">
+              <div className="flex items-center min-w-[100px]">
                 <img className="w-8 h-8 mr-1" src={checkingIndicator} alt="점검중 차량 아이콘" />
                 <div>
                   <span className="font-bold mr-1">점검중인 차량</span>
@@ -170,11 +170,11 @@ function Home() {
           className={`flex-3 border box-border p-4 pt-2 h-[100%]`}
         >
           <div className="w-[100%] h-[9%] flex items-center justify-between">
-            <div className="flex items-center">
+            <div className="flex items-center min-w-[120px]">
               <MapPin className="w-7 h-7 mr-2" />
               <span className="font-bold text-xl">차량 현황</span>
             </div>
-            <div className="flex justify-around w-[75%]">
+            <div className="flex justify-around w-[75%] min-w-[370px]">
               <label className="flex items-center font-bold mr-1 min-w-[60px]">
                 <input
                   type="checkbox"
