@@ -616,26 +616,26 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
   }, [visibleCarLocations]);
 
   // 차량의 status가 carStatusOption의 값과 일치할 때만 overlay를 표시
-  useEffect(() => {
-    if(!selectedCar || carStatusOption === "전체" || !activeOverlayRef.current) return;
-    if(selectedCar.status !== carStatusOption) {
-      activeOverlayRef.current.setMap(null);
+  // useEffect(() => {
+  //   if(!selectedCar || carStatusOption === "전체" || !activeOverlayRef.current) return;
+  //   if(selectedCar.status !== carStatusOption) {
+  //     activeOverlayRef.current.setMap(null);
 
-      const marker = markersRef.current[selectedCar.vehicleNumber];
-      const style = markerStyleRef.current[selectedCar.vehicleNumber] ?? markerMap[selectedCar.status];
-      if (marker && style) {
-        marker.setImage(style.defaultMarkerImg);
-      } 
-      else if (activeMarkerRef.current && activeMarkerImgRef.current) {
-        activeMarkerRef.current.setImage(activeMarkerImgRef.current);
-      }
-      activeOverlayRef.current = null;
-      activeMarkerRef.current = null;
-      activeMarkerImgRef.current = null;
-      setSelectedCar(null);
-    }
+  //     const marker = markersRef.current[selectedCar.vehicleNumber];
+  //     const style = markerStyleRef.current[selectedCar.vehicleNumber] ?? markerMap[selectedCar.status];
+  //     if (marker && style) {
+  //       marker.setImage(style.defaultMarkerImg);
+  //     } 
+  //     else if (activeMarkerRef.current && activeMarkerImgRef.current) {
+  //       activeMarkerRef.current.setImage(activeMarkerImgRef.current);
+  //     }
+  //     activeOverlayRef.current = null;
+  //     activeMarkerRef.current = null;
+  //     activeMarkerImgRef.current = null;
+  //     setSelectedCar(null);
+  //   }
 
-  }, [carStatusOption, selectedCar]);
+  // }, [carStatusOption, selectedCar]);
 
   return (
     <div ref={mapContainerRef} style={{ width: '100%', height: '100%'}}/>
