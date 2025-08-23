@@ -10,7 +10,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 // 젠킨스에 등록된 프론트엔드 Git 레포지토리 주소를 입력해주세요.
-                git branch: 'develop', url: 'https://github.com/Kernel360/KUNI_GPSTracker_FE.git'
+                git branch: 'main', url: 'https://github.com/Kernel360/KUNI_GPSTracker_FE.git'
             }
         }
 
