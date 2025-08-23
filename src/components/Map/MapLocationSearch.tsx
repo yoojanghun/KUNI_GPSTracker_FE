@@ -81,10 +81,6 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
   }, [allCarLocations]);
 
   useEffect(() => {
-    console.log("전체 차량 gps 업데이트", allCarLocations);
-  }, [allCarLocations]);
-
-  useEffect(() => {
     const firstFetch = async () => {
       isBusy.current = true;
       try {
@@ -271,12 +267,6 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
     // 맵 모션이 끝났을 때(zoom_changed/idle) 마커 위치로 즉시 재정렬 후 다시 표시
     const resyncActiveOverlay = () => {
       if (!mapInstance.current || !activeMarkerRef.current || !activeOverlayRef.current) return;
-
-      // 마커가 클러스터러에 의해 맵에서 빠져 있으면(getMap() === null) 오버레이도 숨김
-      if (!activeMarkerRef.current.getMap()) {
-        activeOverlayRef.current.setMap(null);
-        return;
-      }
 
       // 마커 현재 좌표로 오버레이 위치 맞추고 다시 표시
       const pos = activeMarkerRef.current.getPosition();
