@@ -79,11 +79,7 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
   useEffect(() => {
     allCarsRef.current = allCarLocations;
   }, [allCarLocations]);
-
-  useEffect(() => {
-
-  }, [allCarLocations]);
-
+  
   useEffect(() => {
     const firstFetch = async () => {
       isBusy.current = true;
@@ -262,6 +258,28 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
     }
     kakao.maps.event.addListener(mapInstance.current, "dragend", preventDrag);
 
+    const hideActiveOverlay = () => {
+      if (activeOverlayRef.current) {
+        activeOverlayRef.current.setMap(null);
+      }
+    };
+
+    // 맵 모션이 끝났을 때(zoom_changed/idle) 마커 위치로 즉시 재정렬 후 다시 표시
+    const resyncActiveOverlay = () => {
+      if (!mapInstance.current || !activeMarkerRef.current || !activeOverlayRef.current) return;
+
+      // 마커 현재 좌표로 오버레이 위치 맞추고 다시 표시
+      const pos = activeMarkerRef.current.getPosition();
+      activeOverlayRef.current.setPosition(pos);
+      activeOverlayRef.current.setMap(mapInstance.current);
+    };
+
+    // 줌/드래그 시작~진행 중에는 숨기고, 끝나면 재정렬
+    kakao.maps.event.addListener(mapInstance.current, "dragstart", hideActiveOverlay);
+    kakao.maps.event.addListener(mapInstance.current, "center_changed", hideActiveOverlay);
+    kakao.maps.event.addListener(mapInstance.current, "zoom_changed", resyncActiveOverlay);
+    kakao.maps.event.addListener(mapInstance.current, "idle", resyncActiveOverlay);
+
     // zoom 컨트롤러 생성
     const zoomControl = new kakao.maps.ZoomControl();
     mapInstance.current.addControl(zoomControl, kakao.maps.ControlPosition.BOTTOMLEFT);
@@ -409,14 +427,14 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
                 setSelectedCar(null);
               }
               else {
-                newMarker.setImage(style.hoverMarkerImg);
-                newOverlay.setMap(mapInstance.current);
                 if(activeMarkerRef.current && prevMarkerImgRef.current) {
                   activeMarkerRef.current.setImage(prevMarkerImgRef.current);
                 }
                 if(activeOverlayRef.current) {
                   activeOverlayRef.current.setMap(null);
                 }
+                newMarker.setImage(style.hoverMarkerImg);
+                newOverlay.setMap(mapInstance.current);
                 activeMarkerRef.current = newMarker;
                 activeOverlayRef.current = newOverlay;
                 prevMarkerImgRef.current = style.defaultMarkerImg;

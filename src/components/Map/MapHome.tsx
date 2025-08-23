@@ -56,7 +56,6 @@ function MapHome ({ maxLevel, minLevel }: MapTestProps) {
       isBusy.current = true;
       try {
         await allCarsPolling();
-
       }
       catch(e) {
         console.error(e);

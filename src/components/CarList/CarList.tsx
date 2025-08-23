@@ -133,7 +133,6 @@ function CarList() {
       fetchSelectedCarStat(selectedCar.vehicleNumber)
         .then(car => {
           setSelectedCarInfo(car); 
-          
         })
         .catch(console.error);
     });
