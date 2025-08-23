@@ -81,7 +81,7 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
   }, [allCarLocations]);
 
   useEffect(() => {
-    console.log("전체 차량 gps 업데이트", allCarLocations);
+
   }, [allCarLocations]);
 
   useEffect(() => {

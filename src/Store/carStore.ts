@@ -61,12 +61,10 @@ export const useCarStore = create<CarStoreState>((set, get) => ({
   setTotalElement: (n) => set({ totalElement: n }),
 
   setVehicleName: (vehicleName) => {
-    console.log("vehicleName set: ", vehicleName);
     set({ vehicleName: vehicleName });
   },
 
   setStatus: (currentStatus: getCarListRequest["status"]) => {
-    console.log("status set: ", currentStatus);
     set({ status: currentStatus });
   },
 
@@ -85,7 +83,6 @@ export const useCarStore = create<CarStoreState>((set, get) => ({
   },
 
   setSelected: (ids) => {
-    console.log('[store] setSelected', { len: ids.length });
     set({ selected: new Set(ids) })
   },
 

@@ -107,7 +107,7 @@ useEffect(() => {
   // const cars = data?.content ?? [];
   // const totalPages = data?.totalPages ?? 0;
 
-  console.log(cars.map(c => c.carNumber));
+
 
   const handleSort = (key: "createDate" | "vehicleNumber" | "type" | "totalDist" | "status") => {
     if (sortKey === key) {
@@ -116,7 +116,7 @@ useEffect(() => {
       setSortKey(key);
       setSortDirection("ASC");
     }
-    console.log("current sort: ", )
+
   };
 
   if (isError) {

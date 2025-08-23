@@ -56,7 +56,7 @@ function MapHome ({ maxLevel, minLevel }: MapTestProps) {
       isBusy.current = true;
       try {
         await allCarsPolling();
-        console.log("전체 차량 gps");
+
       }
       catch(e) {
         console.error(e);

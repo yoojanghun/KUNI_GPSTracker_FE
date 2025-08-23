@@ -11,7 +11,6 @@ export const instance = ky.create({
   hooks: {
     afterResponse: [
       async (request, options, response) => {
-        console.log("응답 메세지:", response);
       },
       handleResponse,
     ],

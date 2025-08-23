@@ -50,11 +50,10 @@ export function Login() {
     try {
       // 전역 스토어가 API 호출과 토큰 저장을 처리
       await login(username, password);
-      console.log("로그인 성공");
+
 
       // 원래 가려던 경로(from)가 있으면 그쪽으로, 없으면 /home
       if (!isAuthLoading){
-        console.log("메인페이지 이동");
         const params = new URLSearchParams(location.search);
       const from = params.get("from") ?? "/";
       navigate(from, { replace: true });

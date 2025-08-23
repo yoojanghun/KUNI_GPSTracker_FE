@@ -107,7 +107,6 @@ function CarList() {
   // 위의 문제를 useCallback으로 해결
   useEffect(() => {
     totalCarLoc();
-    console.log("페이지네이션");
   }, [totalCarLoc]);
 
   useEffect(() => {
@@ -123,7 +122,7 @@ function CarList() {
     fetchSelectedCarStat(selectedCar.vehicleNumber)
       .then(car => {
         setSelectedCarInfo(car);
-        console.log("첫 번째 gps (한 차량)", car);})
+       })
       .catch(console.error);
   }, [selectedCar?.vehicleNumber]);
 
@@ -134,7 +133,7 @@ function CarList() {
       fetchSelectedCarStat(selectedCar.vehicleNumber)
         .then(car => {
           setSelectedCarInfo(car); 
-          console.log("gps는 이거에요 (한 차량): ", car.location);
+          
         })
         .catch(console.error);
     });
