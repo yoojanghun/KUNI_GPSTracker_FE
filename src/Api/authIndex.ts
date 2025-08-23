@@ -32,7 +32,7 @@ export const instance = ky.create({
     ],
     afterResponse: [
       async (request, options, response) => {
-        console.log("응답 메세지:", response);
+
       },
       handleResponse,
     ],

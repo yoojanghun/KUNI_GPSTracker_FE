@@ -79,7 +79,7 @@ function MapLocationSearch ({ maxLevel }: MapTestProps) {
   useEffect(() => {
     allCarsRef.current = allCarLocations;
   }, [allCarLocations]);
-
+  
   useEffect(() => {
     const firstFetch = async () => {
       isBusy.current = true;

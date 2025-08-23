@@ -45,18 +45,13 @@ export function useManageQuery(p: UseManageParams) {
       searchNonce: [prev[6], key[6]],
       changed: prev.some((v, i) => v !== key[i]),
     };
-    // 체크박스 토글 시 여기서 무엇이 바뀌는지 바로 보임
-    console.log("[useManageQuery key diff]", diff);
   }
   prevKeyRef.current = key;
 
   return useQuery({
     queryKey: key,
     queryFn: async () => {
-      console.log("[useManageQuery fetch start]", {
-        page: p.page, size: p.size, sort: p.sort,
-        vehicleName: p.vehicleName, status: p.status, searchNonce: p.searchNonce,
-      });
+     
       const res = await getCarList({
         page: p.page-1,
         size: p.size,
@@ -64,7 +59,7 @@ export function useManageQuery(p: UseManageParams) {
         vehicleName: p.vehicleName,
         status: p.status,
       });
-      console.log("[useManageQuery fetch done]", res);
+
       return res;
     },
     enabled: true,

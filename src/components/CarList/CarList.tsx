@@ -122,7 +122,7 @@ function CarList() {
     fetchSelectedCarStat(selectedCar.vehicleNumber)
       .then(car => {
         setSelectedCarInfo(car);
-        console.log("첫 번째 gps (한 차량)", car);})
+       })
       .catch(console.error);
   }, [selectedCar?.vehicleNumber]);
 

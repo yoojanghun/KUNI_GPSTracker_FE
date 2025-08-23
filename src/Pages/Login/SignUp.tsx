@@ -38,7 +38,6 @@ export function SignUp() {
     // TODO: 실제 중복 확인 API 연동 필요 시 store에 위임
     try {
       const duplicated = await duplicate({ id: username });
-      console.log("Duplicated: ", duplicated);
       if (!duplicated.ok) {
         setIsValidName(false);
         setIsDuplicateClicked(false);

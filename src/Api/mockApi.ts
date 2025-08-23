@@ -1,5 +1,10 @@
 import ky from 'ky';
-import { handleResponse } from './hooks/handleResponse';
+import { createHandleResponse } from './hooks/handleResponse';
+import { useAuthStore } from '@/Store/Authorization';
+
+const handleResponse = createHandleResponse(() => {
+  useAuthStore.getState().logout("expired");
+});
 
 export const instance = ky.create({
   prefixUrl: 'http://localhost:5173', // baseURL 설정
@@ -17,7 +22,7 @@ export const instance = ky.create({
     ],
      afterResponse: [
       (response) => { 
-      console.log("응답 메세지:", response);
+
       },
       handleResponse
     ]

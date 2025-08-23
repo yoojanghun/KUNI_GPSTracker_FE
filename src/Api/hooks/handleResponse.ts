@@ -21,9 +21,7 @@ export const createHandleResponse = (logoutFn: () => void): AfterResponseHook =>
       const errorData = (await response.json().catch(() => null)) as ErrorResponse | null;
       if (errorData) {
         const message = errorData?.message || "Unknown error";
-        console.log(
-          `request: ${request.body}, options: ${options.body}, response: ${response.body}, message: ${message}`
-        );
+
         throw response;
       }
     }

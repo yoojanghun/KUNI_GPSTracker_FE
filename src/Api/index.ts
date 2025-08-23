@@ -13,13 +13,13 @@ export const instance = ky.create({
   hooks: {
     beforeRequest: [
       async (request, options) => {
-        console.log("토큰 유효성 검사 수행");
+
         await handleRequest(request, options);
       }
     ],
      afterResponse: [
       async (request, options, response) => { 
-      console.log("응답 메세지:", response);
+
       },
       handleResponse
     ]
