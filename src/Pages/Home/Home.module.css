@@ -1,3 +1,27 @@
-.icon {
-    border-color: hsla(0, 0%, 0%, 0.2);
+/* carousel 만들기 */
+.embla { 
+    overflow: hidden; 
+    width: 100%;
+    height: 100%;
+}
+.embla__container { 
+    display: flex; 
+    width: 100%;
+    height: 100%;
+}
+.embla__slide {
+    flex: 0 0 100%;   /* 한 화면에 한 장 */
+    min-width: 0;     /* 내용이 넘칠 때 줄바꿈/축소 허용 */
+    width: 100%;
+    height: 100%;
+}
+
+/* button 위치 배열 */
+.prev-btn,
+.next-btn {
+    border-radius: 5px;
+}
+.prev-btn:hover,
+.next-btn:hover {
+    background-color: hsl(0, 0%, 90%);
 }
