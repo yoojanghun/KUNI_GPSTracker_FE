@@ -50,7 +50,7 @@ export const useVisibleCarLocationStore = create<visibleCarLocations>((set) => (
     visibleCarsPolling: (vehicleNumbers) => {
         const getStat = () => {
             fetchMapCarLocation(vehicleNumbers)
-                .then(carLoc => {console.log(carLoc); set({visibleCarLocations: carLoc});})
+                .then(carLoc => { set({visibleCarLocations: carLoc});})
                 .catch(error => console.error(error));
         }
         getStat();
