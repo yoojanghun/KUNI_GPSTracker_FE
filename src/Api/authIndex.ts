@@ -15,7 +15,6 @@ export const instance = ky.create({
 
         const token = useAuthStore.getState().token;
 
-        console.log("token: ", token);
 
         if (token) {
           const validate = await validateToken({Authorization: token});

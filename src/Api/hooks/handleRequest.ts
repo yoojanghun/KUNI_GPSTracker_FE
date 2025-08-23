@@ -9,7 +9,7 @@ export const handleRequest: BeforeRequestHook = async (request) => {
   const token = useAuthStore.getState().token;
   const setUserId = useAuthStore.getState().setUserId;
 
-  console.log("token: ", token);
+
 
   if (token) {
     console.log("validate 요청 시작");
